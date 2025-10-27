@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+echo "📤 Post-push hook: Push completed successfully!"
+
+# Show current Git user for verification
+echo "👤 Current Git user after push:"
+git config user.name
+git config user.email
+
+# Show the last commit info
+echo "📋 Last commit info:"
+git log -1 --pretty=format:"  Commit: %h%nAuthor: %an <%ae>%nDate: %ad%nMessage: %s%n" --date=short
+
+echo "✅ Post-push verification complete!"
