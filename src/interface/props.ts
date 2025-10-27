@@ -1,5 +1,5 @@
-import type { TimetableDatabase } from "./database";
-import type { CellContent, MergeInfo } from "./types";
+import type { ITimetableDatabase } from "./database";
+import type { ICellContent, IMergeInfo } from "./types";
 
 export interface GridHeaderProps {
   time: string;
@@ -43,10 +43,10 @@ export interface GridCellProps {
   cellKey: string;
   isSelected: boolean;
   tempCellText: string;
-  mergeInfo?: MergeInfo;
+  mergeInfo?: IMergeInfo;
   isColumnHovered: boolean;
   hiddenCells: Set<string>;
-  cellContent?: CellContent;
+  cellContent?: ICellContent;
   editingCell: string | null;
   onSaveCellEdit: () => void;
   onCancelCellEdit: () => void;
@@ -63,27 +63,27 @@ export interface GridCellProps {
 export interface TemplateManagerProps {
   columnCount: number;
   hiddenCells: Set<string>;
-  database: TimetableDatabase;
+  database: ITimetableDatabase;
   defaultSlotDuration: number;
   mergedCells: Map<string, any>;
-  cellContents: Map<string, CellContent>;
+  cellContents: Map<string, ICellContent>;
   columnDurations: { [key: number]: number };
-  onDatabaseUpdate: (database: TimetableDatabase) => void;
+  onDatabaseUpdate: (database: ITimetableDatabase) => void;
   onApplyTemplate: (template: ReturnType<typeof applyTemplate>) => void;
 }
 
 export interface ClassTimetableProps {
   dayLabels: string[];
   timeLabels: string[];
-  classData: TimetableClass;
-  cellContents: Map<string, CellContent>;
+  classData: ITimetableClass;
+  cellContents: Map<string, ICellContent>;
   onGenerateTimetable: (classId: string) => void;
   onExportClassPDF?: (classId: string, className: string) => void;
 }
 
 export interface DatabaseManagerProps {
-  database: TimetableDatabase;
+  database: ITimetableDatabase;
   onLoadSampleData?: () => void;
   onGenerateTimetable: () => void;
-  onDatabaseUpdate: (database: TimetableDatabase) => void;
+  onDatabaseUpdate: (database: ITimetableDatabase) => void;
 }
