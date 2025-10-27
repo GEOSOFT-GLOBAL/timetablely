@@ -1,14 +1,14 @@
 #!/usr/bin/env sh
 
-echo "🚀 Pre-push hook: Switching Git user account..."
+echo "🚀 Pre-commit hook: Switching Git user account..."
 
 # Run the Git user switching script
-yarn config
+yarn run config
 
 # Check if the user switch was successful
 if [ $? -eq 0 ]; then
-    echo "✅ Git user switched successfully, proceeding with push..."
+    echo "✅ Git user switched successfully, proceeding with commit..."
 else
-    echo "❌ Failed to switch Git user, aborting push..."
+    echo "❌ Failed to switch Git user, aborting commit..."
     exit 1
 fi
