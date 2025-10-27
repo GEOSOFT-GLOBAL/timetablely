@@ -1,10 +1,7 @@
+import type { GridHeaderProps } from "@/interface/props";
 import * as React from "react";
 
-interface GridHeaderProps {
-  propName?: string;
-}
-
-const GridHeader: React.FC<GridHeaderProps> = ({ propName }) => {
+const GridHeader: React.FC<GridHeaderProps> = ({}) => {
   return <div></div>;
 };
 
