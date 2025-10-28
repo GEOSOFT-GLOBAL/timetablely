@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { getCellKey } from "@/lib/temputils";
-import type { IGridActions, IGridState, IMergeInfo } from "@/interface/types";
+import { canMergeCells, getCellKey } from "@/lib/temputils";
+import type {
+  ICellContent,
+  IGridActions,
+  IGridState,
+  IMergeInfo,
+} from "@/interface/types";
 
 export const useGridState = (): IGridState & IGridActions => {
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
@@ -269,7 +274,7 @@ export const useGridState = (): IGridState & IGridActions => {
   const saveCellEdit = () => {
     if (editingCell) {
       const currentContent = cellContents.get(editingCell);
-      const newContent: CellContent = {
+      const newContent: ICellContent = {
         text: tempCellText,
         isVertical: currentContent?.isVertical || false,
         alignment: currentContent?.alignment || "center",
@@ -287,5 +292,55 @@ export const useGridState = (): IGridState & IGridActions => {
     }
     setEditingCell(null);
     setTempCellText("");
+  };
+
+  const cancelCellEdit = () => {
+    setEditingCell(null);
+    setTempCellText("");
+  };
+
+  const toggleCellVertical = (cellKey: string) => {
+    const currentContent = cellContents.get(cellKey);
+    const newContent: ICellContent = {
+      text: currentContent?.text || "",
+      isVertical: !currentContent?.isVertical,
+      alignment: currentContent?.alignment || "center",
+      className: currentContent?.className, // Preserve the class ID
+    };
+
+    const newCellContents = new Map(cellContents);
+    newCellContents.set(cellKey, newContent);
+    setCellContents(newCellContents);
+  };
+
+  const setCellAlignment = (
+    cellKey: string,
+    alignment: "left" | "center" | "right",
+  ) => {
+    const currentContent = cellContents.get(cellKey);
+    const newContent: ICellContent = {
+      text: currentContent?.text || "",
+      isVertical: currentContent?.isVertical || false,
+      alignment: alignment,
+      className: currentContent?.className, // Preserve the class ID
+    };
+
+    const newCellContents = new Map(cellContents);
+    newCellContents.set(cellKey, newContent);
+    setCellContents(newCellContents);
+  };
+
+  const setAllCellContents = (newCellContents: Map<string, ICellContent>) => {
+    // This function already properly handles the className property
+    // as it replaces the entire cellContents map
+    setCellContents(newCellContents);
+  };
+
+  const setAllMergedCells = (newMergedCells: Map<string, any>) => {
+    setMergedCells(newMergedCells);
+  };
+
+  const setAllHiddenCells = (newHiddenCells: Set<string>) => {
+    setHiddenCells(newHiddenCells);
   };
 };
