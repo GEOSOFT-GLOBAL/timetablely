@@ -204,4 +204,88 @@ export const useGridState = (): IGridState & IGridActions => {
     setColumnDurations(newColumnDurations);
     setOpenPopover(null);
   };
+
+  const startEditingDuration = (columnIndex: number) => {
+    setEditingDuration(columnIndex);
+    const currentDuration = columnDurations[columnIndex] || defaultSlotDuration;
+    setTempDuration(currentDuration.toString());
+    setOpenPopover(null);
+  };
+
+  const saveDurationEdit = () => {
+    if (editingDuration !== null) {
+      const newDuration = parseInt(tempDuration);
+      if (newDuration > 0 && newDuration <= 480) {
+        setColumnDurations((prev) => ({
+          ...prev,
+          [editingDuration]: newDuration,
+        }));
+      }
+    }
+    setEditingDuration(null);
+    setTempDuration("");
+  };
+
+  const cancelDurationEdit = () => {
+    setEditingDuration(null);
+    setTempDuration("");
+  };
+
+  const saveDefaultDurationEdit = () => {
+    const newDuration = parseInt(tempDefaultDuration);
+    if (newDuration > 0 && newDuration <= 480) {
+      setDefaultSlotDuration(newDuration);
+    }
+    setEditingDefaultDuration(false);
+    setTempDefaultDuration(defaultSlotDuration.toString());
+  };
+
+  const cancelDefaultDurationEdit = () => {
+    setEditingDefaultDuration(false);
+    setTempDefaultDuration(defaultSlotDuration.toString());
+  };
+
+  const resetGrid = () => {
+    setSelectedCells(new Set());
+    setMergedCells(new Map());
+    setHiddenCells(new Set());
+    setColumnCount(12);
+    setColumnDurations({});
+    setEditingDuration(null);
+    setTempDuration("");
+    setOpenPopover(null);
+    setCellContents(new Map());
+    setEditingCell(null);
+    setTempCellText("");
+  };
+
+  const startEditingCell = (cellKey: string) => {
+    const currentContent = cellContents.get(cellKey);
+    setEditingCell(cellKey);
+    setTempCellText(currentContent?.text || "");
+    setSelectedCells(new Set()); // Clear selections when editing
+  };
+
+  const saveCellEdit = () => {
+    if (editingCell) {
+      const currentContent = cellContents.get(editingCell);
+      const newContent: CellContent = {
+        text: tempCellText,
+        isVertical: currentContent?.isVertical || false,
+        alignment: currentContent?.alignment || "center",
+        className: currentContent?.className, // Preserve the class ID
+      };
+
+      const newCellContents = new Map(cellContents);
+      if (tempCellText.trim()) {
+        newCellContents.set(editingCell, newContent);
+      } else {
+        newCellContents.delete(editingCell);
+      }
+
+      setCellContents(newCellContents);
+    }
+    setEditingCell(null);
+    setTempCellText("");
+  };
 };
