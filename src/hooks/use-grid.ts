@@ -24,7 +24,7 @@ export const useGridState = (): IGridState & IGridActions => {
   const [columnDurations, setColumnDurations] = useState<{
     [key: number]: number;
   }>({});
-  const [cellContents, setCellContents] = useState<Map<string, CellContent>>(
+  const [cellContents, setCellContents] = useState<Map<string, ICellContent>>(
     new Map(),
   );
   const [editingCell, setEditingCell] = useState<string | null>(null);
@@ -342,5 +342,51 @@ export const useGridState = (): IGridState & IGridActions => {
 
   const setAllHiddenCells = (newHiddenCells: Set<string>) => {
     setHiddenCells(newHiddenCells);
+  };
+
+  return {
+    // State
+    selectedCells,
+    mergedCells,
+    hiddenCells,
+    columnCount,
+    hoveredColumn,
+    openPopover,
+    editingDuration,
+    tempDuration,
+    defaultSlotDuration,
+    editingDefaultDuration,
+    tempDefaultDuration,
+    columnDurations,
+    cellContents,
+    editingCell,
+    tempCellText,
+    // Actions
+    handleCellClick,
+    handleCellDoubleClick,
+    mergeCells,
+    addColumnAfter,
+    deleteColumn,
+    startEditingDuration,
+    saveDurationEdit,
+    cancelDurationEdit,
+    saveDefaultDurationEdit,
+    cancelDefaultDurationEdit,
+    resetGrid,
+    setHoveredColumn,
+    setOpenPopover,
+    // Additional setters needed by App component
+    setTempDuration,
+    setTempDefaultDuration,
+    setEditingDefaultDuration,
+    startEditingCell,
+    saveCellEdit,
+    cancelCellEdit,
+    setTempCellText,
+    toggleCellVertical,
+    setCellAlignment,
+    setAllCellContents,
+    setAllMergedCells,
+    setAllHiddenCells,
   };
 };
