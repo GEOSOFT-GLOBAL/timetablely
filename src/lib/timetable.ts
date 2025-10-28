@@ -1,4 +1,8 @@
-import type { ITimetableEntry } from "@/interface/database";
+import type {
+  ICourse,
+  ITimetableDatabase,
+  ITimetableEntry,
+} from "@/interface/database";
 import type { ICellContent } from "@/interface/types";
 import { generateTimeLabels } from "./temputils";
 
@@ -80,36 +84,36 @@ export const isCellBlocked = (
 };
 
 export const generateAutomatedTimetable = (
-  database: TimetableDatabase,
+  database: ITimetableDatabase,
   columnCount: number,
-  existingCellContents: Map<string, CellContent>,
+  existingCellContents: Map<string, ICellContent>,
   hiddenCells: Set<string>,
   selectedClassId?: string,
-): Map<string, CellContent> => {
+): Map<string, ICellContent> => {
   const newCellContents = new Map(existingCellContents);
   const {
-    teachers,
-    subjects,
-    classes,
+    tutors,
+    courses,
+    sessions,
     blockedTexts = defaultBlockedTexts,
   } = database;
 
   // Filter subjects based on selected class if provided
-  let classSubjects = subjects;
+  let classSubjects = courses;
   let className = "";
 
   if (selectedClassId) {
-    const selectedClass = classes.find((c) => c.id === selectedClassId);
+    const selectedClass = sessions.find((c) => c.id === selectedClassId);
     if (selectedClass) {
       className = selectedClass.name;
-      classSubjects = subjects.filter((subject) =>
+      classSubjects = courses.filter((subject) =>
         selectedClass.subjects.includes(subject.id),
       );
     }
   }
 
   // Create a schedule grid (5 days × columnCount slots)
-  const schedule: (Subject | null)[][] = Array(5)
+  const schedule: (ICourse | null)[][] = Array(5)
     .fill(null)
     .map(() => Array(columnCount).fill(null));
 
@@ -138,13 +142,13 @@ export const generateAutomatedTimetable = (
 
   // Track teacher assignments per day
   const teacherDailyCount: { [teacherId: string]: number[] } = {};
-  teachers.forEach((teacher) => {
+  tutors.forEach((teacher) => {
     teacherDailyCount[teacher.id] = Array(5).fill(0);
   });
 
   // Assign subjects to schedule
   for (const subject of sortedSubjects) {
-    const teacher = teachers.find((t) => t.id === subject.teacherId);
+    const teacher = tutors.find((t) => t.id === subject.teacherId);
     if (!teacher) continue;
 
     let periodsAssigned = 0;
@@ -227,7 +231,7 @@ export const generateAutomatedTimetable = (
             attemptsToFindSubject < sortedSubjects.length
           ) {
             const subject = sortedSubjects[subjectIndex];
-            const teacher = teachers.find((t) => t.id === subject.teacherId);
+            const teacher = tutors.find((t) => t.id === subject.teacherId);
 
             if (teacher) {
               const cellKey = `${row}-${col}`;
@@ -261,7 +265,7 @@ export const generateAutomatedTimetable = (
       const subject = schedule[row][col];
 
       if (subject && typeof subject !== "string") {
-        const teacher = teachers.find((t) => t.id === subject.teacherId);
+        const teacher = tutors.find((t) => t.id === subject.teacherId);
         let text = teacher
           ? `${subject.name}\n(${teacher.name})`
           : subject.name;
@@ -282,4 +286,30 @@ export const generateAutomatedTimetable = (
   }
 
   return newCellContents;
+};
+
+export const logTimetableData = (entries: ITimetableEntry[]): void => {
+  console.group("📅 Timetable Data Export");
+
+  console.log("📊 Summary:");
+  console.log(`Total entries: ${entries.length}`);
+  console.log(
+    `Entries with content: ${entries.filter((e) => e.customText).length}`,
+  );
+
+  console.log("\n📋 Detailed Data:");
+  console.table(
+    entries.map((entry) => ({
+      Day: entry.day,
+      "Time Slot": entry.timeSlot,
+      Content: entry.customText || "(empty)",
+      Position: `Row ${entry.row}, Col ${entry.col}`,
+      "Cell Key": entry.cellKey,
+    })),
+  );
+
+  console.log("\n🗂️ Raw Data (for export):");
+  console.log(JSON.stringify(entries, null, 2));
+
+  console.groupEnd();
 };
