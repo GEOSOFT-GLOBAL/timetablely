@@ -1,3 +1,4 @@
+import SectionHeader from "@/components/section-header";
 import * as React from "react";
 
 interface DashboardProps {
@@ -5,7 +6,11 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ propName }) => {
-  return <div></div>;
+  return (
+    <div className="w-full items-center flex">
+      <SectionHeader />
+    </div>
+  );
 };
 
 export default Dashboard;
