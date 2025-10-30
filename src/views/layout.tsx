@@ -33,7 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ propName }) => {
                 <div className="px-4 lg:px-6 gap-4 h-full w-full">
                   <Dashboard />
                 </div>
-                <div className="flex w-full">
+                <div className="flex w-full gap-2 px-6">
                   <div className="w-3/4">
                     <TimeTable />
                   </div>

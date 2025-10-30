@@ -1,12 +1,14 @@
 import * as React from "react";
 
 interface TimetableControlsProps {
-  handleGenerateAutomatedTimetableWithAlert: () => void;
-  handleClearTimetable: () => void;
-  handleExportPDF: () => void;
-  databaseClasses: Array<{ id: string; name: string }>;
+  handleGenerateAutomatedTimetableWithAlert?: () => void;
+  handleClearTimetable?: () => void;
+  handleExportPDF?: () => void;
+  databaseClasses?: Array<{ id: string; name: string }>;
   expandedClasses: Record<string, boolean>;
-  setExpandedClasses: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  setExpandedClasses: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
 }
 
 const TimetableControls: React.FC<TimetableControlsProps> = ({
@@ -40,13 +42,13 @@ const TimetableControls: React.FC<TimetableControlsProps> = ({
         </button>
       </div>
 
-      {databaseClasses.length > 0 && (
+      {databaseClasses && databaseClasses?.length > 0 && (
         <div className="flex items-center gap-2 mt-2">
           <span className="font-medium">Toggle class timetables:</span>
           {databaseClasses.map((cls) => (
             <button
               key={cls.id}
-              className={`px-3 py-1 rounded text-sm ${expandedClasses[cls.id] ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"}`}
+              className={`px-3 py-1 rounded text-sm ${expandedClasses![cls.id] ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"}`}
               onClick={() =>
                 setExpandedClasses((prev) => ({
                   ...prev,
