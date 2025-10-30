@@ -8,6 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useGridState } from "@/hooks/use-grid";
+import { useDatabaseStore } from "@/store/databaseStore";
+import type { ITimetableDatabase } from "@/interface/database";
+import { defaultBlockedTexts } from "@/lib/timetable";
+import { generateTimeLabels } from "@/lib/temputils";
 
 interface TimeTableProps {
   propName?: string;
@@ -88,6 +93,76 @@ const scheduleData: Record<string, Record<string, string>> = {
 };
 
 const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
+  const gridState = useGridState();
+  const { database, setDatabase } = useDatabaseStore();
+
+  const {
+    selectedCells,
+    mergedCells,
+    hiddenCells,
+    columnCount,
+    hoveredColumn,
+    openPopover,
+    editingDuration,
+    tempDuration,
+    defaultSlotDuration,
+    editingDefaultDuration,
+    tempDefaultDuration,
+    columnDurations,
+    cellContents,
+    editingCell,
+    tempCellText,
+    handleCellClick,
+    handleCellDoubleClick,
+    mergeCells,
+    addColumnAfter,
+    deleteColumn,
+    startEditingDuration,
+    saveDurationEdit,
+    cancelDurationEdit,
+    saveDefaultDurationEdit,
+    cancelDefaultDurationEdit,
+    resetGrid,
+    setHoveredColumn,
+    setOpenPopover,
+    setTempCellText,
+    toggleCellVertical,
+    setCellAlignment,
+    saveCellEdit,
+    cancelCellEdit,
+  } = gridState;
+
+  const timeLabels = generateTimeLabels(
+    columnCount,
+    columnDurations,
+    defaultSlotDuration,
+  );
+
+  const handleDefaultDurationKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") saveDefaultDurationEdit();
+    if (e.key === "Escape") cancelDefaultDurationEdit();
+  };
+
+  const handleDurationKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") saveDurationEdit();
+    if (e.key === "Escape") cancelDurationEdit();
+  };
+
+  const startEditingDefaultDuration = () => {
+    gridState.setEditingDefaultDuration(true);
+    gridState.setTempDefaultDuration(defaultSlotDuration.toString());
+  };
+
+  const [expandedClasses, setExpandedClasses] = React.useState<{
+    [key: string]: boolean;
+  }>({});
+
+  // Function to clear the timetable
+  const handleClearTimetable = () => {
+    gridState.setAllCellContents(new Map());
+    alert("Timetable cleared!");
+  };
+
   return (
     <div className="rounded-lg border shadow-lg overflow-hidden">
       <div className="bg-primary text-primary-foreground font-bold py-3 px-4 text-center">
