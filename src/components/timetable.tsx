@@ -11,7 +11,10 @@ import {
 import { useGridState } from "@/hooks/use-grid";
 import { useDatabaseStore } from "@/store/databaseStore";
 import type { ITimetableDatabase } from "@/interface/database";
-import { defaultBlockedTexts } from "@/lib/timetable";
+import {
+  defaultBlockedTexts,
+  generateAutomatedTimetable,
+} from "@/lib/timetable";
 import { generateTimeLabels } from "@/lib/temputils";
 
 interface TimeTableProps {
@@ -161,6 +164,66 @@ const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
   const handleClearTimetable = () => {
     gridState.setAllCellContents(new Map());
     alert("Timetable cleared!");
+  };
+
+  const handleGenerateAutomatedTimetable = (classId?: string) => {
+    if (database.courses.length === 0) {
+      alert("Please add subjects to the database first.");
+      return;
+    }
+
+    const newCellContents = generateAutomatedTimetable(
+      database,
+      columnCount,
+      cellContents,
+      hiddenCells,
+      classId,
+    );
+
+    gridState.setAllCellContents(newCellContents);
+
+    // Get the number of subjects for the selected class
+    let subjectsCount = database.courses.length;
+    let periodsCount = database.courses.reduce(
+      (sum, s) => sum + s.periodsPerWeek,
+      0,
+    );
+
+    if (classId) {
+      const selectedClass = database.sessions.find((c) => c.id === classId);
+      if (selectedClass) {
+        const classSubjects = database.courses.filter((s) =>
+          selectedClass.subjects.includes(s.id),
+        );
+        subjectsCount = classSubjects.length;
+        periodsCount = classSubjects.reduce(
+          (sum, s) => sum + s.periodsPerWeek,
+          0,
+        );
+      }
+    }
+  };
+
+  const handleApplyTemplate = (
+    templateResult: ReturnType<typeof applyTemplate>,
+  ) => {
+    gridState.setAllCellContents(templateResult.cellContents);
+
+    // Update merged and hidden cells if available in the template
+    if (templateResult.mergedCells) {
+      gridState.setAllMergedCells(templateResult.mergedCells);
+    }
+
+    if (templateResult.hiddenCells) {
+      gridState.setAllHiddenCells(templateResult.hiddenCells);
+    }
+
+    // Update grid state with template settings
+    // Note: This would require additional hooks in useGridState to update these values
+    // For now, we'll show an alert that some settings might need manual adjustment
+    alert(
+      "Template applied! Note that column count and durations may need manual adjustment.",
+    );
   };
 
   return (
