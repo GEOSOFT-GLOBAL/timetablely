@@ -16,6 +16,7 @@ import {
   generateAutomatedTimetable,
 } from "@/lib/timetable";
 import { generateTimeLabels } from "@/lib/temputils";
+import type { applyTemplate } from "@/lib/template";
 
 interface TimeTableProps {
   propName?: string;
@@ -223,6 +224,35 @@ const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
     // For now, we'll show an alert that some settings might need manual adjustment
     alert(
       "Template applied! Note that column count and durations may need manual adjustment.",
+    );
+  };
+
+  const handleGenerateAutomatedTimetableWithAlert = (classId?: string) => {
+    handleGenerateAutomatedTimetable(classId);
+
+    // Get the number of subjects for the selected class
+    let subjectsCount = database.courses.length;
+    let periodsCount = database.courses.reduce(
+      (sum, s) => sum + s.periodsPerWeek,
+      0,
+    );
+
+    if (classId) {
+      const selectedClass = database.sessions.find((c) => c.id === classId);
+      if (selectedClass) {
+        const classSubjects = database.courses.filter((s) =>
+          selectedClass.subjects.includes(s.id),
+        );
+        subjectsCount = classSubjects.length;
+        periodsCount = classSubjects.reduce(
+          (sum, s) => sum + s.periodsPerWeek,
+          0,
+        );
+      }
+    }
+
+    alert(
+      `Timetable generated! Added ${periodsCount} periods across ${subjectsCount} subjects.`,
     );
   };
 

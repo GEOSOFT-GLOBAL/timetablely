@@ -126,3 +126,34 @@ export const applyTemplate = (
     hiddenCells,
   };
 };
+
+export const deleteTemplate = (
+  templateId: string,
+  database: ITimetableDatabase,
+): ITimetableDatabase => {
+  // Create a copy of the database
+  const updatedDatabase = { ...database };
+
+  // Remove template if it exists
+  if (updatedDatabase.templates) {
+    updatedDatabase.templates = updatedDatabase.templates.filter(
+      (t) => t.id !== templateId,
+    );
+  }
+
+  return updatedDatabase;
+};
+
+export const getTemplates = (
+  database: ITimetableDatabase,
+): ITimetableTemplate[] => {
+  return database.templates || [];
+};
+
+// Get template by ID
+export const getTemplateById = (
+  templateId: string,
+  database: ITimetableDatabase,
+): ITimetableTemplate | undefined => {
+  return database.templates?.find((t) => t.id === templateId);
+};
