@@ -17,6 +17,8 @@ import {
 } from "@/lib/timetable";
 import { generateTimeLabels } from "@/lib/temputils";
 import type { applyTemplate } from "@/lib/template";
+import GridCell from "./grid-cell";
+import GridHeader from "./grid-header";
 
 interface TimeTableProps {
   propName?: string;
@@ -255,6 +257,69 @@ const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
       `Timetable generated! Added ${periodsCount} periods across ${subjectsCount} subjects.`,
     );
   };
+
+  const renderCell = (row: number, col: number, classId?: string) => {
+    const cellKey = `${row}-${col}`;
+    const isSelected = selectedCells.has(cellKey);
+    const mergeInfo = mergedCells.get(cellKey);
+    const isColumnHovered = hoveredColumn === col;
+    let cellContent = cellContents.get(cellKey);
+
+    // Filter cell content based on class ID if provided
+    if (classId && cellContent) {
+      // Only show content for this specific class
+      if (cellContent.className && cellContent.className !== classId) {
+        cellContent = undefined;
+      }
+    }
+
+    return (
+      <GridCell
+        key={cellKey}
+        row={row}
+        col={col}
+        cellKey={cellKey}
+        isSelected={isSelected}
+        isColumnHovered={isColumnHovered}
+        mergeInfo={mergeInfo}
+        hiddenCells={hiddenCells}
+        cellContent={cellContent}
+        editingCell={editingCell}
+        tempCellText={tempCellText}
+        onCellClick={handleCellClick}
+        onCellDoubleClick={handleCellDoubleClick}
+        onTempCellTextChange={setTempCellText}
+        onSaveCellEdit={saveCellEdit}
+        onCancelCellEdit={cancelCellEdit}
+        onToggleCellVertical={toggleCellVertical}
+        onSetCellAlignment={setCellAlignment}
+      />
+    );
+  };
+
+  const renderHeader = (time: string, index: number) => (
+    <GridHeader
+      key={index}
+      time={time}
+      index={index}
+      hoveredColumn={hoveredColumn}
+      editingDuration={editingDuration}
+      openPopover={openPopover}
+      tempDuration={tempDuration}
+      columnCount={columnCount}
+      onMouseEnter={() => setHoveredColumn(index)}
+      onMouseLeave={() => setHoveredColumn(null)}
+      onTempDurationChange={gridState.setTempDuration}
+      onKeyDown={handleDurationKeyDown}
+      onBlur={saveDurationEdit}
+      onOpenPopoverChange={(open: boolean) =>
+        setOpenPopover(open ? index : null)
+      }
+      onStartEditingDuration={() => startEditingDuration(index)}
+      onAddColumnAfter={() => addColumnAfter(index)}
+      onDeleteColumn={() => deleteColumn(index)}
+    />
+  );
 
   return (
     <div className="rounded-lg border shadow-lg overflow-hidden">
