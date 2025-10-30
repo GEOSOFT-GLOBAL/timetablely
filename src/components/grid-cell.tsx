@@ -92,7 +92,7 @@ const GridCell: React.FC<GridCellProps> = ({
                 }}
               >
                 <div
-                  className="block break-words origin-center"
+                  className="block wrap-break-words origin-center"
                   style={{
                     maxWidth: cellContent.isVertical ? "20px" : "100%",
                     lineHeight: "1.2",

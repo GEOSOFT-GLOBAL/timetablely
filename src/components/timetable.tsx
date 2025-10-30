@@ -11,10 +11,7 @@ import {
 import { useGridState } from "@/hooks/use-grid";
 import { useDatabaseStore } from "@/store/databaseStore";
 import type { ITimetableDatabase } from "@/interface/database";
-import {
-  defaultBlockedTexts,
-  generateAutomatedTimetable,
-} from "@/lib/timetable";
+import { generateAutomatedTimetable } from "@/lib/timetable";
 import { generateTimeLabels } from "@/lib/temputils";
 import type { applyTemplate } from "@/lib/template";
 import GridCell from "./grid-cell";
@@ -26,83 +23,9 @@ interface TimeTableProps {
   propName?: string;
 }
 
-// Sample timetable data structure
-const timeSlots = [
-  "08:00 - 09:00",
-  "09:00 - 10:00",
-  "10:00 - 11:00",
-  "11:00 - 12:00",
-  "12:00 - 01:00",
-  "01:00 - 02:00",
-  "02:00 - 03:00",
-  "03:00 - 04:00",
-];
-
-const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
-// Sample schedule data - you can replace this with real data
-const scheduleData: Record<string, Record<string, string>> = {
-  "08:00 - 09:00": {
-    Monday: "Mathematics",
-    Tuesday: "Physics",
-    Wednesday: "Chemistry",
-    Thursday: "Biology",
-    Friday: "English",
-  },
-  "09:00 - 10:00": {
-    Monday: "Physics",
-    Tuesday: "Mathematics",
-    Wednesday: "English",
-    Thursday: "Chemistry",
-    Friday: "Biology",
-  },
-  "10:00 - 11:00": {
-    Monday: "Chemistry",
-    Tuesday: "English",
-    Wednesday: "Mathematics",
-    Thursday: "Physics",
-    Friday: "Computer Science",
-  },
-  "11:00 - 12:00": {
-    Monday: "Biology",
-    Tuesday: "Computer Science",
-    Wednesday: "Physics",
-    Thursday: "Mathematics",
-    Friday: "Chemistry",
-  },
-  "12:00 - 01:00": {
-    Monday: "Lunch Break",
-    Tuesday: "Lunch Break",
-    Wednesday: "Lunch Break",
-    Thursday: "Lunch Break",
-    Friday: "Lunch Break",
-  },
-  "01:00 - 02:00": {
-    Monday: "English",
-    Tuesday: "Biology",
-    Wednesday: "Computer Science",
-    Thursday: "English",
-    Friday: "Mathematics",
-  },
-  "02:00 - 03:00": {
-    Monday: "Computer Science",
-    Tuesday: "Chemistry",
-    Wednesday: "Biology",
-    Thursday: "Computer Science",
-    Friday: "Physics",
-  },
-  "03:00 - 04:00": {
-    Monday: "Free Period",
-    Tuesday: "Free Period",
-    Wednesday: "Free Period",
-    Thursday: "Free Period",
-    Friday: "Free Period",
-  },
-};
-
-const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
+const TimeTable: React.FC<TimeTableProps> = () => {
   const gridState = useGridState();
-  const { database, setDatabase } = useDatabaseStore();
+  const { database } = useDatabaseStore();
 
   const {
     selectedCells,
@@ -114,15 +37,12 @@ const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
     editingDuration,
     tempDuration,
     defaultSlotDuration,
-    editingDefaultDuration,
-    tempDefaultDuration,
     columnDurations,
     cellContents,
     editingCell,
     tempCellText,
     handleCellClick,
     handleCellDoubleClick,
-    mergeCells,
     addColumnAfter,
     deleteColumn,
     startEditingDuration,
@@ -130,7 +50,6 @@ const TimeTable: React.FC<TimeTableProps> = ({ propName }) => {
     cancelDurationEdit,
     saveDefaultDurationEdit,
     cancelDefaultDurationEdit,
-    resetGrid,
     setHoveredColumn,
     setOpenPopover,
     setTempCellText,
