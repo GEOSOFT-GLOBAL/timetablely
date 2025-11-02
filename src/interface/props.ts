@@ -1,4 +1,5 @@
-import type { ITimetableDatabase } from "./database";
+import type { applyTemplate } from "@/lib/template";
+import type { ISession, ITimetableDatabase } from "./database";
 import type { ICellContent, IMergeInfo } from "./types";
 
 export interface GridHeaderProps {
@@ -75,7 +76,7 @@ export interface TemplateManagerProps {
 export interface ClassTimetableProps {
   dayLabels: string[];
   timeLabels: string[];
-  classData: ITimetableClass;
+  classData: ISession;
   cellContents: Map<string, ICellContent>;
   onGenerateTimetable: (classId: string) => void;
   onExportClassPDF?: (classId: string, className: string) => void;

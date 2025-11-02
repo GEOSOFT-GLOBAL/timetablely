@@ -30,7 +30,7 @@ export const defaultBlockedTexts = [
 
 export const extractTimetableData = (
   cellContents: Map<string, ICellContent>,
-  mergedCells: Map<string, any>,
+  // mergedCells: Map<string, any>,
   hiddenCells: Set<string>,
   columnCount: number,
   columnDurations: { [key: number]: number },
@@ -52,7 +52,7 @@ export const extractTimetableData = (
       if (hiddenCells.has(cellKey)) continue;
 
       const cellContent = cellContents.get(cellKey);
-      const _mergeInfo = mergedCells.get(cellKey);
+      // const _mergeInfo = mergedCells.get(cellKey);
 
       const entry: ITimetableEntry = {
         cellKey,
@@ -134,7 +134,7 @@ export const generateAutomatedTimetable = (
 
   // Sort subjects by priority and periods per week
   const sortedSubjects = [...classSubjects].sort((a, b) => {
-    const priorityWeight = { high: 3, medium: 2, low: 1 };
+    const priorityWeight = { HIGH: 3, MEDIUM: 2, LOW: 1 };
     const aPriority = priorityWeight[a.priority] * a.periodsPerWeek;
     const bPriority = priorityWeight[b.priority] * b.periodsPerWeek;
     return bPriority - aPriority;

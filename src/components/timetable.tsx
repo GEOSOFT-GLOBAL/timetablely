@@ -248,7 +248,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
         expandedClasses={expandedClasses}
         setExpandedClasses={setExpandedClasses}
       />
-      <div className="rounded-lg border shadow-lg overflow-hidden">
+      <div className="rounded-sm border shadow-lg overflow-hidden">
         <div className="bg-primary text-primary-foreground font-bold py-3 px-4 text-center">
           Master Timetable (All Classes)
         </div>
@@ -263,7 +263,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
                 {timeLabels.map(renderHeader)}
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="h-full">
               {Array.from({ length: gridSize }, (_, row) => (
                 <tr key={row}>
                   <td className="bg-gray-200 border-2 border-gray-400 h-16 w-32 font-semibold text-gray-700 text-center sticky left-0 z-10">
