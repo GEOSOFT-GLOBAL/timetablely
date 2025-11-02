@@ -44,13 +44,13 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Lifecycle",
-      url: "#",
+      title: "Courses",
+      url: "#/courses",
       icon: IconListDetails,
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "#/tutors",
       icon: IconChartBar,
     },
     {
