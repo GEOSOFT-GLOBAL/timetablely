@@ -1,10 +1,10 @@
 import * as React from "react";
 
 interface GridControllsProps {
-  propName: type;
+  propName?: string;
 }
 
-const GridControlls: React.FC<GridControllsProps> = ({ propName }) => {
+const GridControlls: React.FC<GridControllsProps> = () => {
   return (
     <div>
       <div>

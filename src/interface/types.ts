@@ -65,7 +65,7 @@ export interface IGridActions {
     cellKey: string,
     alignment: "left" | "center" | "right",
   ) => void;
-  updateCellContents: (contents: Map<string, ICellContent>) => void;
+  // updateCellContents: (contents: Map<string, ICellContent>) => void;
   setAllCellContents: (contents: Map<string, ICellContent>) => void;
   setAllMergedCells: (mergedCells: Map<string, any>) => void;
   setAllHiddenCells: (hiddenCells: Set<string>) => void;
