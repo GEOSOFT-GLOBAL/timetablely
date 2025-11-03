@@ -22,7 +22,7 @@ export const appRoutes = [
     element: <Sessions />,
   },
   {
-    path: "sessions",
+    path: "templates",
     element: <Templates />,
   },
 ];
