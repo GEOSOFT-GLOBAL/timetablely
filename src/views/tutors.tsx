@@ -4,9 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import * as React from "react";
 import { useDatabaseStore } from "@/store/databaseStore";
 import type { ITutor } from "@/interface/database";
+import { XIcon } from "lucide-react";
 
 interface TutorsProps {
   propName?: string;
@@ -19,6 +27,23 @@ const Tutors: React.FC<TutorsProps> = () => {
     subjects: [],
     maxPeriodsPerDay: 3,
   });
+  const [selectedCourse, setSelectedCourse] = React.useState<string>("");
+
+  const addCourseToTutor = (courseId: string) => {
+    if (!courseId || newTutor.subjects?.includes(courseId)) return;
+    setNewTutor({
+      ...newTutor,
+      subjects: [...(newTutor.subjects || []), courseId],
+    });
+    setSelectedCourse("");
+  };
+
+  const removeCourseFromTutor = (courseId: string) => {
+    setNewTutor({
+      ...newTutor,
+      subjects: newTutor.subjects?.filter((id) => id !== courseId) || [],
+    });
+  };
 
   const addTutor = () => {
     if (!newTutor.name?.trim()) return;
@@ -63,6 +88,49 @@ const Tutors: React.FC<TutorsProps> = () => {
                 setNewTutor({ ...newTutor, name: e.target.value })
               }
             />
+            <Label htmlFor="course">Courses</Label>
+            <Select value={selectedCourse} onValueChange={addCourseToTutor}>
+              <SelectTrigger id="course" className="w-full">
+                <SelectValue placeholder="Select a course" />
+              </SelectTrigger>
+              <SelectContent>
+                {database.courses.length === 0 ? (
+                  <SelectItem value="no-courses" disabled>
+                    No courses available
+                  </SelectItem>
+                ) : (
+                  database.courses.map((course) => (
+                    <SelectItem key={course.id} value={course.id}>
+                      {course.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            {newTutor.subjects && newTutor.subjects.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {newTutor.subjects.map((subjectId) => {
+                  const course = database.courses.find(
+                    (c) => c.id === subjectId
+                  );
+                  return (
+                    <div
+                      key={subjectId}
+                      className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm"
+                    >
+                      <span>{course?.name || subjectId}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCourseFromTutor(subjectId)}
+                        className="hover:bg-secondary-foreground/20 rounded-sm p-0.5"
+                      >
+                        <XIcon className="size-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <Label htmlFor="maxPeriods">Max Periods Per Day</Label>
             <Input
               id="maxPeriods"
