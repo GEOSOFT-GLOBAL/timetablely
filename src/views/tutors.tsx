@@ -14,7 +14,15 @@ import {
 import * as React from "react";
 import { useDatabaseStore } from "@/store/databaseStore";
 import type { ITutor } from "@/interface/database";
-import { XIcon } from "lucide-react";
+import { RefreshCcwIcon, UserCircle, XIcon } from "lucide-react";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 interface TutorsProps {
   propName?: string;
@@ -111,7 +119,7 @@ const Tutors: React.FC<TutorsProps> = () => {
               <div className="flex flex-wrap gap-2">
                 {newTutor.subjects.map((subjectId) => {
                   const course = database.courses.find(
-                    (c) => c.id === subjectId
+                    (c) => c.id === subjectId,
                   );
                   return (
                     <div
@@ -163,9 +171,23 @@ const Tutors: React.FC<TutorsProps> = () => {
             <TutorItem key={tutor.id} tutor={tutor} onRemove={removeTutor} />
           ))}
           {database.tutors.length === 0 && (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              No tutors added yet
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <UserCircle />
+                </EmptyMedia>
+                <EmptyTitle>No Tutor</EmptyTitle>
+                <EmptyDescription>
+                  No Tutors found, created and available tutors will appear here
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="outline" size="sm">
+                  <RefreshCcwIcon />
+                  Refresh
+                </Button>
+              </EmptyContent>
+            </Empty>
           )}
         </Card>
       </div>
