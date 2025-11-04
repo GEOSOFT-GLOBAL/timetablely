@@ -1,73 +1,81 @@
-# React + TypeScript + Vite
+# Timetablely
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Timetablely is a modern, responsive web application designed to help users create, manage, and share timetables with ease. Built with React, TypeScript, and Vite, it offers a fast and intuitive user experience.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   **Intuitive Interface:** A clean and user-friendly interface for managing schedules.
+-   **Customizable Themes:** Light and dark mode support with the ability to switch between themes.
+-   **Responsive Design:** Fully responsive layout that works on all devices.
+-   **Quick Create:** Easily add new events or tasks to your timetable.
 
-## React Compiler
+## 🚀 Getting Started
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-## Expanding the ESLint configuration
+### Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+-   [Node.js](https://nodejs.org/) (version 18 or higher)
+-   [pnpm](https://pnpm.io/) (or your preferred package manager)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1.  Clone the repository:
+    ```sh
+    git clone https://github.com/your-username/timetablely.git
+    ```
+2.  Navigate to the project directory:
+    ```sh
+    cd timetablely
+    ```
+3.  Install the dependencies:
+    ```sh
+    pnpm install
+    ```
+4.  Start the development server:
+    ```sh
+    pnpm run dev
+    ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The application should now be running on `http://localhost:5173`.
+
+## 📂 App Structure
+
+The project follows a modular structure to keep the codebase organized and maintainable.
+
+```
+/src
+├── /app            # Core application logic
+├── /assets         # Static assets (images, fonts)
+├── /components     # Reusable UI components
+│   ├── /ui         # Components from shadcn/ui
+│   └── theme-provider.tsx
+├── /helpers        # Helper functions
+├── /hooks          # Custom React hooks
+├── /interface      # TypeScript interfaces and types
+├── /lib            # Utility functions and library configurations
+├── /mock           # Mock data for development
+├── /routes         # Routing configuration (React Router)
+├── /store          # Global state management
+├── /views          # Application pages/views
+├── constants.ts    # Application constants
+├── main.tsx        # Main application entry point
+└── index.css       # Global styles
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🧩 Main Components
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+-   **`ThemeProvider`**: Manages the application's theme (light/dark mode) and provides it to all components.
+-   **`RouterProvider`**: Handles client-side routing using `react-router-dom`. The routes are defined in the `/routes` directory.
+-   **`NavMain`**: The main navigation component, which includes links to different parts of the application and quick action buttons.
+-   **UI Components (`/components/ui`)**: A collection of reusable UI components, likely built using a library like `shadcn/ui`, including `Button`, `Sidebar`, and more.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🛠️ Built With
+
+-   [Vite](https://vitejs.dev/) - Next-generation front-end tooling.
+-   [React](https://react.dev/) - A JavaScript library for building user interfaces.
+-   [TypeScript](https://www.typescriptlang.org/) - A typed superset of JavaScript.
+-   [React Router](https://reactrouter.com/) - Declarative routing for React applications.
+-   [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework.
+-   [shadcn/ui](https://ui.shadcn.com/) - Re-usable components built using Radix UI and Tailwind CSS.
+-   [Tabler Icons](https.tabler-icons.io) - A set of over 4700 free MIT-licensed high-quality SVG icons.
