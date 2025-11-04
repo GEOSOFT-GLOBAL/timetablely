@@ -1,4 +1,5 @@
 import SectionHeader from "@/components/section-header";
+import TutorItem from "@/components/tutor-item";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,9 +26,11 @@ const Tutors: React.FC<TutorsProps> = () => {
             <Button variant="outline">Cancel</Button>
           </CardFooter>
         </Card>
-        <div>
-          <Card></Card>
-        </div>
+        <Card className="w-full flex flex-col px-4">
+          <TutorItem />
+          <TutorItem />
+          <TutorItem />
+        </Card>
       </div>
     </div>
   );
