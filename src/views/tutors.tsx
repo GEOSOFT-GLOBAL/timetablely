@@ -1,5 +1,6 @@
 import SectionHeader from "@/components/section-header";
-import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import * as React from "react";
 
@@ -14,9 +15,15 @@ const Tutors: React.FC<TutorsProps> = () => {
         <SectionHeader />
       </div>
       <div className=" grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
-        <Card>
-          <Input />
-          <Input />
+        <Card className="">
+          <div className="p-4 flex flex-col gap-4">
+            <Input />
+            <Input />
+          </div>
+          <CardFooter className="gap-4">
+            <Button variant="outline">Save</Button>
+            <Button variant="outline">Cancel</Button>
+          </CardFooter>
         </Card>
         <div>
           <Card></Card>
