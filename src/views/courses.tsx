@@ -5,7 +5,7 @@ interface CoursesProps {
 }
 
 const Courses: React.FC<CoursesProps> = () => {
-  return <div></div>;
+  return <div>hi</div>;
 };
 
 export default Courses;
