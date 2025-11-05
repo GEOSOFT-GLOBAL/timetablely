@@ -131,8 +131,8 @@ const data = {
   ],
   documents: [
     {
-      name: "Data Library",
-      url: "#",
+      name: "Blocked Texts",
+      url: "/special-blocks",
       icon: IconDatabase,
     },
     {
@@ -160,7 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">Timetablely.</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
