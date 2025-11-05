@@ -7,7 +7,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { GraduationCapIcon, Trash2Icon } from "lucide-react";
+import { GraduationCapIcon, Trash2Icon, PencilIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import type { ISession } from "@/interface/database";
 
@@ -15,12 +15,14 @@ interface SessionItemProps {
   session: ISession;
   courseNames: string[];
   onRemove: (sessionId: string) => void;
+  onEdit: (session: ISession) => void;
 }
 
 const SessionItem: React.FC<SessionItemProps> = ({
   session,
   courseNames,
   onRemove,
+  onEdit,
 }) => {
   return (
     <Item variant="outline" className="my-2">
@@ -34,6 +36,9 @@ const SessionItem: React.FC<SessionItemProps> = ({
         </ItemDescription>
       </ItemContent>
       <ItemActions>
+        <Button variant="ghost" size="sm" onClick={() => onEdit(session)}>
+          <PencilIcon className="size-4" />
+        </Button>
         <Button variant="ghost" size="sm" onClick={() => onRemove(session.id)}>
           <Trash2Icon className="size-4" />
         </Button>

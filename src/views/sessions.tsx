@@ -12,6 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useDatabaseStore } from "@/store/databaseStore";
 import type { ISession } from "@/interface/database";
 import { XIcon } from "lucide-react";
@@ -27,6 +35,12 @@ const Sessions: React.FC<SessionsProps> = () => {
     subjects: [],
   });
   const [selectedCourse, setSelectedCourse] = React.useState<string>("");
+  const [editingSession, setEditingSession] = React.useState<ISession | null>(
+    null
+  );
+  const [isEditSheetOpen, setIsEditSheetOpen] = React.useState(false);
+  const [editSelectedCourse, setEditSelectedCourse] =
+    React.useState<string>("");
 
   const addCourseToSession = (courseId: string) => {
     if (!courseId || newSession.subjects?.includes(courseId)) return;
@@ -66,6 +80,48 @@ const Sessions: React.FC<SessionsProps> = () => {
       ...database,
       sessions: database.sessions.filter((s) => s.id !== sessionId),
     });
+  };
+
+  const handleEditSession = (session: ISession) => {
+    setEditingSession(session);
+    setIsEditSheetOpen(true);
+  };
+
+  const addCourseToEditingSession = (courseId: string) => {
+    if (
+      !courseId ||
+      !editingSession ||
+      editingSession.subjects?.includes(courseId)
+    )
+      return;
+    setEditingSession({
+      ...editingSession,
+      subjects: [...(editingSession.subjects || []), courseId],
+    });
+    setEditSelectedCourse("");
+  };
+
+  const removeCourseFromEditingSession = (courseId: string) => {
+    if (!editingSession) return;
+    setEditingSession({
+      ...editingSession,
+      subjects: editingSession.subjects?.filter((id) => id !== courseId) || [],
+    });
+  };
+
+  const updateSession = () => {
+    if (!editingSession?.name?.trim()) return;
+
+    setDatabase({
+      ...database,
+      sessions: database.sessions.map((s) =>
+        s.id === editingSession.id ? editingSession : s
+      ),
+    });
+
+    setIsEditSheetOpen(false);
+    setEditingSession(null);
+    setEditSelectedCourse("");
   };
 
   return (
@@ -156,6 +212,7 @@ const Sessions: React.FC<SessionsProps> = () => {
                 session={session}
                 courseNames={courseNames}
                 onRemove={removeSession}
+                onEdit={handleEditSession}
               />
             );
           })}
@@ -166,6 +223,95 @@ const Sessions: React.FC<SessionsProps> = () => {
           )}
         </Card>
       </div>
+
+      <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Edit Class</SheetTitle>
+            <SheetDescription>
+              Make changes to the class details below.
+            </SheetDescription>
+          </SheetHeader>
+
+          {editingSession && (
+            <div className="flex flex-col gap-4 py-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="edit-sessionName">Class Name</Label>
+                <Input
+                  id="edit-sessionName"
+                  value={editingSession.name}
+                  onChange={(e) =>
+                    setEditingSession({
+                      ...editingSession,
+                      name: e.target.value,
+                    })
+                  }
+                  placeholder="e.g., Class 1A, Grade 10B"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="edit-course">Assign Courses</Label>
+                <Select
+                  value={editSelectedCourse}
+                  onValueChange={addCourseToEditingSession}
+                >
+                  <SelectTrigger id="edit-course" className="w-full">
+                    <SelectValue placeholder="Select a course" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {database.courses.length === 0 ? (
+                      <SelectItem value="no-courses" disabled>
+                        No courses available
+                      </SelectItem>
+                    ) : (
+                      database.courses.map((course) => (
+                        <SelectItem key={course.id} value={course.id}>
+                          {course.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+
+                {editingSession.subjects &&
+                  editingSession.subjects.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {editingSession.subjects.map((subjectId) => {
+                        const course = database.courses.find(
+                          (c) => c.id === subjectId
+                        );
+                        return (
+                          <div
+                            key={subjectId}
+                            className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm"
+                          >
+                            <span>{course?.name || subjectId}</span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                removeCourseFromEditingSession(subjectId)
+                              }
+                              className="hover:bg-secondary-foreground/20 rounded-sm p-0.5"
+                            >
+                              <XIcon className="size-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+              </div>
+            </div>
+          )}
+
+          <SheetFooter>
+            <Button variant="outline" onClick={updateSession}>
+              Save Changes
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
