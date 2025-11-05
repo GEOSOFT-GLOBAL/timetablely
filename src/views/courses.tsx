@@ -15,6 +15,7 @@ import {
 import { useDatabaseStore } from "@/store/databaseStore";
 import type { ICourse } from "@/interface/database";
 import { PRIORITY } from "@/interface/enums";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CoursesProps {
   propName?: string;
@@ -136,6 +137,8 @@ const Courses: React.FC<CoursesProps> = () => {
                 <SelectItem value={PRIORITY.HIGH}>High</SelectItem>
               </SelectContent>
             </Select>
+            <Label>Avoid consecutive periods</Label>
+            <Checkbox />
           </div>
           <CardFooter className="gap-4">
             <Button variant="outline" onClick={addCourse}>
@@ -159,7 +162,9 @@ const Courses: React.FC<CoursesProps> = () => {
 
         <Card className="w-full h-[calc(100vh-220px)] flex flex-col px-4 overflow-y-auto">
           {database.courses.map((course) => {
-            const tutor = database.tutors.find((t) => t.id === course.teacherId);
+            const tutor = database.tutors.find(
+              (t) => t.id === course.teacherId
+            );
             return (
               <CourseItem
                 key={course.id}

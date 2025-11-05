@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { PRIORITY } from "./enums";
 
 export interface ITutor {
