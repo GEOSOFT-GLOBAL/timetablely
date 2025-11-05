@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { useGridState } from "@/hooks/use-grid";
 import { useDatabaseStore } from "@/store/databaseStore";
-import type { ITimetableDatabase } from "@/interface/database";
 import { generateAutomatedTimetable } from "@/lib/timetable";
 import { generateTimeLabels } from "@/lib/temputils";
 import type { applyTemplate } from "@/lib/template";
