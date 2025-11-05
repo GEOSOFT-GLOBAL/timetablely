@@ -1,4 +1,5 @@
 import Dashboard from "@/views";
+import Blocks from "@/views/blocks";
 import Courses from "@/views/courses";
 import Sessions from "@/views/sessions";
 import Templates from "@/views/templates";
@@ -24,5 +25,9 @@ export const appRoutes = [
   {
     path: "templates",
     element: <Templates />,
+  },
+  {
+    path: "special-blocks",
+    element: <Blocks />,
   },
 ];

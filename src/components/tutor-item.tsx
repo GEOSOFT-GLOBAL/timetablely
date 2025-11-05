@@ -7,43 +7,38 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import { BadgeCheckIcon, ChevronRightIcon } from "lucide-react";
+import { UserIcon, Trash2Icon, PencilIcon } from "lucide-react";
 import { Button } from "./ui/button";
+import type { ITutor } from "@/interface/database";
 
 interface TutorItemProps {
-  propName?: string;
+  tutor: ITutor;
+  onRemove: (tutorId: string) => void;
+  onEdit: (tutor: ITutor) => void;
 }
 
-const TutorItem: React.FC<TutorItemProps> = () => {
+const TutorItem: React.FC<TutorItemProps> = ({ tutor, onRemove, onEdit }) => {
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6">
-      <Item variant="outline">
-        <ItemContent>
-          <ItemTitle>Basic Item</ItemTitle>
-          <ItemDescription>
-            A simple item with title and description.
-          </ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <Button variant="outline" size="sm">
-            Action
-          </Button>
-        </ItemActions>
-      </Item>
-      <Item variant="outline" size="sm" asChild>
-        <a href="#">
-          <ItemMedia>
-            <BadgeCheckIcon className="size-5" />
-          </ItemMedia>
-          <ItemContent>
-            <ItemTitle>Your profile has been verified.</ItemTitle>
-          </ItemContent>
-          <ItemActions>
-            <ChevronRightIcon className="size-4" />
-          </ItemActions>
-        </a>
-      </Item>
-    </div>
+    <Item variant="outline" className="my-2">
+      <ItemMedia>
+        <UserIcon className="size-5" />
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>{tutor.name}</ItemTitle>
+        <ItemDescription>
+          Max periods: {tutor.maxPeriodsPerDay || 3} | Subjects:{" "}
+          {tutor.subjects.length > 0 ? tutor.subjects.join(", ") : "None"}
+        </ItemDescription>
+      </ItemContent>
+      <ItemActions>
+        <Button variant="ghost" size="sm" onClick={() => onEdit(tutor)}>
+          <PencilIcon className="size-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => onRemove(tutor.id)}>
+          <Trash2Icon className="size-4" />
+        </Button>
+      </ItemActions>
+    </Item>
   );
 };
 
