@@ -26,7 +26,7 @@ const TimetableControls: React.FC<TimetableControlsProps> = ({
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-none"
           onClick={handleGenerateAutomatedTimetableWithAlert}
         >
-          Generate All Timetables
+          Generate Timetables
         </button>
         <button
           className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-none"

@@ -171,7 +171,7 @@ const Sessions: React.FC<SessionsProps> = () => {
                   return (
                     <div
                       key={subjectId}
-                      className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm"
+                      className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-none text-sm"
                     >
                       <span>{course?.name || subjectId}</span>
                       <button
@@ -284,7 +284,7 @@ const Sessions: React.FC<SessionsProps> = () => {
                         return (
                           <div
                             key={subjectId}
-                            className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm"
+                            className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-none text-sm"
                           >
                             <span>{course?.name || subjectId}</span>
                             <button
