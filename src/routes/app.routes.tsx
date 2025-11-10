@@ -1,9 +1,10 @@
 import Dashboard from "@/views";
 import Blocks from "@/views/blocks";
+import Tutors from "@/views/tutors";
 import Courses from "@/views/courses";
 import Sessions from "@/views/sessions";
 import Templates from "@/views/templates";
-import Tutors from "@/views/tutors";
+import Timetables from "@/views/timetables";
 
 export const appRoutes = [
   {
@@ -29,5 +30,9 @@ export const appRoutes = [
   {
     path: "special-blocks",
     element: <Blocks />,
+  },
+  {
+    path: "timetables",
+    element: <Timetables />,
   },
 ];
