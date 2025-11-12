@@ -141,8 +141,8 @@ const data = {
       icon: IconReport,
     },
     {
-      name: "Word Assistant",
-      url: "#",
+      name: "Walkthrough",
+      url: "/walkthrough",
       icon: IconFileWord,
     },
   ],

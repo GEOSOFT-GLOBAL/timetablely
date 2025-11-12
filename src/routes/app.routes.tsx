@@ -3,6 +3,7 @@ import Blocks from "@/views/blocks";
 import Tutors from "@/views/tutors";
 import Courses from "@/views/courses";
 import Sessions from "@/views/sessions";
+import HowToUse from "@/views/how-to-use";
 import Templates from "@/views/templates";
 import Timetables from "@/views/timetables";
 
@@ -34,5 +35,9 @@ export const appRoutes = [
   {
     path: "timetables",
     element: <Timetables />,
+  },
+  {
+    path: "walkthrough",
+    element: <HowToUse />,
   },
 ];
