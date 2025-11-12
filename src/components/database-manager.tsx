@@ -97,7 +97,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
 
       {onGenerateTimetable && (
         <Card>
-          <CardContent className="pt-6">
+          <CardContent className="pt-3">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold">Generate Timetable</h3>
