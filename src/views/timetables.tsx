@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import DatabaseManager from "@/components/database-manager";
 import GridCell from "@/components/grid-cell";
 import GridControlls from "@/components/grid-controlls";
@@ -41,6 +42,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
     resetGrid,
     handleCellClick,
     handleCellDoubleClick,
+    mergeCells,
     addColumnAfter,
     deleteColumn,
     startEditingDuration,
@@ -291,7 +293,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
         editingDefaultDuration={editingDefaultDuration}
         onResetGrid={resetGrid}
         onExportData={handleExportData}
-        onMergeCells={mergedCells}
+        onMergeCells={mergeCells}
         onTempDefaultDurationChange={gridState.setTempDefaultDuration}
         onSaveDefaultDurationEdit={saveDefaultDurationEdit}
         onCancelDefaultDurationEdit={cancelDefaultDurationEdit}

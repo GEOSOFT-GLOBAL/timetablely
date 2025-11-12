@@ -27,7 +27,7 @@ export interface GridControlsProps {
   columnCount: number;
   onResetGrid: () => void;
   onExportData: () => void;
-  onMergeCells: Map<string, IMergeInfo>;
+  onMergeCells: () => void;
   selectedCellsCount: number;
   tempDefaultDuration: string;
   defaultSlotDuration: number;
