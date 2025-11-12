@@ -1,6 +1,7 @@
 import DatabaseManager from "@/components/database-manager";
 import GridCell from "@/components/grid-cell";
 import GridHeader from "@/components/grid-header";
+import TemplateManager from "@/components/template-manager";
 import TimetableControls from "@/components/timetable-controls";
 import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { dayLabels, gridSize } from "@/constants";
@@ -241,6 +242,17 @@ const Timetables: React.FC<TimetablesProps> = () => {
         database={database}
         onGenerateTimetable={handleGenerateAutomatedTimetableWithAlert}
         onLoadSampleData={() => setDatabase(sampleDatabase) }
+      />
+      <TemplateManager
+        columnCount={columnCount}
+        hiddenCells={hiddenCells}
+        database={database}
+        defaultSlotDuration={defaultSlotDuration}
+        mergedCells={mergedCells}
+        cellContents={cellContents}
+        columnDurations={columnDurations}
+        onDatabaseUpdate={setDatabase}
+        onApplyTemplate={handleApplyTemplate}
       />
       <TimetableControls
         expandedClasses={expandedClasses}
