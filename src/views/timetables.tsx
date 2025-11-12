@@ -1,5 +1,6 @@
 import DatabaseManager from "@/components/database-manager";
 import GridCell from "@/components/grid-cell";
+import GridControlls from "@/components/grid-controlls";
 import GridHeader from "@/components/grid-header";
 import TemplateManager from "@/components/template-manager";
 import TimetableControls from "@/components/timetable-controls";
@@ -7,8 +8,8 @@ import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from
 import { dayLabels, gridSize } from "@/constants";
 import { useGridState } from "@/hooks/use-grid";
 import type { applyTemplate } from "@/lib/template";
-import { generateTimeLabels } from "@/lib/temputils";
-import { generateAutomatedTimetable } from "@/lib/timetable";
+import { canMergeCells, generateTimeLabels } from "@/lib/temputils";
+import { extractTimetableData, generateAutomatedTimetable, logTimetableData } from "@/lib/timetable";
 import { sampleDatabase } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
 import * as React from "react";
@@ -35,6 +36,9 @@ const Timetables: React.FC<TimetablesProps> = () => {
     cellContents,
     editingCell,
     tempCellText,
+    tempDefaultDuration,
+    editingDefaultDuration,
+    resetGrid,
     handleCellClick,
     handleCellDoubleClick,
     addColumnAfter,
@@ -82,6 +86,29 @@ const Timetables: React.FC<TimetablesProps> = () => {
   const handleClearTimetable = () => {
     gridState.setAllCellContents(new Map());
     alert("Timetable cleared!");
+  };
+
+  const handleExportData = () => {
+    const timetableData = extractTimetableData(
+      cellContents,
+      hiddenCells,
+      columnCount,
+      columnDurations,
+      defaultSlotDuration,
+      mergedCells,
+    );
+
+    logTimetableData(timetableData);
+
+    // Also copy to clipboard as JSON
+    navigator.clipboard
+      .writeText(JSON.stringify(timetableData, null, 2))
+      .then(() => {
+        alert("Timetable data copied to clipboard and logged to console!");
+      })
+      .catch(() => {
+        alert("Timetable data logged to console (clipboard copy failed)");
+      });
   };
 
   const handleGenerateAutomatedTimetable = (classId?: string) => {
@@ -254,9 +281,27 @@ const Timetables: React.FC<TimetablesProps> = () => {
         onDatabaseUpdate={setDatabase}
         onApplyTemplate={handleApplyTemplate}
       />
+
+      <GridControlls
+        canMerge={canMergeCells(selectedCells)}
+        columnCount={columnCount}
+        selectedCellsCount={selectedCells.size}
+        tempDefaultDuration={tempDefaultDuration}
+        defaultSlotDuration={defaultSlotDuration}
+        editingDefaultDuration={editingDefaultDuration}
+        onResetGrid={resetGrid}
+        onExportData={handleExportData}
+        onMergeCells={mergedCells}
+        onTempDefaultDurationChange={gridState.setTempDefaultDuration}
+        onSaveDefaultDurationEdit={saveDefaultDurationEdit}
+        onCancelDefaultDurationEdit={cancelDefaultDurationEdit}
+        onDefaultDurationKeyDown={handleDefaultDurationKeyDown}
+        onStartEditingDefaultDuration={startEditingDefaultDuration}
+      />
       <TimetableControls
         expandedClasses={expandedClasses}
         setExpandedClasses={setExpandedClasses}
+        handleClearTimetable={handleClearTimetable}
       />
       <div className="rounded-sm border shadow-lg overflow-hidden">
         <div className="bg-primary text-primary-foreground font-bold py-3 px-4 text-center">

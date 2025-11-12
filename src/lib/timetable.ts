@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ICourse,
   ITimetableDatabase,
@@ -30,11 +31,11 @@ export const defaultBlockedTexts = [
 
 export const extractTimetableData = (
   cellContents: Map<string, ICellContent>,
-  // mergedCells: Map<string, any>,
   hiddenCells: Set<string>,
   columnCount: number,
   columnDurations: { [key: number]: number },
   defaultSlotDuration: number,
+  mergedCells?: Map<string, any>
 ): ITimetableEntry[] => {
   const timeLabels = generateTimeLabels(
     columnCount,

@@ -4,14 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -75,7 +75,7 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
     template.createdAt = new Date().toISOString();
 
     const updatedDatabase = saveTemplateToDatabase(template, database);
-    
+
     // Update database through prop callback or store
     if (onDatabaseUpdate) {
       onDatabaseUpdate(updatedDatabase);
@@ -114,7 +114,7 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
       ...database,
       templates: (database.templates || []).filter((t) => t.id !== templateId),
     };
-    
+
     // Update database through prop callback or store
     if (onDatabaseUpdate) {
       onDatabaseUpdate(updatedDatabase);
@@ -135,20 +135,20 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
         {/* Save Template Section */}
         <div className="space-y-2">
           <Label>Save Current Layout</Label>
-          <Sheet open={showSaveModal} onOpenChange={setShowSaveModal}>
-            <SheetTrigger asChild>
+          <Dialog open={showSaveModal} onOpenChange={setShowSaveModal}>
+            <DialogTrigger asChild>
               <Button variant="outline" className="w-full gap-2">
                 <SaveIcon className="size-4" />
                 Save as Template
               </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Save Template</SheetTitle>
-                <SheetDescription>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Save Template</DialogTitle>
+                <DialogDescription>
                   Save the current timetable layout as a reusable template.
-                </SheetDescription>
-              </SheetHeader>
+                </DialogDescription>
+              </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="templateName">Template Name</Label>
@@ -172,7 +172,7 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
                   />
                 </div>
               </div>
-              <SheetFooter>
+              <DialogFooter>
                 <Button
                   variant="outline"
                   onClick={() => setShowSaveModal(false)}
@@ -180,9 +180,9 @@ const TemplateManager: React.FC<TemplateManagerProps> = ({
                   Cancel
                 </Button>
                 <Button onClick={handleSaveTemplate}>Save Template</Button>
-              </SheetFooter>
-            </SheetContent>
-          </Sheet>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Apply Template Section */}

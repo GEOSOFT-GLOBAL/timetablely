@@ -27,7 +27,7 @@ export interface GridControlsProps {
   columnCount: number;
   onResetGrid: () => void;
   onExportData: () => void;
-  onMergeCells: () => void;
+  onMergeCells: Map<string, IMergeInfo>;
   selectedCellsCount: number;
   tempDefaultDuration: string;
   defaultSlotDuration: number;
@@ -58,7 +58,7 @@ export interface GridCellProps {
   onCellDoubleClick: (row: number, col: number) => void;
   onSetCellAlignment: (
     cellKey: string,
-    alignment: "left" | "center" | "right",
+    alignment: "left" | "center" | "right"
   ) => void;
 }
 
