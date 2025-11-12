@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { applyTemplate } from "@/lib/template";
 import type { ISession, ITimetableDatabase } from "./database";
 import type { ICellContent, IMergeInfo } from "./types";
@@ -57,7 +58,7 @@ export interface GridCellProps {
   onCellDoubleClick: (row: number, col: number) => void;
   onSetCellAlignment: (
     cellKey: string,
-    alignment: "left" | "center" | "right",
+    alignment: "left" | "center" | "right"
   ) => void;
 }
 
@@ -86,5 +87,5 @@ export interface DatabaseManagerProps {
   database: ITimetableDatabase;
   onLoadSampleData?: () => void;
   onGenerateTimetable: () => void;
-  onDatabaseUpdate: (database: ITimetableDatabase) => void;
+  onDatabaseUpdate?: (database: ITimetableDatabase) => void;
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { canMergeCells, getCellKey } from "@/lib/temputils";
 import type {

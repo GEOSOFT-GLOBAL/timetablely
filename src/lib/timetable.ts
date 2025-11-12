@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ICourse,
   ITimetableDatabase,
@@ -30,16 +31,16 @@ export const defaultBlockedTexts = [
 
 export const extractTimetableData = (
   cellContents: Map<string, ICellContent>,
-  // mergedCells: Map<string, any>,
   hiddenCells: Set<string>,
   columnCount: number,
   columnDurations: { [key: number]: number },
   defaultSlotDuration: number,
+  mergedCells?: Map<string, any>
 ): ITimetableEntry[] => {
   const timeLabels = generateTimeLabels(
     columnCount,
     columnDurations,
-    defaultSlotDuration,
+    defaultSlotDuration
   );
   const entries: ITimetableEntry[] = [];
 
@@ -52,7 +53,8 @@ export const extractTimetableData = (
       if (hiddenCells.has(cellKey)) continue;
 
       const cellContent = cellContents.get(cellKey);
-      // const _mergeInfo = mergedCells.get(cellKey);
+      const _mergeInfo = mergedCells?.get(cellKey);
+      console.log(_mergeInfo);
 
       const entry: ITimetableEntry = {
         cellKey,
@@ -75,7 +77,7 @@ export const extractTimetableData = (
 
 export const isCellBlocked = (
   cellContent: ICellContent | undefined,
-  blockedTexts: string[],
+  blockedTexts: string[]
 ): boolean => {
   if (!cellContent?.text) return false;
 
@@ -88,7 +90,7 @@ export const generateAutomatedTimetable = (
   columnCount: number,
   existingCellContents: Map<string, ICellContent>,
   hiddenCells: Set<string>,
-  selectedClassId?: string,
+  selectedClassId?: string
 ): Map<string, ICellContent> => {
   const newCellContents = new Map(existingCellContents);
   const {
@@ -107,7 +109,7 @@ export const generateAutomatedTimetable = (
     if (selectedClass) {
       className = selectedClass.name;
       classSubjects = courses.filter((subject) =>
-        selectedClass.subjects.includes(subject.id),
+        selectedClass.subjects.includes(subject.id)
       );
     }
   }
@@ -197,7 +199,7 @@ export const generateAutomatedTimetable = (
       let chosenSlots = availableSlots;
       if (subject.preferredSlots && subject.preferredSlots.length > 0) {
         const preferredAvailable = availableSlots.filter((slot) =>
-          subject.preferredSlots!.includes(`${slot.row}-${slot.col}`),
+          subject.preferredSlots!.includes(`${slot.row}-${slot.col}`)
         );
         if (preferredAvailable.length > 0) {
           chosenSlots = preferredAvailable;
@@ -294,7 +296,7 @@ export const logTimetableData = (entries: ITimetableEntry[]): void => {
   console.log("📊 Summary:");
   console.log(`Total entries: ${entries.length}`);
   console.log(
-    `Entries with content: ${entries.filter((e) => e.customText).length}`,
+    `Entries with content: ${entries.filter((e) => e.customText).length}`
   );
 
   console.log("\n📋 Detailed Data:");
@@ -305,7 +307,7 @@ export const logTimetableData = (entries: ITimetableEntry[]): void => {
       Content: entry.customText || "(empty)",
       Position: `Row ${entry.row}, Col ${entry.col}`,
       "Cell Key": entry.cellKey,
-    })),
+    }))
   );
 
   console.log("\n🗂️ Raw Data (for export):");

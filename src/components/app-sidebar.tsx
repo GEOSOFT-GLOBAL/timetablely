@@ -136,13 +136,13 @@ const data = {
       icon: IconDatabase,
     },
     {
-      name: "Reports",
-      url: "#",
+      name: "Timetable",
+      url: "/timetables",
       icon: IconReport,
     },
     {
-      name: "Word Assistant",
-      url: "#",
+      name: "Walkthrough",
+      url: "/walkthrough",
       icon: IconFileWord,
     },
   ],
@@ -156,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5"
             >
               <a href="#">
                 <IconInnerShadowTop className="size-5!" />
