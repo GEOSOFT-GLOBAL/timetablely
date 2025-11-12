@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { applyTemplate } from "@/lib/template";
 import type { ISession, ITimetableDatabase } from "./database";
 import type { ICellContent, IMergeInfo } from "./types";
@@ -86,5 +87,5 @@ export interface DatabaseManagerProps {
   database: ITimetableDatabase;
   onLoadSampleData?: () => void;
   onGenerateTimetable: () => void;
-  onDatabaseUpdate: (database: ITimetableDatabase) => void;
+  onDatabaseUpdate?: (database: ITimetableDatabase) => void;
 }

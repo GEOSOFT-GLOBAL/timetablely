@@ -136,8 +136,8 @@ const data = {
       icon: IconDatabase,
     },
     {
-      name: "Reports",
-      url: "#",
+      name: "Timetable",
+      url: "/timetables",
       icon: IconReport,
     },
     {

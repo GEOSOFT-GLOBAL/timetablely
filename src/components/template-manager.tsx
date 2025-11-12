@@ -1,10 +1,10 @@
 import * as React from "react";
 
 interface TemplateManagerProps {
-  propName: type;
+  propName?: string;
 }
 
-const TemplateManager: React.FC<TemplateManagerProps> = ({ propName }) => {
+const TemplateManager: React.FC<TemplateManagerProps> = () => {
   return <div></div>;
 };
 

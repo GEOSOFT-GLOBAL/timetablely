@@ -1,3 +1,4 @@
+import DatabaseManager from "@/components/database-manager";
 import GridCell from "@/components/grid-cell";
 import GridHeader from "@/components/grid-header";
 import TimetableControls from "@/components/timetable-controls";
@@ -7,6 +8,7 @@ import { useGridState } from "@/hooks/use-grid";
 import type { applyTemplate } from "@/lib/template";
 import { generateTimeLabels } from "@/lib/temputils";
 import { generateAutomatedTimetable } from "@/lib/timetable";
+import { sampleDatabase } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
 import * as React from "react";
 
@@ -16,7 +18,7 @@ interface TimetablesProps {
 
 const Timetables: React.FC<TimetablesProps> = () => {
   const gridState = useGridState();
-  const { database } = useDatabaseStore();
+  const { database, setDatabase } = useDatabaseStore();
 
     const {
     selectedCells,
@@ -234,7 +236,12 @@ const Timetables: React.FC<TimetablesProps> = () => {
   );
 
   return (
-    <div className="">
+    <div className="flex flex-col w-full md:py-6 py-4 gap-4 px-4 lg:px-6">
+      <DatabaseManager
+        database={database}
+        onGenerateTimetable={handleGenerateAutomatedTimetableWithAlert}
+        onLoadSampleData={() => setDatabase(sampleDatabase) }
+      />
       <TimetableControls
         expandedClasses={expandedClasses}
         setExpandedClasses={setExpandedClasses}
