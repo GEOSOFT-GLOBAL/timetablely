@@ -8,6 +8,7 @@
 - Export to PDF using Rust
 - Add background colors to cells
 - Use tabs for certain views to manage space
+- move notifications from a view to a floating closable side bar to the right
 
 
 ## Future Suggestions

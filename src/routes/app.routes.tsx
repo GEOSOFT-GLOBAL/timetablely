@@ -7,6 +7,7 @@ import HowToUse from "@/views/how-to-use";
 import Templates from "@/views/templates";
 import Timetables from "@/views/timetables";
 import Settings from "@/views/settings";
+import Notifications from "@/views/notifications";
 
 export const appRoutes = [
   {
@@ -44,5 +45,9 @@ export const appRoutes = [
   {
     path: "settings",
     element: <Settings />,
+  },
+  {
+    path: "notifications",
+    element: <Notifications />,
   },
 ];
