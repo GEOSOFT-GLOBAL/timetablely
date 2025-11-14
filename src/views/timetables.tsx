@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import DatabaseManager from "@/components/database-manager";
 import GridCell from "@/components/grid-cell";
 import GridControlls from "@/components/grid-controlls";
@@ -22,6 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { dayLabels, gridSize } from "@/constants";
 import { useGridState } from "@/hooks/use-grid";
 import type { applyTemplate } from "@/lib/template";
@@ -31,9 +32,10 @@ import {
   generateAutomatedTimetable,
   logTimetableData,
 } from "@/lib/timetable";
+import { generateAITimetable } from "@/lib/ai-timetable";
 import { sampleDatabase } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
-import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
+import { IconCheck, IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
 import * as React from "react";
 
 interface TimetablesProps {
@@ -49,6 +51,9 @@ const Timetables: React.FC<TimetablesProps> = () => {
     message: string;
     type: "success" | "error" | "info";
   }>({ title: "", message: "", type: "info" });
+  const [apiKeyDialogOpen, setApiKeyDialogOpen] = React.useState(false);
+  const [apiKey, setApiKey] = React.useState("");
+  const [isGenerating, setIsGenerating] = React.useState(false);
 
   const {
     selectedCells,
@@ -126,6 +131,76 @@ const Timetables: React.FC<TimetablesProps> = () => {
     showDialog("Success", "Timetable cleared successfully!", "success");
   };
 
+  // Load API key from localStorage on mount
+  React.useEffect(() => {
+    const savedApiKey = localStorage.getItem("gemini_api_key");
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
+  // Handle AI timetable generation
+  const handleAIGeneration = () => {
+    if (!apiKey) {
+      setApiKeyDialogOpen(true);
+      return;
+    }
+    generateWithAI();
+  };
+
+  const generateWithAI = async () => {
+    if (database.courses.length === 0) {
+      showDialog("Error", "Please add subjects to the database first.", "error");
+      return;
+    }
+
+    setIsGenerating(true);
+    setApiKeyDialogOpen(false);
+
+    try {
+      const newCellContents = await generateAITimetable({
+        apiKey,
+        database,
+        columnCount,
+        columnDurations,
+        defaultSlotDuration,
+        existingCellContents: cellContents,
+        hiddenCells,
+      });
+
+      gridState.setAllCellContents(newCellContents);
+
+      const periodsCount = database.courses.reduce(
+        (sum, s) => sum + s.periodsPerWeek,
+        0
+      );
+
+      showDialog(
+        "AI Timetable Generated",
+        `Successfully generated timetable with ${periodsCount} periods across ${database.courses.length} subjects using AI.`,
+        "success"
+      );
+    } catch (error) {
+      console.error("AI Generation Error:", error);
+      showDialog(
+        "AI Generation Failed",
+        error instanceof Error ? error.message : "Failed to generate timetable with AI. Please check your API key and try again.",
+        "error"
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const saveApiKey = () => {
+    if (!apiKey.trim()) {
+      showDialog("Error", "Please enter a valid API key.", "error");
+      return;
+    }
+    localStorage.setItem("gemini_api_key", apiKey);
+    generateWithAI();
+  };
+
   const handleExportData = () => {
     const timetableData = extractTimetableData(
       cellContents,
@@ -176,27 +251,6 @@ const Timetables: React.FC<TimetablesProps> = () => {
     );
 
     gridState.setAllCellContents(newCellContents);
-
-    // Get the number of subjects for the selected class
-    let subjectsCount = database.courses.length;
-    let periodsCount = database.courses.reduce(
-      (sum, s) => sum + s.periodsPerWeek,
-      0
-    );
-
-    if (classId) {
-      const selectedClass = database.sessions.find((c) => c.id === classId);
-      if (selectedClass) {
-        const classSubjects = database.courses.filter((s) =>
-          selectedClass.subjects.includes(s.id)
-        );
-        subjectsCount = classSubjects.length;
-        periodsCount = classSubjects.reduce(
-          (sum, s) => sum + s.periodsPerWeek,
-          0
-        );
-      }
-    }
   };
 
   const handleApplyTemplate = (
@@ -363,9 +417,70 @@ const Timetables: React.FC<TimetablesProps> = () => {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={apiKeyDialogOpen} onOpenChange={setApiKeyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter Gemini API Key</DialogTitle>
+            <DialogDescription>
+              Please enter your Google Gemini API key to use AI-powered timetable generation.
+              Your key will be saved locally for future use.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="apiKey">API Key</Label>
+              <Input
+                id="apiKey"
+                type="password"
+                placeholder="Enter your Gemini API key"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && saveApiKey()}
+              />
+              <p className="text-xs text-muted-foreground">
+                Get your API key from{" "}
+                <a
+                  href="https://makersuite.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  Google AI Studio
+                </a>
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setApiKeyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveApiKey} disabled={!apiKey.trim()}>
+              Save & Generate
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {isGenerating && (
+        <Dialog open={isGenerating}>
+          <DialogContent showCloseButton={false}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <IconLoader2 className="h-5 w-5 animate-spin" />
+                Generating AI Timetable
+              </DialogTitle>
+              <DialogDescription>
+                Please wait while AI generates your optimal timetable...
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      )}
+
       <DatabaseManager
         database={database}
         onGenerateTimetable={handleGenerateAutomatedTimetableWithAlert}
+        onGenerateAITimetable={handleAIGeneration}
         onLoadSampleData={() => setDatabase(sampleDatabase)}
       />
       <TemplateManager

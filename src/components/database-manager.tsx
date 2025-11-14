@@ -10,11 +10,13 @@ import {
   PlusIcon,
   DatabaseIcon,
 } from "lucide-react";
+import { IconSparkles } from "@tabler/icons-react";
 import type { DatabaseManagerProps } from "@/interface/props";
 
 const DatabaseManager: React.FC<DatabaseManagerProps> = ({
   database,
   onGenerateTimetable,
+  onGenerateAITimetable,
   onLoadSampleData,
 }) => {
   const navigate = useNavigate();
@@ -95,7 +97,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
         ))}
       </div>
 
-      {onGenerateTimetable && (
+      {(onGenerateTimetable || onGenerateAITimetable) && (
         <Card>
           <CardContent className="pt-3">
             <div className="flex items-center justify-between">
@@ -105,7 +107,19 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
                   Create timetables based on your database
                 </p>
               </div>
-              <Button onClick={onGenerateTimetable}>Generate</Button>
+              <div className="flex gap-2">
+                {onGenerateTimetable && (
+                  <Button variant="outline" onClick={onGenerateTimetable}>
+                    Generate
+                  </Button>
+                )}
+                {onGenerateAITimetable && (
+                  <Button onClick={onGenerateAITimetable} className="gap-2">
+                    <IconSparkles className="h-4 w-4" />
+                    AI Generate
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

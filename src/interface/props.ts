@@ -86,6 +86,7 @@ export interface ClassTimetableProps {
 export interface DatabaseManagerProps {
   database: ITimetableDatabase;
   onLoadSampleData?: () => void;
-  onGenerateTimetable: () => void;
+  onGenerateTimetable?: () => void;
+  onGenerateAITimetable?: () => void;
   onDatabaseUpdate?: (database: ITimetableDatabase) => void;
 }
