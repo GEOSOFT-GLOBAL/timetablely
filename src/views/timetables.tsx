@@ -5,14 +5,35 @@ import GridControlls from "@/components/grid-controlls";
 import GridHeader from "@/components/grid-header";
 import TemplateManager from "@/components/template-manager";
 import TimetableControls from "@/components/timetable-controls";
-import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { dayLabels, gridSize } from "@/constants";
 import { useGridState } from "@/hooks/use-grid";
 import type { applyTemplate } from "@/lib/template";
 import { canMergeCells, generateTimeLabels } from "@/lib/temputils";
-import { extractTimetableData, generateAutomatedTimetable, logTimetableData } from "@/lib/timetable";
+import {
+  extractTimetableData,
+  generateAutomatedTimetable,
+  logTimetableData,
+} from "@/lib/timetable";
 import { sampleDatabase } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
+import { IconCheck, IconAlertCircle } from "@tabler/icons-react";
 import * as React from "react";
 
 interface TimetablesProps {
@@ -22,8 +43,14 @@ interface TimetablesProps {
 const Timetables: React.FC<TimetablesProps> = () => {
   const gridState = useGridState();
   const { database, setDatabase } = useDatabaseStore();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState<{
+    title: string;
+    message: string;
+    type: "success" | "error" | "info";
+  }>({ title: "", message: "", type: "info" });
 
-    const {
+  const {
     selectedCells,
     mergedCells,
     hiddenCells,
@@ -59,10 +86,10 @@ const Timetables: React.FC<TimetablesProps> = () => {
     cancelCellEdit,
   } = gridState;
 
- const timeLabels = generateTimeLabels(
+  const timeLabels = generateTimeLabels(
     columnCount,
     columnDurations,
-    defaultSlotDuration,
+    defaultSlotDuration
   );
 
   const handleDefaultDurationKeyDown = (e: React.KeyboardEvent) => {
@@ -84,10 +111,19 @@ const Timetables: React.FC<TimetablesProps> = () => {
     [key: string]: boolean;
   }>({});
 
+  const showDialog = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "info" = "info"
+  ) => {
+    setDialogContent({ title, message, type });
+    setDialogOpen(true);
+  };
+
   // Function to clear the timetable
   const handleClearTimetable = () => {
     gridState.setAllCellContents(new Map());
-    alert("Timetable cleared!");
+    showDialog("Success", "Timetable cleared successfully!", "success");
   };
 
   const handleExportData = () => {
@@ -97,7 +133,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
       columnCount,
       columnDurations,
       defaultSlotDuration,
-      mergedCells,
+      mergedCells
     );
 
     logTimetableData(timetableData);
@@ -106,16 +142,28 @@ const Timetables: React.FC<TimetablesProps> = () => {
     navigator.clipboard
       .writeText(JSON.stringify(timetableData, null, 2))
       .then(() => {
-        alert("Timetable data copied to clipboard and logged to console!");
+        showDialog(
+          "Success",
+          "Timetable data copied to clipboard and logged to console!",
+          "success"
+        );
       })
       .catch(() => {
-        alert("Timetable data logged to console (clipboard copy failed)");
+        showDialog(
+          "Info",
+          "Timetable data logged to console (clipboard copy failed)",
+          "info"
+        );
       });
   };
 
   const handleGenerateAutomatedTimetable = (classId?: string) => {
     if (database.courses.length === 0) {
-      alert("Please add subjects to the database first.");
+      showDialog(
+        "Error",
+        "Please add subjects to the database first.",
+        "error"
+      );
       return;
     }
 
@@ -124,7 +172,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
       columnCount,
       cellContents,
       hiddenCells,
-      classId,
+      classId
     );
 
     gridState.setAllCellContents(newCellContents);
@@ -133,26 +181,26 @@ const Timetables: React.FC<TimetablesProps> = () => {
     let subjectsCount = database.courses.length;
     let periodsCount = database.courses.reduce(
       (sum, s) => sum + s.periodsPerWeek,
-      0,
+      0
     );
 
     if (classId) {
       const selectedClass = database.sessions.find((c) => c.id === classId);
       if (selectedClass) {
         const classSubjects = database.courses.filter((s) =>
-          selectedClass.subjects.includes(s.id),
+          selectedClass.subjects.includes(s.id)
         );
         subjectsCount = classSubjects.length;
         periodsCount = classSubjects.reduce(
           (sum, s) => sum + s.periodsPerWeek,
-          0,
+          0
         );
       }
     }
   };
 
   const handleApplyTemplate = (
-    templateResult: ReturnType<typeof applyTemplate>,
+    templateResult: ReturnType<typeof applyTemplate>
   ) => {
     gridState.setAllCellContents(templateResult.cellContents);
 
@@ -167,38 +215,51 @@ const Timetables: React.FC<TimetablesProps> = () => {
 
     // Update grid state with template settings
     // Note: This would require additional hooks in useGridState to update these values
-    // For now, we'll show an alert that some settings might need manual adjustment
-    alert(
-      "Template applied! Note that column count and durations may need manual adjustment.",
+    // For now, we'll show a dialog that some settings might need manual adjustment
+    showDialog(
+      "Template Applied",
+      "Template applied successfully! Note that column count and durations may need manual adjustment.",
+      "success"
     );
   };
 
   const handleGenerateAutomatedTimetableWithAlert = (classId?: string) => {
+    if (database.courses.length === 0) {
+      showDialog(
+        "Error",
+        "Please add subjects to the database first.",
+        "error"
+      );
+      return;
+    }
+
     handleGenerateAutomatedTimetable(classId);
 
     // Get the number of subjects for the selected class
     let subjectsCount = database.courses.length;
     let periodsCount = database.courses.reduce(
       (sum, s) => sum + s.periodsPerWeek,
-      0,
+      0
     );
 
     if (classId) {
       const selectedClass = database.sessions.find((c) => c.id === classId);
       if (selectedClass) {
         const classSubjects = database.courses.filter((s) =>
-          selectedClass.subjects.includes(s.id),
+          selectedClass.subjects.includes(s.id)
         );
         subjectsCount = classSubjects.length;
         periodsCount = classSubjects.reduce(
           (sum, s) => sum + s.periodsPerWeek,
-          0,
+          0
         );
       }
     }
 
-    alert(
-      `Timetable generated! Added ${periodsCount} periods across ${subjectsCount} subjects.`,
+    showDialog(
+      "Timetable Generated",
+      `Successfully added ${periodsCount} periods across ${subjectsCount} subjects.`,
+      "success"
     );
   };
 
@@ -267,10 +328,45 @@ const Timetables: React.FC<TimetablesProps> = () => {
 
   return (
     <div className="flex flex-col w-full md:py-6 py-4 gap-4 px-4 lg:px-6">
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{dialogContent.title}</DialogTitle>
+            <DialogDescription>
+              <Alert
+                variant={
+                  dialogContent.type === "error" ? "destructive" : "default"
+                }
+                className="mt-4"
+              >
+                {dialogContent.type === "success" && (
+                  <IconCheck className="h-4 w-4" />
+                )}
+                {dialogContent.type === "error" && (
+                  <IconAlertCircle className="h-4 w-4" />
+                )}
+                {dialogContent.type === "info" && (
+                  <IconAlertCircle className="h-4 w-4" />
+                )}
+                <AlertTitle>
+                  {dialogContent.type === "success" && "Success"}
+                  {dialogContent.type === "error" && "Error"}
+                  {dialogContent.type === "info" && "Information"}
+                </AlertTitle>
+                <AlertDescription>{dialogContent.message}</AlertDescription>
+              </Alert>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end">
+            <Button onClick={() => setDialogOpen(false)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <DatabaseManager
         database={database}
         onGenerateTimetable={handleGenerateAutomatedTimetableWithAlert}
-        onLoadSampleData={() => setDatabase(sampleDatabase) }
+        onLoadSampleData={() => setDatabase(sampleDatabase)}
       />
       <TemplateManager
         columnCount={columnCount}
@@ -329,7 +425,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
                     </div>
                   </td>
                   {Array.from({ length: columnCount }, (_, col) =>
-                    renderCell(row, col),
+                    renderCell(row, col)
                   )}
                 </tr>
               ))}
