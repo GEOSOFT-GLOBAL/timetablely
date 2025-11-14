@@ -8,6 +8,8 @@ import Templates from "@/views/templates";
 import Timetables from "@/views/timetables";
 import Settings from "@/views/settings";
 import Notifications from "@/views/notifications";
+import Billing from "@/views/billing";
+import Account from "@/views/account";
 
 export const appRoutes = [
   {
@@ -49,5 +51,13 @@ export const appRoutes = [
   {
     path: "notifications",
     element: <Notifications />,
+  },
+  {
+    path: "billing",
+    element: <Billing />,
+  },
+  {
+    path: "account",
+    element: <Account />,
   },
 ];
