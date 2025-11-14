@@ -10,12 +10,14 @@ import {
   RefreshCwIcon,
   ClockIcon,
 } from "lucide-react";
+import { IconFileTypePdf } from "@tabler/icons-react";
 
 const GridControlls: React.FC<GridControlsProps> = ({
   canMerge,
   columnCount,
   onResetGrid,
   onExportData,
+  onExportPDF,
   onMergeCells,
   selectedCellsCount,
   tempDefaultDuration,
@@ -103,7 +105,16 @@ const GridControlls: React.FC<GridControlsProps> = ({
             onClick={onExportData}
           >
             <DownloadIcon className="size-4" />
-            Export Data
+            Export JSON
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full gap-2"
+            onClick={onExportPDF}
+          >
+            <IconFileTypePdf className="size-4" />
+            Export PDF
           </Button>
 
           <Button

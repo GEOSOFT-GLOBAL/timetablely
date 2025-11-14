@@ -33,6 +33,7 @@ import {
   logTimetableData,
 } from "@/lib/timetable";
 import { generateAITimetable } from "@/lib/ai-timetable";
+import { exportTimetableToPDF } from "@/lib/pdf-export";
 import { sampleDatabase } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { IconCheck, IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
@@ -150,7 +151,11 @@ const Timetables: React.FC<TimetablesProps> = () => {
 
   const generateWithAI = async () => {
     if (database.courses.length === 0) {
-      showDialog("Error", "Please add subjects to the database first.", "error");
+      showDialog(
+        "Error",
+        "Please add subjects to the database first.",
+        "error"
+      );
       return;
     }
 
@@ -184,7 +189,9 @@ const Timetables: React.FC<TimetablesProps> = () => {
       console.error("AI Generation Error:", error);
       showDialog(
         "AI Generation Failed",
-        error instanceof Error ? error.message : "Failed to generate timetable with AI. Please check your API key and try again.",
+        error instanceof Error
+          ? error.message
+          : "Failed to generate timetable with AI. Please check your API key and try again.",
         "error"
       );
     } finally {
@@ -230,6 +237,28 @@ const Timetables: React.FC<TimetablesProps> = () => {
           "info"
         );
       });
+  };
+
+  const handleExportPDF = () => {
+    try {
+      exportTimetableToPDF({
+        cellContents,
+        columnCount,
+        columnDurations,
+        defaultSlotDuration,
+        hiddenCells,
+        title: "Weekly Timetable",
+        subtitle: "Master Schedule",
+      });
+      showDialog(
+        "Success",
+        "Timetable exported as PDF successfully!",
+        "success"
+      );
+    } catch (error) {
+      console.error("PDF Export Error:", error);
+      showDialog("Error", "Failed to export PDF. Please try again.", "error");
+    }
   };
 
   const handleGenerateAutomatedTimetable = (classId?: string) => {
@@ -422,8 +451,9 @@ const Timetables: React.FC<TimetablesProps> = () => {
           <DialogHeader>
             <DialogTitle>Enter Gemini API Key</DialogTitle>
             <DialogDescription>
-              Please enter your Google Gemini API key to use AI-powered timetable generation.
-              Your key will be saved locally for future use.
+              Please enter your Google Gemini API key to use AI-powered
+              timetable generation. Your key will be saved locally for future
+              use.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -451,7 +481,10 @@ const Timetables: React.FC<TimetablesProps> = () => {
             </div>
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setApiKeyDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setApiKeyDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={saveApiKey} disabled={!apiKey.trim()}>
@@ -504,6 +537,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
         editingDefaultDuration={editingDefaultDuration}
         onResetGrid={resetGrid}
         onExportData={handleExportData}
+        onExportPDF={handleExportPDF}
         onMergeCells={mergeCells}
         onTempDefaultDurationChange={gridState.setTempDefaultDuration}
         onSaveDefaultDurationEdit={saveDefaultDurationEdit}

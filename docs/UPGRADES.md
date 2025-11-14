@@ -4,7 +4,7 @@
 
 - Be able to merge already merged (rectangular) cells
 - Be able to sync timetable to the server
-- Add AI generation using Gemini
+✅ Add AI generation using Gemini
 - Export to PDF using Rust
 - Add background colors to cells
 - Use tabs for certain views to manage space

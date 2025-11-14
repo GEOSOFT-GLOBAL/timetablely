@@ -27,6 +27,7 @@ export interface GridControlsProps {
   columnCount: number;
   onResetGrid: () => void;
   onExportData: () => void;
+  onExportPDF?: () => void;
   onMergeCells: () => void;
   selectedCellsCount: number;
   tempDefaultDuration: string;
