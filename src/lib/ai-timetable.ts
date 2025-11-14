@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import type { ITimetableDatabase } from "@/interface/database";
 import type { ICellContent } from "@/interface/types";
 import { generateTimeLabels } from "./temputils";
@@ -31,11 +31,7 @@ export const generateAITimetable = async (
   } = config;
 
   // Initialize Gemini AI
-  const genAI = new GoogleGenerativeAI(apiKey);
-
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-exp",
-  });
+  const ai = new GoogleGenAI({ apiKey });
 
   // Prepare data for AI
   const timeLabels = generateTimeLabels(
@@ -139,9 +135,11 @@ Where:
 Generate the optimal timetable now:`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
+    const text = response.text || "";
 
     // Parse AI response
     let schedule: Array<{ day: number; slot: number; subjectId: string }>;

@@ -136,11 +136,13 @@ This means you've made too many requests in a short time:
 - You can clear it anytime by clearing browser localStorage
 - For production use, consider implementing server-side API key management
 
-## Cost
+## Cost & Rate Limits
 
+- **Free Tier**: 15 requests per minute, 1,500 requests per day
 - Gemini API has a free tier with generous limits
 - Check [Google AI Pricing](https://ai.google.dev/pricing) for current rates
 - Typical timetable generation uses minimal tokens
+- If you hit rate limits, wait 30-60 seconds or use regular generation
 
 ## Support
 
