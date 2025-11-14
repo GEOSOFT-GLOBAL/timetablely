@@ -1,27 +1,27 @@
 import {
   IconDots,
-  IconFolder,
-  IconShare3,
   IconTrash,
   type Icon,
+  IconShare3,
+  IconFolder,
 } from "@tabler/icons-react";
 import { NavLink } from "react-router-dom";
 
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
   useSidebar,
+  SidebarMenu,
+  SidebarGroup,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuAction,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 
 export function NavDocuments({
