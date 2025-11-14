@@ -6,6 +6,7 @@ import Sessions from "@/views/sessions";
 import HowToUse from "@/views/how-to-use";
 import Templates from "@/views/templates";
 import Timetables from "@/views/timetables";
+import Settings from "@/views/settings";
 
 export const appRoutes = [
   {
@@ -39,5 +40,9 @@ export const appRoutes = [
   {
     path: "walkthrough",
     element: <HowToUse />,
+  },
+  {
+    path: "settings",
+    element: <Settings />,
   },
 ];
