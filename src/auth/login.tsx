@@ -1,8 +1,9 @@
+import { LoginForm } from '@/components/login-form'
 import React from 'react'
 
 const Login = () => {
   return (
-    <div>Login</div>
+    <div><LoginForm/></div>
   )
 }
 
