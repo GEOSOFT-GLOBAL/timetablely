@@ -24,7 +24,7 @@ export function LoginForm({
   const handleSubmit = () => 
   {
     sessionStorage.setItem("token", "123456789jgjgnkvn");
-    navigation("/#/")
+    navigation("/app/dashboard")
   }
   return (
     <div className={cn("flex flex-col w-[550px] gap-6", className)} {...props}>

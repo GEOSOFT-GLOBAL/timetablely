@@ -40,27 +40,27 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/",
+      url: "/app/dashboard",
       icon: IconDashboard,
     },
     {
       title: "Courses",
-      url: "/courses",
+      url: "/app/courses",
       icon: IconListDetails,
     },
     {
       title: "Tutors",
-      url: "/tutors",
+      url: "/app/tutors",
       icon: IconChartBar,
     },
     {
       title: "Sessions",
-      url: "/sessions",
+      url: "/app/sessions",
       icon: IconFolder,
     },
     {
       title: "Templates",
-      url: "/templates",
+      url: "/app/templates",
       icon: IconUsers,
     },
   ],
@@ -115,7 +115,7 @@ const data = {
   navSecondary: [
     {
       title: "Settings",
-      url: "/settings",
+      url: "/app/settings",
       icon: IconSettings,
     },
     {
@@ -132,17 +132,17 @@ const data = {
   documents: [
     {
       name: "Blocked Texts",
-      url: "/special-blocks",
+      url: "/app/special-blocks",
       icon: IconDatabase,
     },
     {
       name: "Timetable",
-      url: "/timetables",
+      url: "/app/timetables",
       icon: IconReport,
     },
     {
       name: "Walkthrough",
-      url: "/walkthrough",
+      url: "/app/walkthrough",
       icon: IconFileWord,
     },
   ],

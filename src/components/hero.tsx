@@ -2,8 +2,11 @@ import * as React from "react";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-white dark:bg-neutral-950">
       <BackgroundRippleEffect />
@@ -31,11 +34,20 @@ const Hero: React.FC = () => {
         </p>
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button size="lg" className="gap-2 text-base">
+          <Button
+            size="lg"
+            className="gap-2 text-base"
+            onClick={() => navigate("/app/dashboard")}
+          >
             <Calendar className="size-5" />
             Get Started Free
           </Button>
-          <Button size="lg" variant="outline" className="gap-2 text-base">
+          <Button
+            size="lg"
+            variant="outline"
+            className="gap-2 text-base"
+            onClick={() => navigate("/app/timetables")}
+          >
             <Clock className="size-5" />
             View Demo
           </Button>

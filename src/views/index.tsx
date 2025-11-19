@@ -47,7 +47,7 @@ const Dashboard = () => {
       icon: IconUsers,
       color: "text-blue-600",
       bgColor: "bg-blue-50 dark:bg-blue-950",
-      route: "/tutors",
+      route: "/app/tutors",
     },
     {
       title: "Total Courses",
@@ -55,7 +55,7 @@ const Dashboard = () => {
       icon: IconBook,
       color: "text-green-600",
       bgColor: "bg-green-50 dark:bg-green-950",
-      route: "/courses",
+      route: "/app/courses",
     },
     {
       title: "Total Sessions",
@@ -63,7 +63,7 @@ const Dashboard = () => {
       icon: IconSchool,
       color: "text-purple-600",
       bgColor: "bg-purple-50 dark:bg-purple-950",
-      route: "/sessions",
+      route: "/app/sessions",
     },
     {
       title: "Weekly Periods",
@@ -71,7 +71,7 @@ const Dashboard = () => {
       icon: IconClock,
       color: "text-orange-600",
       bgColor: "bg-orange-50 dark:bg-orange-950",
-      route: "/timetables",
+      route: "/app/timetables",
     },
   ];
 
@@ -232,7 +232,7 @@ const Dashboard = () => {
             <Button
               variant="outline"
               className="h-auto py-4 flex flex-col gap-2"
-              onClick={() => navigate("/timetables")}
+              onClick={() => navigate("/app/timetables")}
             >
               <IconCalendar className="h-6 w-6" />
               <span>Generate Timetable</span>
@@ -241,7 +241,7 @@ const Dashboard = () => {
             <Button
               variant="outline"
               className="h-auto py-4 flex flex-col gap-2"
-              onClick={() => navigate("/tutors")}
+              onClick={() => navigate("/app/tutors")}
             >
               <IconUsers className="h-6 w-6" />
               <span>Manage Tutors</span>
@@ -250,7 +250,7 @@ const Dashboard = () => {
             <Button
               variant="outline"
               className="h-auto py-4 flex flex-col gap-2"
-              onClick={() => navigate("/courses")}
+              onClick={() => navigate("/app/courses")}
             >
               <IconBook className="h-6 w-6" />
               <span>Manage Courses</span>
@@ -277,7 +277,7 @@ const Dashboard = () => {
               <li>Set up sessions (classes) if needed</li>
               <li>Generate your timetable automatically</li>
             </ol>
-            <Button className="mt-4" onClick={() => navigate("/tutors")}>
+            <Button className="mt-4" onClick={() => navigate("/app/tutors")}>
               Add Your First Tutor
             </Button>
           </CardContent>

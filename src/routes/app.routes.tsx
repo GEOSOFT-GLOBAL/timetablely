@@ -13,7 +13,7 @@ import Notifications from "@/views/notifications";
 
 export const appRoutes = [
   {
-    index: true,
+    path: "dashboard",
     element: <Dashboard />,
   },
   {

@@ -32,7 +32,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
       icon: UserIcon,
       color: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-950",
-      route: "/tutors",
+      route: "/app/tutors",
     },
     {
       title: "Courses",
@@ -40,7 +40,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
       icon: BookOpenIcon,
       color: "text-green-500",
       bgColor: "bg-green-50 dark:bg-green-950",
-      route: "/courses",
+      route: "/app/courses",
     },
     {
       title: "Classes",
@@ -48,7 +48,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
       icon: GraduationCapIcon,
       color: "text-purple-500",
       bgColor: "bg-purple-50 dark:bg-purple-950",
-      route: "/sessions",
+      route: "/app/sessions",
     },
   ];
 
