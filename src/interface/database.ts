@@ -4,6 +4,7 @@ import type { PRIORITY } from "./enums";
 export interface ITutor {
   id: string;
   name: string;
+  email?: string;
   subjects: string[];
   maxPeriodsPerDay?: number;
   unavailableSlots?: string[]; // cellKeys like "1-3" (row-col)

@@ -2,6 +2,23 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCaption,
@@ -15,17 +32,60 @@ import { dayLabels, gridSize } from "@/constants";
 import { useGridState } from "@/hooks/use-grid";
 import { canMergeCells, generateTimeLabels } from "@/lib/temputils";
 import { exportTimetableToPDF } from "@/lib/pdf-export";
-import { sampleDatabase } from "@/mock/load-data";
 import { generateAutomatedTimetable } from "@/lib/timetable";
-import { ArrowLeft, Sparkles, RefreshCw, Merge, Palette } from "lucide-react";
+import type {
+  ITimetableDatabase,
+  ITutor,
+  ICourse,
+  ISession,
+} from "@/interface/database";
+import { PRIORITY } from "@/interface/enums";
+import {
+  ArrowLeft,
+  Sparkles,
+  RefreshCw,
+  Merge,
+  Palette,
+  UserPlus,
+  BookPlus,
+  Users,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { IconFileTypePdf } from "@tabler/icons-react";
+import { v4 as uuidv4 } from "uuid";
 
 const QuickStart: React.FC = () => {
   const navigate = useNavigate();
   const gridState = useGridState();
-  const [database] = React.useState(sampleDatabase);
   const [showColorPalette, setShowColorPalette] = React.useState(false);
+
+  // Database state
+  const [database, setDatabase] = React.useState<ITimetableDatabase>({
+    tutors: [],
+    courses: [],
+    sessions: [],
+    blockedSlots: [],
+    blockedTexts: [],
+    templates: [],
+  });
+
+  // Dialog states
+  const [tutorDialogOpen, setTutorDialogOpen] = React.useState(false);
+  const [courseDialogOpen, setCourseDialogOpen] = React.useState(false);
+  const [sessionDialogOpen, setSessionDialogOpen] = React.useState(false);
+
+  // Form states
+  const [newTutor, setNewTutor] = React.useState({ name: "", email: "" });
+  const [newCourse, setNewCourse] = React.useState({
+    name: "",
+    tutorId: "",
+    periodsPerWeek: 3,
+    priority: PRIORITY.MEDIUM,
+  });
+  const [newSession, setNewSession] = React.useState({
+    name: "",
+    subjects: [] as string[],
+  });
 
   const {
     selectedCells,
@@ -72,7 +132,77 @@ const QuickStart: React.FC = () => {
     if (e.key === "Escape") cancelDurationEdit();
   };
 
+  // Add Tutor
+  const handleAddTutor = () => {
+    if (!newTutor.name.trim()) return;
+
+    const tutor: ITutor = {
+      id: uuidv4(),
+      name: newTutor.name,
+      email: newTutor.email,
+      subjects: [],
+    };
+
+    setDatabase((prev) => ({
+      ...prev,
+      tutors: [...prev.tutors, tutor],
+    }));
+
+    setNewTutor({ name: "", email: "" });
+    setTutorDialogOpen(false);
+  };
+
+  // Add Course
+  const handleAddCourse = () => {
+    if (!newCourse.name.trim() || !newCourse.tutorId) return;
+
+    const course: ICourse = {
+      id: uuidv4(),
+      name: newCourse.name,
+      teacherId: newCourse.tutorId,
+      periodsPerWeek: newCourse.periodsPerWeek,
+      priority: newCourse.priority,
+    };
+
+    setDatabase((prev) => ({
+      ...prev,
+      courses: [...prev.courses, course],
+    }));
+
+    setNewCourse({
+      name: "",
+      tutorId: "",
+      periodsPerWeek: 3,
+      priority: PRIORITY.MEDIUM,
+    });
+    setCourseDialogOpen(false);
+  };
+
+  // Add Session
+  const handleAddSession = () => {
+    if (!newSession.name.trim()) return;
+
+    const session: ISession = {
+      id: uuidv4(),
+      name: newSession.name,
+      subjects: newSession.subjects,
+    };
+
+    setDatabase((prev) => ({
+      ...prev,
+      sessions: [...prev.sessions, session],
+    }));
+
+    setNewSession({ name: "", subjects: [] });
+    setSessionDialogOpen(false);
+  };
+
   const handleGenerateTimetable = () => {
+    if (database.courses.length === 0) {
+      alert("Please add at least one course first!");
+      return;
+    }
+
     const newCellContents = generateAutomatedTimetable(
       database,
       columnCount,
@@ -155,7 +285,7 @@ const QuickStart: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
       {/* Header */}
       <div className="border-b bg-white/80 backdrop-blur-sm dark:bg-neutral-900/80">
         <div className="container mx-auto px-4 py-4">
@@ -168,7 +298,7 @@ const QuickStart: React.FC = () => {
                 className="gap-2"
               >
                 <ArrowLeft className="size-4" />
-                Back to Home
+                Back
               </Button>
               <div>
                 <h1 className="text-2xl font-bold">Quick Start Timetable</h1>
@@ -179,7 +309,7 @@ const QuickStart: React.FC = () => {
             </div>
             <Button onClick={() => navigate("/auth/login")} className="gap-2">
               <Sparkles className="size-4" />
-              Sign Up for Full Access
+              Sign Up
             </Button>
           </div>
         </div>
@@ -189,87 +319,48 @@ const QuickStart: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Controls */}
           <div className="lg:col-span-1 space-y-4">
+            {/* Add Data */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Quick Actions</CardTitle>
+                <CardTitle className="text-base">Add Data</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button
-                  className="w-full gap-2"
-                  onClick={handleGenerateTimetable}
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2 justify-start"
+                  onClick={() => setTutorDialogOpen(true)}
                 >
-                  <Sparkles className="size-4" />
-                  Generate Sample
+                  <UserPlus className="size-4" />
+                  Add Tutor
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full gap-2"
-                  onClick={handleExportPDF}
+                  size="sm"
+                  className="w-full gap-2 justify-start"
+                  onClick={() => setCourseDialogOpen(true)}
+                  disabled={database.tutors.length === 0}
                 >
-                  <IconFileTypePdf className="size-4" />
-                  Export PDF
+                  <BookPlus className="size-4" />
+                  Add Course
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full gap-2"
-                  onClick={mergeCells}
-                  disabled={!canMergeCells(selectedCells)}
+                  size="sm"
+                  className="w-full gap-2 justify-start"
+                  onClick={() => setSessionDialogOpen(true)}
+                  disabled={database.courses.length === 0}
                 >
-                  <Merge className="size-4" />
-                  Merge Cells
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full gap-2"
-                  onClick={() => setShowColorPalette(!showColorPalette)}
-                  disabled={selectedCells.size === 0}
-                >
-                  <Palette className="size-4" />
-                  Color Cells
-                </Button>
-                {showColorPalette && selectedCells.size > 0 && (
-                  <div className="p-3 border rounded-lg space-y-2 bg-gray-50 dark:bg-neutral-800">
-                    <div className="grid grid-cols-5 gap-2">
-                      {[
-                        "#ffffff",
-                        "#f3f4f6",
-                        "#fef3c7",
-                        "#fecaca",
-                        "#fed7aa",
-                        "#d1fae5",
-                        "#bfdbfe",
-                        "#ddd6fe",
-                        "#fbcfe8",
-                        "#fce7f3",
-                      ].map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => {
-                            setSelectedCellsBackgroundColor(color);
-                            setShowColorPalette(false);
-                          }}
-                          className="w-full h-8 rounded border-2 border-gray-300 hover:scale-110 transition-transform"
-                          style={{ backgroundColor: color }}
-                          title={color}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <Button
-                  variant="destructive"
-                  className="w-full gap-2"
-                  onClick={resetGrid}
-                >
-                  <RefreshCw className="size-4" />
-                  Reset Grid
+                  <Users className="size-4" />
+                  Add Session
                 </Button>
               </CardContent>
             </Card>
 
+            {/* Stats */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Sample Data</CardTitle>
+                <CardTitle className="text-base">Your Data</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -289,11 +380,96 @@ const QuickStart: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={handleGenerateTimetable}
+                  disabled={database.courses.length === 0}
+                >
+                  <Sparkles className="size-4" />
+                  Generate
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={handleExportPDF}
+                >
+                  <IconFileTypePdf className="size-4" />
+                  Export PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={mergeCells}
+                  disabled={!canMergeCells(selectedCells)}
+                >
+                  <Merge className="size-4" />
+                  Merge
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={() => setShowColorPalette(!showColorPalette)}
+                  disabled={selectedCells.size === 0}
+                >
+                  <Palette className="size-4" />
+                  Color
+                </Button>
+                {showColorPalette && selectedCells.size > 0 && (
+                  <div className="p-2 border rounded-lg space-y-2 bg-gray-50 dark:bg-neutral-800">
+                    <div className="grid grid-cols-5 gap-1">
+                      {[
+                        "#ffffff",
+                        "#f3f4f6",
+                        "#fef3c7",
+                        "#fecaca",
+                        "#fed7aa",
+                        "#d1fae5",
+                        "#bfdbfe",
+                        "#ddd6fe",
+                        "#fbcfe8",
+                        "#fce7f3",
+                      ].map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => {
+                            setSelectedCellsBackgroundColor(color);
+                            setShowColorPalette(false);
+                          }}
+                          className="w-full h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full gap-2"
+                  onClick={resetGrid}
+                >
+                  <RefreshCw className="size-4" />
+                  Reset
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
-              <CardContent className="pt-6">
-                <p className="text-sm text-blue-900 dark:text-blue-100">
-                  💡 <strong>Tip:</strong> Double-click cells to edit, select
-                  multiple cells to merge or color them!
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-blue-900 dark:text-blue-100">
+                  💡 Start by adding tutors, then courses, then generate your
+                  timetable!
                 </p>
               </CardContent>
             </Card>
@@ -302,15 +478,15 @@ const QuickStart: React.FC = () => {
           {/* Timetable Grid */}
           <div className="lg:col-span-3">
             <Card>
-              <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+              <CardHeader className="bg-linear-to-r from-blue-600 to-purple-600 text-white">
                 <CardTitle>Weekly Timetable</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <Table>
                     <TableCaption>
-                      Interactive timetable - try editing, merging, and coloring
-                      cells!
+                      Double-click cells to edit, select multiple to merge or
+                      color!
                     </TableCaption>
                     <TableHeader>
                       <TableRow>
@@ -341,6 +517,183 @@ const QuickStart: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Tutor Dialog */}
+      <Dialog open={tutorDialogOpen} onOpenChange={setTutorDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Tutor</DialogTitle>
+            <DialogDescription>
+              Add a new tutor to your database.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="tutor-name">Name *</Label>
+              <Input
+                id="tutor-name"
+                value={newTutor.name}
+                onChange={(e) =>
+                  setNewTutor({ ...newTutor, name: e.target.value })
+                }
+                placeholder="John Doe"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="tutor-email">Email</Label>
+              <Input
+                id="tutor-email"
+                type="email"
+                value={newTutor.email}
+                onChange={(e) =>
+                  setNewTutor({ ...newTutor, email: e.target.value })
+                }
+                placeholder="john@example.com"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTutorDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddTutor} disabled={!newTutor.name.trim()}>
+              Add Tutor
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Course Dialog */}
+      <Dialog open={courseDialogOpen} onOpenChange={setCourseDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Course</DialogTitle>
+            <DialogDescription>
+              Add a new course and assign a tutor.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="course-name">Course Name *</Label>
+              <Input
+                id="course-name"
+                value={newCourse.name}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, name: e.target.value })
+                }
+                placeholder="Mathematics"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="course-tutor">Tutor *</Label>
+              <Select
+                value={newCourse.tutorId}
+                onValueChange={(value) =>
+                  setNewCourse({ ...newCourse, tutorId: value })
+                }
+              >
+                <SelectTrigger id="course-tutor">
+                  <SelectValue placeholder="Select a tutor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {database.tutors.map((tutor) => (
+                    <SelectItem key={tutor.id} value={tutor.id}>
+                      {tutor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="course-periods">Periods per Week</Label>
+              <Input
+                id="course-periods"
+                type="number"
+                min="1"
+                max="10"
+                value={newCourse.periodsPerWeek}
+                onChange={(e) =>
+                  setNewCourse({
+                    ...newCourse,
+                    periodsPerWeek: parseInt(e.target.value) || 1,
+                  })
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="course-priority">Priority</Label>
+              <Select
+                value={newCourse.priority}
+                onValueChange={(value) =>
+                  setNewCourse({ ...newCourse, priority: value as PRIORITY })
+                }
+              >
+                <SelectTrigger id="course-priority">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PRIORITY.HIGH}>High</SelectItem>
+                  <SelectItem value={PRIORITY.MEDIUM}>Medium</SelectItem>
+                  <SelectItem value={PRIORITY.LOW}>Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCourseDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddCourse}
+              disabled={!newCourse.name.trim() || !newCourse.tutorId}
+            >
+              Add Course
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Session Dialog */}
+      <Dialog open={sessionDialogOpen} onOpenChange={setSessionDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Session</DialogTitle>
+            <DialogDescription>
+              Add a new class session (optional).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="session-name">Session Name *</Label>
+              <Input
+                id="session-name"
+                value={newSession.name}
+                onChange={(e) =>
+                  setNewSession({ ...newSession, name: e.target.value })
+                }
+                placeholder="Class A"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setSessionDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddSession}
+              disabled={!newSession.name.trim()}
+            >
+              Add Session
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
