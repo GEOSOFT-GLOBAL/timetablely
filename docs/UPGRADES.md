@@ -6,9 +6,10 @@
 - Be able to sync timetable to the server
 ✅ Add AI generation using Gemini
 - Export to PDF using Rust
-- Add background colors to cells
+✅ Add background colors to cells
 - Use tabs for certain views to manage space
 - move notifications from a view to a floating closable side bar to the right
+- export to PDF on web is a Premium feature
 
 
 ## Future Suggestions

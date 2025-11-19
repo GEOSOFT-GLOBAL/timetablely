@@ -1,9 +1,10 @@
 import * as React from "react";
+import Hero from "@/components/hero";
 
 const Landing: React.FC = () => {
   return (
-    <div>
-      <div>hi</div>
+    <div className="min-h-screen">
+      <Hero />
     </div>
   );
 };
