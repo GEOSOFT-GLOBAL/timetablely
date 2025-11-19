@@ -61,6 +61,7 @@ export interface GridCellProps {
     cellKey: string,
     alignment: "left" | "center" | "right"
   ) => void;
+  onSetCellBackgroundColor: (cellKey: string, color: string) => void;
 }
 
 export interface TemplateManagerProps {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface IMergeInfo {
   rowSpan: number;
   colSpan: number;
@@ -14,6 +15,7 @@ export interface ICellContent {
   isVertical: boolean;
   alignment: "left" | "center" | "right";
   className?: string; // ID of the class this cell belongs to
+  backgroundColor?: string; // Background color for the cell
 }
 
 export interface ICellPosition {
@@ -65,6 +67,7 @@ export interface IGridActions {
     cellKey: string,
     alignment: "left" | "center" | "right",
   ) => void;
+  setCellBackgroundColor: (cellKey: string, color: string) => void;
   // updateCellContents: (contents: Map<string, ICellContent>) => void;
   setAllCellContents: (contents: Map<string, ICellContent>) => void;
   setAllMergedCells: (mergedCells: Map<string, any>) => void;

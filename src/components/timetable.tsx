@@ -52,6 +52,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
     setTempCellText,
     toggleCellVertical,
     setCellAlignment,
+    setCellBackgroundColor,
     saveCellEdit,
     cancelCellEdit,
   } = gridState;
@@ -59,7 +60,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
   const timeLabels = generateTimeLabels(
     columnCount,
     columnDurations,
-    defaultSlotDuration,
+    defaultSlotDuration
   );
 
   const handleDefaultDurationKeyDown = (e: React.KeyboardEvent) => {
@@ -98,7 +99,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
       columnCount,
       cellContents,
       hiddenCells,
-      classId,
+      classId
     );
 
     gridState.setAllCellContents(newCellContents);
@@ -107,19 +108,19 @@ const TimeTable: React.FC<TimeTableProps> = () => {
     let subjectsCount = database.courses.length;
     let periodsCount = database.courses.reduce(
       (sum, s) => sum + s.periodsPerWeek,
-      0,
+      0
     );
 
     if (classId) {
       const selectedClass = database.sessions.find((c) => c.id === classId);
       if (selectedClass) {
         const classSubjects = database.courses.filter((s) =>
-          selectedClass.subjects.includes(s.id),
+          selectedClass.subjects.includes(s.id)
         );
         subjectsCount = classSubjects.length;
         periodsCount = classSubjects.reduce(
           (sum, s) => sum + s.periodsPerWeek,
-          0,
+          0
         );
       }
     }
@@ -132,25 +133,25 @@ const TimeTable: React.FC<TimeTableProps> = () => {
     let subjectsCount = database.courses.length;
     let periodsCount = database.courses.reduce(
       (sum, s) => sum + s.periodsPerWeek,
-      0,
+      0
     );
 
     if (classId) {
       const selectedClass = database.sessions.find((c) => c.id === classId);
       if (selectedClass) {
         const classSubjects = database.courses.filter((s) =>
-          selectedClass.subjects.includes(s.id),
+          selectedClass.subjects.includes(s.id)
         );
         subjectsCount = classSubjects.length;
         periodsCount = classSubjects.reduce(
           (sum, s) => sum + s.periodsPerWeek,
-          0,
+          0
         );
       }
     }
 
     alert(
-      `Timetable generated! Added ${periodsCount} periods across ${subjectsCount} subjects.`,
+      `Timetable generated! Added ${periodsCount} periods across ${subjectsCount} subjects.`
     );
   };
 
@@ -189,6 +190,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
         onCancelCellEdit={cancelCellEdit}
         onToggleCellVertical={toggleCellVertical}
         onSetCellAlignment={setCellAlignment}
+        onSetCellBackgroundColor={setCellBackgroundColor}
       />
     );
   };
@@ -247,7 +249,7 @@ const TimeTable: React.FC<TimeTableProps> = () => {
                     </div>
                   </td>
                   {Array.from({ length: columnCount }, (_, col) =>
-                    renderCell(row, col),
+                    renderCell(row, col)
                   )}
                 </tr>
               ))}

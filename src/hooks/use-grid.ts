@@ -280,6 +280,7 @@ export const useGridState = (): IGridState & IGridActions => {
         isVertical: currentContent?.isVertical || false,
         alignment: currentContent?.alignment || "center",
         className: currentContent?.className, // Preserve the class ID
+        backgroundColor: currentContent?.backgroundColor, // Preserve the background color
       };
 
       const newCellContents = new Map(cellContents);
@@ -307,6 +308,7 @@ export const useGridState = (): IGridState & IGridActions => {
       isVertical: !currentContent?.isVertical,
       alignment: currentContent?.alignment || "center",
       className: currentContent?.className, // Preserve the class ID
+      backgroundColor: currentContent?.backgroundColor, // Preserve the background color
     };
 
     const newCellContents = new Map(cellContents);
@@ -324,6 +326,22 @@ export const useGridState = (): IGridState & IGridActions => {
       isVertical: currentContent?.isVertical || false,
       alignment: alignment,
       className: currentContent?.className, // Preserve the class ID
+      backgroundColor: currentContent?.backgroundColor, // Preserve the background color
+    };
+
+    const newCellContents = new Map(cellContents);
+    newCellContents.set(cellKey, newContent);
+    setCellContents(newCellContents);
+  };
+
+  const setCellBackgroundColor = (cellKey: string, color: string) => {
+    const currentContent = cellContents.get(cellKey);
+    const newContent: ICellContent = {
+      text: currentContent?.text || "",
+      isVertical: currentContent?.isVertical || false,
+      alignment: currentContent?.alignment || "center",
+      className: currentContent?.className, // Preserve the class ID
+      backgroundColor: color || undefined, // Set or clear the background color
     };
 
     const newCellContents = new Map(cellContents);
@@ -386,6 +404,7 @@ export const useGridState = (): IGridState & IGridActions => {
     setTempCellText,
     toggleCellVertical,
     setCellAlignment,
+    setCellBackgroundColor,
     setAllCellContents,
     setAllMergedCells,
     setAllHiddenCells,

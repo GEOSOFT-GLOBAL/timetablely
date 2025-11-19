@@ -88,6 +88,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
     setTempCellText,
     toggleCellVertical,
     setCellAlignment,
+    setCellBackgroundColor,
     saveCellEdit,
     cancelCellEdit,
   } = gridState;
@@ -381,6 +382,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
         onCancelCellEdit={cancelCellEdit}
         onToggleCellVertical={toggleCellVertical}
         onSetCellAlignment={setCellAlignment}
+        onSetCellBackgroundColor={setCellBackgroundColor}
       />
     );
   };

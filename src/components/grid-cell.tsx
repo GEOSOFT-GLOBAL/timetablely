@@ -6,9 +6,11 @@ import {
   AlignRight,
   MoreVertical,
   RotateCcw,
+  Palette,
 } from "lucide-react";
 import * as React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Input } from "./ui/input";
 
 const GridCell: React.FC<GridCellProps> = ({
   row,
@@ -28,8 +30,10 @@ const GridCell: React.FC<GridCellProps> = ({
   onCancelCellEdit,
   onToggleCellVertical,
   onSetCellAlignment,
+  onSetCellBackgroundColor,
 }) => {
   const [showCellMenu, setShowCellMenu] = React.useState(false);
+  const [showColorPicker, setShowColorPicker] = React.useState(false);
 
   if (hiddenCells.has(cellKey)) {
     return null;
@@ -47,20 +51,31 @@ const GridCell: React.FC<GridCellProps> = ({
 
   const hasContent = cellContent && cellContent.text.trim();
   const alignmentClass = getAlignmentClass(cellContent?.alignment || "center");
+  const backgroundColor = cellContent?.backgroundColor;
+  
+  // Determine the background color based on state
+  const getBgColor = () => {
+    if (editingCell === cellKey) return "bg-yellow-50";
+    if (isSelected) return "bg-blue-300";
+    if (mergeInfo) return "bg-green-100";
+    if (isColumnHovered && !backgroundColor) return "bg-gray-50";
+    return backgroundColor ? "" : "bg-white";
+  };
+
   return (
     <td
       key={cellKey}
       className={`
         border-2 border-gray-400 h-[100px] w-[150px] cursor-pointer transition-all duration-200 relative group
-        ${
-          isSelected
-            ? "bg-blue-300 border-blue-500 shadow-lg"
-            : "bg-white hover:bg-gray-100"
-        }
-        ${mergeInfo ? "bg-green-100 border-green-500" : ""}
-        ${isColumnHovered ? "bg-gray-50" : ""}
-        ${editingCell === cellKey ? "bg-yellow-50 border-yellow-400" : ""}
+        ${getBgColor()}
+        ${!backgroundColor ? "hover:bg-gray-100" : ""}
+        ${isSelected ? "border-blue-500 shadow-lg" : ""}
+        ${mergeInfo ? "border-green-500" : ""}
+        ${editingCell === cellKey ? "border-yellow-400" : ""}
       `}
+      style={{
+        backgroundColor: backgroundColor && editingCell !== cellKey && !isSelected && !mergeInfo ? backgroundColor : undefined,
+      }}
       rowSpan={mergeInfo?.rowSpan || 1}
       colSpan={mergeInfo?.colSpan || 1}
       onClick={() => onCellClick(row, col)}
@@ -212,6 +227,71 @@ const GridCell: React.FC<GridCellProps> = ({
                       >
                         <AlignRight size={14} /> Right
                       </button>
+
+                      <div className="border-t border-gray-200 my-1" />
+
+                      <div className="px-3 py-1 text-xs font-medium text-gray-500">
+                        Background Color
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setShowColorPicker(!showColorPicker);
+                        }}
+                        className="px-3 py-2 text-left text-sm hover:bg-gray-100 rounded flex items-center gap-2 w-full"
+                      >
+                        <Palette size={14} />
+                        <span>Choose Color</span>
+                        {cellContent?.backgroundColor && (
+                          <div
+                            className="ml-auto w-4 h-4 rounded border border-gray-300"
+                            style={{ backgroundColor: cellContent.backgroundColor }}
+                          />
+                        )}
+                      </button>
+
+                      {showColorPicker && (
+                        <div className="px-3 py-2 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="color"
+                              value={cellContent?.backgroundColor || "#ffffff"}
+                              onChange={(e) => {
+                                onSetCellBackgroundColor(cellKey, e.target.value);
+                              }}
+                              className="w-full h-8 cursor-pointer"
+                            />
+                          </div>
+                          <div className="grid grid-cols-5 gap-1">
+                            {[
+                              "#ffffff", "#f3f4f6", "#fef3c7", "#fecaca", "#fed7aa",
+                              "#d1fae5", "#bfdbfe", "#ddd6fe", "#fbcfe8", "#fce7f3",
+                            ].map((color) => (
+                              <button
+                                key={color}
+                                onClick={() => {
+                                  onSetCellBackgroundColor(cellKey, color);
+                                  setShowColorPicker(false);
+                                  setShowCellMenu(false);
+                                }}
+                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                                style={{ backgroundColor: color }}
+                                title={color}
+                              />
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => {
+                              onSetCellBackgroundColor(cellKey, "");
+                              setShowColorPicker(false);
+                              setShowCellMenu(false);
+                            }}
+                            className="w-full px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                          >
+                            Clear Color
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
