@@ -22,7 +22,7 @@ const Hero: React.FC = () => {
         <h1 className="mb-6 text-4xl font-bold tracking-tight text-neutral-900 md:text-6xl lg:text-7xl dark:text-neutral-100">
           Create Perfect Timetables
           <br />
-          <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             In Minutes, Not Hours
           </span>
         </h1>
@@ -37,7 +37,7 @@ const Hero: React.FC = () => {
           <Button
             size="lg"
             className="gap-2 text-base"
-            onClick={() => navigate("/app/dashboard")}
+            onClick={() => navigate("/auth/login")}
           >
             <Calendar className="size-5" />
             Get Started Free
@@ -46,10 +46,10 @@ const Hero: React.FC = () => {
             size="lg"
             variant="outline"
             className="gap-2 text-base"
-            onClick={() => navigate("/app/timetables")}
+            onClick={() => navigate("/quick-start")}
           >
             <Clock className="size-5" />
-            View Demo
+            Quick Start
           </Button>
         </div>
 
