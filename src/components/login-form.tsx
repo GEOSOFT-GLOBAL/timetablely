@@ -14,11 +14,18 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useNavigate } from "react-router-dom"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const navigation = useNavigate();
+  const handleSubmit = () => 
+  {
+    sessionStorage.setItem("token", "123456789jgjgnkvn");
+    navigation("/#/")
+  }
   return (
     <div className={cn("flex flex-col w-[550px] gap-6", className)} {...props}>
       <Card>
@@ -29,7 +36,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -54,11 +61,11 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
+                <Button variant="outline" type="button" onClick={handleSubmit}>
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account? <a href="/#/auth/signup">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
