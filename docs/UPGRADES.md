@@ -11,7 +11,7 @@
 - move notifications from a view to a floating closable side bar to the right
 - export to PDF on web is a Premium feature
 - QUICK START (free mode): users can only add a max of 12 tutors, 11 courses (remove sessions and make an editable input for the class name) max regenerations per sessions is 2 and 1 for AI, export to PDF (dropdown of standard (default for free), premium (paid))
-- 
+- add restriction of not being able to add more than 12 columns (default for quick start/free mode)
 
 
 ## Future Suggestions

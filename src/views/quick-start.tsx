@@ -54,6 +54,8 @@ import { useNavigate } from "react-router-dom";
 import { IconFileTypePdf } from "@tabler/icons-react";
 import { v4 as uuidv4 } from "uuid";
 
+const MAX_COLUMNS_FREE = 12;
+
 const QuickStart: React.FC = () => {
   const navigate = useNavigate();
   const gridState = useGridState();
@@ -73,6 +75,7 @@ const QuickStart: React.FC = () => {
   const [tutorDialogOpen, setTutorDialogOpen] = React.useState(false);
   const [courseDialogOpen, setCourseDialogOpen] = React.useState(false);
   const [sessionDialogOpen, setSessionDialogOpen] = React.useState(false);
+  const [limitDialogOpen, setLimitDialogOpen] = React.useState(false);
 
   // Form states
   const [newTutor, setNewTutor] = React.useState({ name: "", email: "" });
@@ -260,6 +263,14 @@ const QuickStart: React.FC = () => {
     );
   };
 
+  const handleAddColumnAfter = (index: number) => {
+    if (columnCount >= MAX_COLUMNS_FREE) {
+      setLimitDialogOpen(true);
+      return;
+    }
+    addColumnAfter(index);
+  };
+
   const renderHeader = (time: string, index: number) => (
     <GridHeader
       key={index}
@@ -279,7 +290,7 @@ const QuickStart: React.FC = () => {
         setOpenPopover(open ? index : null)
       }
       onStartEditingDuration={() => startEditingDuration(index)}
-      onAddColumnAfter={() => addColumnAfter(index)}
+      onAddColumnAfter={() => handleAddColumnAfter(index)}
       onDeleteColumn={() => deleteColumn(index)}
     />
   );
@@ -376,6 +387,25 @@ const QuickStart: React.FC = () => {
                   <span className="font-medium">
                     {database.sessions.length}
                   </span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Columns:</span>
+                    <span
+                      className={`font-medium ${
+                        columnCount >= MAX_COLUMNS_FREE
+                          ? "text-amber-600 dark:text-amber-400"
+                          : ""
+                      }`}
+                    >
+                      {columnCount} / {MAX_COLUMNS_FREE}
+                    </span>
+                  </div>
+                  {columnCount >= MAX_COLUMNS_FREE && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      Free limit reached
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -690,6 +720,53 @@ const QuickStart: React.FC = () => {
               disabled={!newSession.name.trim()}
             >
               Add Session
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Column Limit Warning Dialog */}
+      <Dialog open={limitDialogOpen} onOpenChange={setLimitDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="text-2xl">⚠️</span>
+              Column Limit Reached
+            </DialogTitle>
+            <DialogDescription>
+              You've reached the maximum number of columns for Quick Start mode.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 dark:bg-amber-950 dark:border-amber-800">
+              <p className="text-sm text-amber-900 dark:text-amber-100">
+                <strong>Free Mode Limit:</strong> {MAX_COLUMNS_FREE} columns
+              </p>
+              <p className="text-sm text-amber-800 dark:text-amber-200 mt-2">
+                Sign up for a free account to unlock:
+              </p>
+              <ul className="text-sm text-amber-800 dark:text-amber-200 mt-2 ml-4 list-disc space-y-1">
+                <li>Unlimited columns</li>
+                <li>Save your timetables</li>
+                <li>AI-powered generation</li>
+                <li>Advanced features</li>
+              </ul>
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setLimitDialogOpen(false)}
+              className="w-full sm:w-auto"
+            >
+              Continue with {columnCount} columns
+            </Button>
+            <Button
+              onClick={() => navigate("/auth/login")}
+              className="w-full sm:w-auto gap-2"
+            >
+              <Sparkles className="size-4" />
+              Sign Up Free
             </Button>
           </DialogFooter>
         </DialogContent>
