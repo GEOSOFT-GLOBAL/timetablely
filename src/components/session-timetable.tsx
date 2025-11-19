@@ -1,10 +1,10 @@
 import * as React from "react";
 
 interface SessionTimeTableProps {
-  propName: type;
+  propName?: string;
 }
 
-const SessionTimeTable: React.FC<SessionTimeTableProps> = ({ propName }) => {
+const SessionTimeTable: React.FC<SessionTimeTableProps> = () => {
   return (
     <div>
       <div className="session-time-table">

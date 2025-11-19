@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import {
   Table,
@@ -68,6 +69,8 @@ const TimeTable: React.FC<TimeTableProps> = () => {
     if (e.key === "Escape") cancelDefaultDurationEdit();
   };
 
+  console.log(handleDefaultDurationKeyDown)
+
   const handleDurationKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") saveDurationEdit();
     if (e.key === "Escape") cancelDurationEdit();
@@ -78,6 +81,8 @@ const TimeTable: React.FC<TimeTableProps> = () => {
     gridState.setTempDefaultDuration(defaultSlotDuration.toString());
   };
 
+  console.log(startEditingDefaultDuration)
+
   const [expandedClasses, setExpandedClasses] = React.useState<{
     [key: string]: boolean;
   }>({});
@@ -87,6 +92,8 @@ const TimeTable: React.FC<TimeTableProps> = () => {
     gridState.setAllCellContents(new Map());
     alert("Timetable cleared!");
   };
+
+  console.log(handleClearTimetable)
 
   const handleGenerateAutomatedTimetable = (classId?: string) => {
     if (database.courses.length === 0) {
@@ -154,6 +161,8 @@ const TimeTable: React.FC<TimeTableProps> = () => {
       `Timetable generated! Added ${periodsCount} periods across ${subjectsCount} subjects.`
     );
   };
+
+  console.log(handleGenerateAutomatedTimetableWithAlert)
 
   const renderCell = (row: number, col: number, classId?: string) => {
     const cellKey = `${row}-${col}`;

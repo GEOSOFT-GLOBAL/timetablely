@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ITimetableDatabase,
   ITimetableTemplate,
@@ -13,16 +14,16 @@ export const saveAsTemplate = (
   hiddenCells: Set<string>,
   columnCount: number,
   columnDurations: { [key: number]: number },
-  defaultSlotDuration: number,
+  defaultSlotDuration: number
 ): ITimetableTemplate => {
   // Extract timetable data
   const entries = extractTimetableData(
     cellContents,
-    mergedCells,
     hiddenCells,
     columnCount,
     columnDurations,
     defaultSlotDuration,
+    mergedCells
   );
 
   // Store merged cells information
@@ -51,7 +52,7 @@ export const saveAsTemplate = (
 
 export const saveTemplateToDatabase = (
   template: ITimetableTemplate,
-  database: ITimetableDatabase,
+  database: ITimetableDatabase
 ): ITimetableDatabase => {
   // Create a copy of the database
   const updatedDatabase = { ...database };
@@ -63,7 +64,7 @@ export const saveTemplateToDatabase = (
 
   // Add or update template
   const existingIndex = updatedDatabase.templates.findIndex(
-    (t) => t.id === template.id,
+    (t) => t.id === template.id
   );
   if (existingIndex >= 0) {
     updatedDatabase.templates[existingIndex] = template;
@@ -75,7 +76,7 @@ export const saveTemplateToDatabase = (
 };
 
 export const applyTemplate = (
-  template: ITimetableTemplate,
+  template: ITimetableTemplate
 ): {
   cellContents: Map<string, ICellContent>;
   columnCount: number;
@@ -129,7 +130,7 @@ export const applyTemplate = (
 
 export const deleteTemplate = (
   templateId: string,
-  database: ITimetableDatabase,
+  database: ITimetableDatabase
 ): ITimetableDatabase => {
   // Create a copy of the database
   const updatedDatabase = { ...database };
@@ -137,7 +138,7 @@ export const deleteTemplate = (
   // Remove template if it exists
   if (updatedDatabase.templates) {
     updatedDatabase.templates = updatedDatabase.templates.filter(
-      (t) => t.id !== templateId,
+      (t) => t.id !== templateId
     );
   }
 
@@ -145,7 +146,7 @@ export const deleteTemplate = (
 };
 
 export const getTemplates = (
-  database: ITimetableDatabase,
+  database: ITimetableDatabase
 ): ITimetableTemplate[] => {
   return database.templates || [];
 };
@@ -153,7 +154,7 @@ export const getTemplates = (
 // Get template by ID
 export const getTemplateById = (
   templateId: string,
-  database: ITimetableDatabase,
+  database: ITimetableDatabase
 ): ITimetableTemplate | undefined => {
   return database.templates?.find((t) => t.id === templateId);
 };
