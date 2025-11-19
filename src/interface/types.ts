@@ -68,6 +68,7 @@ export interface IGridActions {
     alignment: "left" | "center" | "right",
   ) => void;
   setCellBackgroundColor: (cellKey: string, color: string) => void;
+  setSelectedCellsBackgroundColor: (color: string) => void;
   // updateCellContents: (contents: Map<string, ICellContent>) => void;
   setAllCellContents: (contents: Map<string, ICellContent>) => void;
   setAllMergedCells: (mergedCells: Map<string, any>) => void;

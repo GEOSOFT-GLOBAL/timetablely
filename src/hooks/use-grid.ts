@@ -349,6 +349,24 @@ export const useGridState = (): IGridState & IGridActions => {
     setCellContents(newCellContents);
   };
 
+  const setSelectedCellsBackgroundColor = (color: string) => {
+    const newCellContents = new Map(cellContents);
+    
+    selectedCells.forEach((cellKey) => {
+      const currentContent = cellContents.get(cellKey);
+      const newContent: ICellContent = {
+        text: currentContent?.text || "",
+        isVertical: currentContent?.isVertical || false,
+        alignment: currentContent?.alignment || "center",
+        className: currentContent?.className,
+        backgroundColor: color || undefined,
+      };
+      newCellContents.set(cellKey, newContent);
+    });
+
+    setCellContents(newCellContents);
+  };
+
   const setAllCellContents = (newCellContents: Map<string, ICellContent>) => {
     // This function already properly handles the className property
     // as it replaces the entire cellContents map
@@ -405,6 +423,7 @@ export const useGridState = (): IGridState & IGridActions => {
     toggleCellVertical,
     setCellAlignment,
     setCellBackgroundColor,
+    setSelectedCellsBackgroundColor,
     setAllCellContents,
     setAllMergedCells,
     setAllHiddenCells,

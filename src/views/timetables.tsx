@@ -89,6 +89,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
     toggleCellVertical,
     setCellAlignment,
     setCellBackgroundColor,
+    setSelectedCellsBackgroundColor,
     saveCellEdit,
     cancelCellEdit,
   } = gridState;
@@ -546,6 +547,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
         onCancelDefaultDurationEdit={cancelDefaultDurationEdit}
         onDefaultDurationKeyDown={handleDefaultDurationKeyDown}
         onStartEditingDefaultDuration={startEditingDefaultDuration}
+        onSetSelectedCellsBackgroundColor={setSelectedCellsBackgroundColor}
       />
       <TimetableControls
         expandedClasses={expandedClasses}

@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import * as React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Input } from "./ui/input";
 
 const GridCell: React.FC<GridCellProps> = ({
   row,
@@ -33,7 +32,6 @@ const GridCell: React.FC<GridCellProps> = ({
   onSetCellBackgroundColor,
 }) => {
   const [showCellMenu, setShowCellMenu] = React.useState(false);
-  const [showColorPicker, setShowColorPicker] = React.useState(false);
 
   if (hiddenCells.has(cellKey)) {
     return null;
@@ -230,68 +228,61 @@ const GridCell: React.FC<GridCellProps> = ({
 
                       <div className="border-t border-gray-200 my-1" />
 
-                      <div className="px-3 py-1 text-xs font-medium text-gray-500">
+                      <div className="px-3 py-1 text-xs font-medium text-gray-500 flex items-center gap-2">
+                        <Palette size={12} />
                         Background Color
                       </div>
 
-                      <button
-                        onClick={() => {
-                          setShowColorPicker(!showColorPicker);
-                        }}
-                        className="px-3 py-2 text-left text-sm hover:bg-gray-100 rounded flex items-center gap-2 w-full"
-                      >
-                        <Palette size={14} />
-                        <span>Choose Color</span>
-                        {cellContent?.backgroundColor && (
-                          <div
-                            className="ml-auto w-4 h-4 rounded border border-gray-300"
-                            style={{ backgroundColor: cellContent.backgroundColor }}
-                          />
-                        )}
-                      </button>
-
-                      {showColorPicker && (
-                        <div className="px-3 py-2 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="color"
-                              value={cellContent?.backgroundColor || "#ffffff"}
-                              onChange={(e) => {
-                                onSetCellBackgroundColor(cellKey, e.target.value);
-                              }}
-                              className="w-full h-8 cursor-pointer"
-                            />
-                          </div>
-                          <div className="grid grid-cols-5 gap-1">
-                            {[
-                              "#ffffff", "#f3f4f6", "#fef3c7", "#fecaca", "#fed7aa",
-                              "#d1fae5", "#bfdbfe", "#ddd6fe", "#fbcfe8", "#fce7f3",
-                            ].map((color) => (
-                              <button
-                                key={color}
-                                onClick={() => {
-                                  onSetCellBackgroundColor(cellKey, color);
-                                  setShowColorPicker(false);
-                                  setShowCellMenu(false);
-                                }}
-                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
-                                style={{ backgroundColor: color }}
-                                title={color}
-                              />
-                            ))}
-                          </div>
-                          <button
-                            onClick={() => {
-                              onSetCellBackgroundColor(cellKey, "");
-                              setShowColorPicker(false);
-                              setShowCellMenu(false);
+                      <div className="px-3 py-2 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-gray-600">Custom:</label>
+                          <input
+                            type="color"
+                            value={cellContent?.backgroundColor || "#ffffff"}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              onSetCellBackgroundColor(cellKey, e.target.value);
                             }}
-                            className="w-full px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
-                          >
-                            Clear Color
-                          </button>
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full h-8 cursor-pointer rounded border border-gray-300"
+                          />
                         </div>
-                      )}
+                        <div className="grid grid-cols-5 gap-1">
+                          {[
+                            "#ffffff",
+                            "#f3f4f6",
+                            "#fef3c7",
+                            "#fecaca",
+                            "#fed7aa",
+                            "#d1fae5",
+                            "#bfdbfe",
+                            "#ddd6fe",
+                            "#fbcfe8",
+                            "#fce7f3",
+                          ].map((color) => (
+                            <button
+                              key={color}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSetCellBackgroundColor(cellKey, color);
+                              }}
+                              className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSetCellBackgroundColor(cellKey, "");
+                            setShowCellMenu(false);
+                          }}
+                          className="w-full px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                        >
+                          Clear Color
+                        </button>
+                      </div>
                     </div>
                   </PopoverContent>
                 </Popover>

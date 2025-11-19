@@ -38,6 +38,7 @@ export interface GridControlsProps {
   onStartEditingDefaultDuration: () => void;
   onTempDefaultDurationChange: (value: string) => void;
   onDefaultDurationKeyDown: (e: React.KeyboardEvent) => void;
+  onSetSelectedCellsBackgroundColor?: (color: string) => void;
 }
 
 export interface GridCellProps {
