@@ -101,6 +101,58 @@ export function useStorageNumber(
   return useStorage<number>(key, initialValue);
 }
 
+// Session Storage Hook
+export function useSessionStorage<T>(
+  key: string,
+  initialValue?: T
+): UseStorageReturn<T> {
+  const [value, setValue] = useState<StorageValue<T>>(() => {
+    try {
+      const item = sessionStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : initialValue ?? null;
+    } catch (error) {
+      console.error(`Error reading sessionStorage key "${key}":`, error);
+      return initialValue ?? null;
+    }
+  });
+
+  const set = useCallback(
+    (newValue: T) => {
+      try {
+        sessionStorage.setItem(key, JSON.stringify(newValue));
+        setValue(newValue);
+      } catch (error) {
+        console.error(`Error setting sessionStorage key "${key}":`, error);
+      }
+    },
+    [key]
+  );
+
+  const remove = useCallback(() => {
+    try {
+      sessionStorage.removeItem(key);
+      setValue(null);
+    } catch (error) {
+      console.error(`Error removing sessionStorage key "${key}":`, error);
+    }
+  }, [key]);
+
+  const update = useCallback(
+    (updater: (prev: StorageValue<T>) => T) => {
+      try {
+        const newValue = updater(value);
+        sessionStorage.setItem(key, JSON.stringify(newValue));
+        setValue(newValue);
+      } catch (error) {
+        console.error(`Error updating sessionStorage key "${key}":`, error);
+      }
+    },
+    [key, value]
+  );
+
+  return { value, set, remove, update };
+}
+
 // Static utility functions for direct localStorage operations
 export const storage = {
   get: <T>(key: string): T | null => {
@@ -143,5 +195,50 @@ export const storage = {
 
   keys: (): string[] => {
     return Object.keys(localStorage);
+  },
+};
+
+// Static utility functions for direct sessionStorage operations
+export const sessionStore = {
+  get: <T>(key: string): T | null => {
+    try {
+      const item = sessionStorage.getItem(key);
+      return item ? (JSON.parse(item) as T) : null;
+    } catch (error) {
+      console.error(`Error reading sessionStorage key "${key}":`, error);
+      return null;
+    }
+  },
+
+  set: <T>(key: string, value: T): void => {
+    try {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error(`Error setting sessionStorage key "${key}":`, error);
+    }
+  },
+
+  remove: (key: string): void => {
+    try {
+      sessionStorage.removeItem(key);
+    } catch (error) {
+      console.error(`Error removing sessionStorage key "${key}":`, error);
+    }
+  },
+
+  clear: (): void => {
+    try {
+      sessionStorage.clear();
+    } catch (error) {
+      console.error("Error clearing sessionStorage:", error);
+    }
+  },
+
+  has: (key: string): boolean => {
+    return sessionStorage.getItem(key) !== null;
+  },
+
+  keys: (): string[] => {
+    return Object.keys(sessionStorage);
   },
 };

@@ -33,12 +33,7 @@ import { useGridState } from "@/hooks/use-grid";
 import { canMergeCells, generateTimeLabels } from "@/lib/temputils";
 import { exportTimetableToPDF } from "@/lib/pdf-export";
 import { generateAutomatedTimetable } from "@/lib/timetable";
-import type {
-  ITimetableDatabase,
-  ITutor,
-  ICourse,
-  ISession,
-} from "@/interface/database";
+import type { ITimetableDatabase, ITutor, ICourse } from "@/interface/database";
 import { PRIORITY } from "@/interface/enums";
 import {
   ArrowLeft,
@@ -48,18 +43,37 @@ import {
   Palette,
   UserPlus,
   BookPlus,
-  Users,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { IconFileTypePdf } from "@tabler/icons-react";
 import { v4 as uuidv4 } from "uuid";
+import { useSessionStorage } from "@/hooks/storage";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const MAX_COLUMNS_FREE = 12;
+const MAX_TUTORS_FREE = 12;
+const MAX_COURSES_FREE = 11;
+const MAX_REGENERATIONS_FREE = 2;
+
+interface QuickStartUsage {
+  regenerations: number;
+}
 
 const QuickStart: React.FC = () => {
   const navigate = useNavigate();
+  const { value: usage, set: setUsage } = useSessionStorage<QuickStartUsage>(
+    "quickstart_usage",
+    { regenerations: 0 }
+  );
   const gridState = useGridState();
   const [showColorPalette, setShowColorPalette] = React.useState(false);
+  const [className, setClassName] = React.useState("My Class");
 
   // Database state
   const [database, setDatabase] = React.useState<ITimetableDatabase>({
@@ -74,8 +88,10 @@ const QuickStart: React.FC = () => {
   // Dialog states
   const [tutorDialogOpen, setTutorDialogOpen] = React.useState(false);
   const [courseDialogOpen, setCourseDialogOpen] = React.useState(false);
-  const [sessionDialogOpen, setSessionDialogOpen] = React.useState(false);
   const [limitDialogOpen, setLimitDialogOpen] = React.useState(false);
+  const [limitType, setLimitType] = React.useState<
+    "tutors" | "courses" | "regenerations" | "columns"
+  >("columns");
 
   // Form states
   const [newTutor, setNewTutor] = React.useState({ name: "", email: "" });
@@ -84,10 +100,6 @@ const QuickStart: React.FC = () => {
     tutorId: "",
     periodsPerWeek: 3,
     priority: PRIORITY.MEDIUM,
-  });
-  const [newSession, setNewSession] = React.useState({
-    name: "",
-    subjects: [] as string[],
   });
 
   const {
@@ -139,6 +151,12 @@ const QuickStart: React.FC = () => {
   const handleAddTutor = () => {
     if (!newTutor.name.trim()) return;
 
+    if (database.tutors.length >= MAX_TUTORS_FREE) {
+      setLimitType("tutors");
+      setLimitDialogOpen(true);
+      return;
+    }
+
     const tutor: ITutor = {
       id: uuidv4(),
       name: newTutor.name,
@@ -158,6 +176,12 @@ const QuickStart: React.FC = () => {
   // Add Course
   const handleAddCourse = () => {
     if (!newCourse.name.trim() || !newCourse.tutorId) return;
+
+    if (database.courses.length >= MAX_COURSES_FREE) {
+      setLimitType("courses");
+      setLimitDialogOpen(true);
+      return;
+    }
 
     const course: ICourse = {
       id: uuidv4(),
@@ -181,28 +205,16 @@ const QuickStart: React.FC = () => {
     setCourseDialogOpen(false);
   };
 
-  // Add Session
-  const handleAddSession = () => {
-    if (!newSession.name.trim()) return;
-
-    const session: ISession = {
-      id: uuidv4(),
-      name: newSession.name,
-      subjects: newSession.subjects,
-    };
-
-    setDatabase((prev) => ({
-      ...prev,
-      sessions: [...prev.sessions, session],
-    }));
-
-    setNewSession({ name: "", subjects: [] });
-    setSessionDialogOpen(false);
-  };
-
   const handleGenerateTimetable = () => {
     if (database.courses.length === 0) {
       alert("Please add at least one course first!");
+      return;
+    }
+
+    const currentUsage = usage || { regenerations: 0 };
+    if (currentUsage.regenerations >= MAX_REGENERATIONS_FREE) {
+      setLimitType("regenerations");
+      setLimitDialogOpen(true);
       return;
     }
 
@@ -213,9 +225,20 @@ const QuickStart: React.FC = () => {
       hiddenCells
     );
     gridState.setAllCellContents(newCellContents);
+
+    // Increment regeneration count
+    setUsage({ regenerations: currentUsage.regenerations + 1 });
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = (type: "standard" | "premium" = "standard") => {
+    if (type === "premium") {
+      alert(
+        "Premium PDF export is available for paid accounts. Sign up to unlock!"
+      );
+      navigate("/auth/login");
+      return;
+    }
+
     try {
       exportTimetableToPDF({
         cellContents,
@@ -223,8 +246,8 @@ const QuickStart: React.FC = () => {
         columnDurations,
         defaultSlotDuration,
         hiddenCells,
-        title: "Quick Start Timetable",
-        subtitle: "Generated with Timetablely",
+        title: className || "Quick Start Timetable",
+        subtitle: "Generated with Timetablely (Free)",
       });
     } catch (error) {
       console.error("PDF Export Error:", error);
@@ -265,6 +288,7 @@ const QuickStart: React.FC = () => {
 
   const handleAddColumnAfter = (index: number) => {
     if (columnCount >= MAX_COLUMNS_FREE) {
+      setLimitType("columns");
       setLimitDialogOpen(true);
       return;
     }
@@ -330,6 +354,21 @@ const QuickStart: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Controls */}
           <div className="lg:col-span-1 space-y-4">
+            {/* Class Name */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Class Name</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Input
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                  placeholder="Enter class name"
+                  className="text-sm"
+                />
+              </CardContent>
+            </Card>
+
             {/* Add Data */}
             <Card>
               <CardHeader>
@@ -341,29 +380,23 @@ const QuickStart: React.FC = () => {
                   size="sm"
                   className="w-full gap-2 justify-start"
                   onClick={() => setTutorDialogOpen(true)}
+                  disabled={database.tutors.length >= MAX_TUTORS_FREE}
                 >
                   <UserPlus className="size-4" />
-                  Add Tutor
+                  Add Tutor ({database.tutors.length}/{MAX_TUTORS_FREE})
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   className="w-full gap-2 justify-start"
                   onClick={() => setCourseDialogOpen(true)}
-                  disabled={database.tutors.length === 0}
+                  disabled={
+                    database.tutors.length === 0 ||
+                    database.courses.length >= MAX_COURSES_FREE
+                  }
                 >
                   <BookPlus className="size-4" />
-                  Add Course
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-2 justify-start"
-                  onClick={() => setSessionDialogOpen(true)}
-                  disabled={database.courses.length === 0}
-                >
-                  <Users className="size-4" />
-                  Add Session
+                  Add Course ({database.courses.length}/{MAX_COURSES_FREE})
                 </Button>
               </CardContent>
             </Card>
@@ -371,39 +404,61 @@ const QuickStart: React.FC = () => {
             {/* Stats */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Your Data</CardTitle>
+                <CardTitle className="text-base">Usage Stats</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Tutors:</span>
-                  <span className="font-medium">{database.tutors.length}</span>
+                  <span
+                    className={`font-medium ${
+                      database.tutors.length >= MAX_TUTORS_FREE
+                        ? "text-amber-600 dark:text-amber-400"
+                        : ""
+                    }`}
+                  >
+                    {database.tutors.length} / {MAX_TUTORS_FREE}
+                  </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Courses:</span>
-                  <span className="font-medium">{database.courses.length}</span>
+                  <span
+                    className={`font-medium ${
+                      database.courses.length >= MAX_COURSES_FREE
+                        ? "text-amber-600 dark:text-amber-400"
+                        : ""
+                    }`}
+                  >
+                    {database.courses.length} / {MAX_COURSES_FREE}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Sessions:</span>
-                  <span className="font-medium">
-                    {database.sessions.length}
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Columns:</span>
+                  <span
+                    className={`font-medium ${
+                      columnCount >= MAX_COLUMNS_FREE
+                        ? "text-amber-600 dark:text-amber-400"
+                        : ""
+                    }`}
+                  >
+                    {columnCount} / {MAX_COLUMNS_FREE}
                   </span>
                 </div>
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Columns:</span>
+                    <span className="text-muted-foreground">Generations:</span>
                     <span
                       className={`font-medium ${
-                        columnCount >= MAX_COLUMNS_FREE
+                        (usage?.regenerations || 0) >= MAX_REGENERATIONS_FREE
                           ? "text-amber-600 dark:text-amber-400"
                           : ""
                       }`}
                     >
-                      {columnCount} / {MAX_COLUMNS_FREE}
+                      {usage?.regenerations || 0} / {MAX_REGENERATIONS_FREE}
                     </span>
                   </div>
-                  {columnCount >= MAX_COLUMNS_FREE && (
+                  {(usage?.regenerations || 0) >= MAX_REGENERATIONS_FREE && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                      Free limit reached
+                      Limit reached
                     </p>
                   )}
                 </div>
@@ -420,20 +475,50 @@ const QuickStart: React.FC = () => {
                   size="sm"
                   className="w-full gap-2"
                   onClick={handleGenerateTimetable}
-                  disabled={database.courses.length === 0}
+                  disabled={
+                    database.courses.length === 0 ||
+                    (usage?.regenerations || 0) >= MAX_REGENERATIONS_FREE
+                  }
                 >
                   <Sparkles className="size-4" />
-                  Generate
+                  Generate ({usage?.regenerations || 0}/{MAX_REGENERATIONS_FREE}
+                  )
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-2"
-                  onClick={handleExportPDF}
-                >
-                  <IconFileTypePdf className="size-4" />
-                  Export PDF
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2"
+                    >
+                      <IconFileTypePdf className="size-4" />
+                      Export PDF
+                      <ChevronDown className="size-3 ml-auto" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem
+                      onClick={() => handleExportPDF("standard")}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">Standard</span>
+                        <span className="text-xs text-muted-foreground">
+                          Free - Basic layout
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleExportPDF("premium")}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">Premium ✨</span>
+                        <span className="text-xs text-muted-foreground">
+                          Paid - Enhanced design
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <Button
                   variant="outline"
                   size="sm"
@@ -686,70 +771,48 @@ const QuickStart: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Add Session Dialog */}
-      <Dialog open={sessionDialogOpen} onOpenChange={setSessionDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Add Session</DialogTitle>
-            <DialogDescription>
-              Add a new class session (optional).
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="session-name">Session Name *</Label>
-              <Input
-                id="session-name"
-                value={newSession.name}
-                onChange={(e) =>
-                  setNewSession({ ...newSession, name: e.target.value })
-                }
-                placeholder="Class A"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setSessionDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleAddSession}
-              disabled={!newSession.name.trim()}
-            >
-              Add Session
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Column Limit Warning Dialog */}
+      {/* Limit Warning Dialog */}
       <Dialog open={limitDialogOpen} onOpenChange={setLimitDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="text-2xl">⚠️</span>
-              Column Limit Reached
+              {limitType === "tutors" && "Tutor Limit Reached"}
+              {limitType === "courses" && "Course Limit Reached"}
+              {limitType === "columns" && "Column Limit Reached"}
+              {limitType === "regenerations" && "Generation Limit Reached"}
             </DialogTitle>
             <DialogDescription>
-              You've reached the maximum number of columns for Quick Start mode.
+              {limitType === "tutors" &&
+                `You've reached the maximum of ${MAX_TUTORS_FREE} tutors for Quick Start mode.`}
+              {limitType === "courses" &&
+                `You've reached the maximum of ${MAX_COURSES_FREE} courses for Quick Start mode.`}
+              {limitType === "columns" &&
+                `You've reached the maximum of ${MAX_COLUMNS_FREE} columns for Quick Start mode.`}
+              {limitType === "regenerations" &&
+                `You've used all ${MAX_REGENERATIONS_FREE} free generations for this session.`}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 dark:bg-amber-950 dark:border-amber-800">
               <p className="text-sm text-amber-900 dark:text-amber-100">
-                <strong>Free Mode Limit:</strong> {MAX_COLUMNS_FREE} columns
+                <strong>Free Mode Limits:</strong>
               </p>
-              <p className="text-sm text-amber-800 dark:text-amber-200 mt-2">
+              <ul className="text-sm text-amber-800 dark:text-amber-200 mt-2 ml-4 list-disc space-y-1">
+                <li>{MAX_TUTORS_FREE} tutors</li>
+                <li>{MAX_COURSES_FREE} courses</li>
+                <li>{MAX_COLUMNS_FREE} columns</li>
+                <li>{MAX_REGENERATIONS_FREE} generations per session</li>
+              </ul>
+              <p className="text-sm text-amber-800 dark:text-amber-200 mt-3">
                 Sign up for a free account to unlock:
               </p>
               <ul className="text-sm text-amber-800 dark:text-amber-200 mt-2 ml-4 list-disc space-y-1">
-                <li>Unlimited columns</li>
+                <li>Unlimited tutors, courses & columns</li>
+                <li>Unlimited generations</li>
                 <li>Save your timetables</li>
                 <li>AI-powered generation</li>
-                <li>Advanced features</li>
+                <li>Premium PDF exports</li>
               </ul>
             </div>
           </div>
@@ -759,7 +822,7 @@ const QuickStart: React.FC = () => {
               onClick={() => setLimitDialogOpen(false)}
               className="w-full sm:w-auto"
             >
-              Continue with {columnCount} columns
+              Continue
             </Button>
             <Button
               onClick={() => navigate("/auth/login")}
