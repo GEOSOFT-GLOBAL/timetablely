@@ -1,0 +1,128 @@
+/* Font Utility Classes */
+
+.montserrat {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.audiowide {
+  font-family: "Audiowide", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.calsans {
+  font-family: "CalSans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.desirable-calligraphy {
+  font-family: "Desirable Calligraphy", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.fira-code {
+  font-family: "Fira Code", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.goldman {
+  font-family: "Goldman", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.michroma {
+  font-family: "Michroma", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.mozilla-text {
+  font-family: "Mozilla Text", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.nunito-sans {
+  font-family: "Nunito Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.orbitron {
+  font-family: "Orbitron", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.oswald {
+  font-family: "Oswald", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.rubik-distressed {
+  font-family: "Rubik Distressed", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.rubik-moonrocks {
+  font-family: "Rubik Moonrocks", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.snell-bt {
+  font-family: "Snell BT", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.special-gothic {
+  font-family: "Special Gothic Expanded One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.syncopate {
+  font-family: "Syncopate", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.tagesschrift {
+  font-family: "Tagesschrift", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.tektur {
+  font-family: "Tektur", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.titillium-web {
+  font-family: "Titillium Web", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.winky-rough {
+  font-family: "Winky Rough", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.zen-tokyo-zoo {
+  font-family: "Zen Tokyo Zoo", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}

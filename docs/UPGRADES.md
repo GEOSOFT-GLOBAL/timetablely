@@ -12,6 +12,10 @@
 - export to PDF on web is a Premium feature
 - QUICK START (free mode): users can only add a max of 12 tutors, 11 courses (remove add sessions and make an editable input for the class name (has default class/session name)) max regenerations per sessions is 2 and 1 for AI, export to PDF (dropdown of standard (default for free), premium (paid))
 - add restriction of not being able to add more than 15 columns (non premium users (logged in users only))
+- create a pricing page
+- create a util that saves a url before login and redirects to that saves url then deletes the saved url.
+- download and add fonts to the app settings, and change the landing page font.
+- add blocked text button in the actions card to open a dialog to add and list the blocked text. (quick start)
 
 
 ## Future Suggestions
