@@ -14,12 +14,12 @@ const Hero: React.FC = () => {
       <div className="relative z-10 mx-auto max-w-6xl px-4 text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-4 py-2 text-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
           <Sparkles className="size-4 text-blue-500" />
-          <span className="text-neutral-700 dark:text-neutral-300">
+          <span className="text-neutral-700 michroma dark:text-neutral-300">
             Smart Timetable Generation
           </span>
         </div>
 
-        <h1 className="mb-6 text-4xl font-bold tracking-tight text-neutral-900 md:text-6xl lg:text-7xl dark:text-neutral-100">
+        <h1 className="mb-6 text-4xl font-semibold tracking-tight syncopate text-neutral-900 md:text-6xl lg:text-7xl dark:text-neutral-100">
           Create Perfect Timetables
           <br />
           <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -27,7 +27,7 @@ const Hero: React.FC = () => {
           </span>
         </h1>
 
-        <p className="mx-auto mb-10 max-w-2xl text-lg text-neutral-600 md:text-xl dark:text-neutral-400">
+        <p className="mx-auto mb-10 max-w-2xl text-lg goldman text-neutral-600 md:text-xl dark:text-neutral-400">
           Effortlessly design, manage, and optimize your class schedules with
           AI-powered automation. Perfect for schools, universities, and training
           centers.
@@ -36,7 +36,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button
             size="lg"
-            className="gap-2 text-base"
+            className="gap-2 text-base goldman"
             onClick={() => navigate("/auth/login")}
           >
             <Calendar className="size-5" />
@@ -45,7 +45,7 @@ const Hero: React.FC = () => {
           <Button
             size="lg"
             variant="outline"
-            className="gap-2 text-base"
+            className="gap-2 text-base goldman"
             onClick={() => navigate("/quick-start")}
           >
             <Clock className="size-5" />
@@ -53,8 +53,8 @@ const Hero: React.FC = () => {
           </Button>
         </div>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-neutral-500 dark:text-neutral-500">
-          <div className="flex items-center gap-2">
+        <div className="mt-12 flex flex-wrap items-center michroma justify-center gap-8 text-sm text-neutral-500 dark:text-neutral-500">
+          <div className="flex items-center gap-2 michroma">
             <div className="size-2 rounded-full bg-green-500" />
             <span>AI-Powered Generation</span>
           </div>
