@@ -3,6 +3,7 @@ import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import TargetCursor from "./TargetCursor";
 
 const Hero: React.FC = () => {
   const navigate = useNavigate();
@@ -10,7 +11,12 @@ const Hero: React.FC = () => {
   return (
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-white dark:bg-neutral-950">
       <BackgroundRippleEffect />
-      
+      <TargetCursor
+        spinDuration={2}
+        hideDefaultCursor={true}
+        parallaxOn={true}
+      />
+
       <div className="relative z-10 mx-auto max-w-6xl px-4 text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-4 py-2 text-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
           <Sparkles className="size-4 text-blue-500" />
@@ -36,7 +42,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button
             size="lg"
-            className="gap-2 text-base goldman"
+            className="gap-2 text-base goldman cursor-target"
             onClick={() => navigate("/auth/login")}
           >
             <Calendar className="size-5" />
@@ -45,7 +51,7 @@ const Hero: React.FC = () => {
           <Button
             size="lg"
             variant="outline"
-            className="gap-2 text-base goldman"
+            className="gap-2 text-base goldman cursor-target"
             onClick={() => navigate("/quick-start")}
           >
             <Clock className="size-5" />
@@ -55,15 +61,15 @@ const Hero: React.FC = () => {
 
         <div className="mt-12 flex flex-wrap items-center michroma justify-center gap-8 text-sm text-neutral-500 dark:text-neutral-500">
           <div className="flex items-center gap-2 michroma">
-            <div className="size-2 rounded-full bg-green-500" />
+            <div className="size-2 rounded-full bg-green-500 cursor-target" />
             <span>AI-Powered Generation</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="size-2 rounded-full bg-blue-500" />
+            <div className="size-2 rounded-full bg-blue-500 cursor-target" />
             <span>Drag & Drop Interface</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="size-2 rounded-full bg-purple-500" />
+            <div className="size-2 rounded-full bg-purple-500 cursor-target" />
             <span>Export to PDF</span>
           </div>
         </div>
