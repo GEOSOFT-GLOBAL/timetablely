@@ -6,14 +6,14 @@ const Landing: React.FC = () => {
   const menuItems = [
     {
       label: "pricing",
-      href: "#pricing",
+      href: "/pricing",
       ariaLabel: "Pricing",
       rotation: -8,
       hoverStyles: { bgColor: "#3b82f6", textColor: "#ffffff" },
     },
     {
       label: "features",
-      href: "#features",
+      href: "/features",
       ariaLabel: "Features",
       rotation: 8,
       hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
@@ -27,14 +27,14 @@ const Landing: React.FC = () => {
     },
     {
       label: "about",
-      href: "#about",
+      href: "/about",
       ariaLabel: "About",
       rotation: 8,
       hoverStyles: { bgColor: "#ef4444", textColor: "#ffffff" },
     },
     {
       label: "faqs",
-      href: "#faqs",
+      href: "/faqs",
       ariaLabel: "FAQs",
       rotation: -8,
       hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
