@@ -674,6 +674,59 @@ Save and reuse timetable layouts for efficiency.
 - Date/time handling
 - JSON processing
 
+**Typography:**
+- 21 custom fonts loaded
+- Font utility classes
+- Web font optimization
+- Fallback font stacks
+
+### Available Fonts
+
+The application includes 21 professionally selected fonts for various use cases:
+
+**Display & Headings:**
+- **Audiowide** - Bold, futuristic display font
+- **Orbitron** - Geometric, tech-inspired
+- **Michroma** - Modern, clean display
+- **Syncopate** - Condensed, impactful
+- **Tektur** - Technical, structured
+- **Goldman** - Bold, attention-grabbing
+- **Zen Tokyo Zoo** - Playful, unique
+
+**Body & UI:**
+- **Montserrat** - Clean, versatile sans-serif (default)
+- **Nunito Sans** - Friendly, readable
+- **Titillium Web** - Modern, professional
+- **Mozilla Text** - Optimized for readability
+- **Oswald** - Condensed, efficient
+
+**Monospace:**
+- **Fira Code** - Code-friendly with ligatures
+
+**Decorative:**
+- **CalSans** - Stylish, contemporary
+- **Rubik Distressed** - Textured, vintage
+- **Rubik Moonrocks** - Playful, textured
+- **Special Gothic Expanded One** - Wide, bold
+- **Winky Rough** - Hand-drawn feel
+- **Tagesschrift** - Newspaper-style
+
+**Script & Calligraphy:**
+- **Snell BT** - Elegant script
+- **Desirable Calligraphy** - Formal, decorative
+
+**Usage:**
+```tsx
+// CSS Class
+<h1 className="orbitron">Timetablely</h1>
+
+// Inline Style
+<p style={{ fontFamily: 'Montserrat' }}>Text</p>
+
+// Tailwind
+<div className="font-['Nunito_Sans']">Content</div>
+```
+
 ### Browser Support
 
 **Recommended:**
