@@ -358,50 +358,48 @@ const QuickStart: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar Controls */}
           <div className="lg:col-span-1 space-y-4">
-            {/* Class Name */}
+            {/* Setup */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Class Name</CardTitle>
+                <CardTitle className="text-base">Setup</CardTitle>
               </CardHeader>
-              <CardContent>
-                <Input
-                  value={className}
-                  onChange={(e) => setClassName(e.target.value)}
-                  placeholder="Enter class name"
-                  className="text-sm"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Add Data */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Add Data</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-2 justify-start"
-                  onClick={() => setTutorDialogOpen(true)}
-                  disabled={database.tutors.length >= MAX_TUTORS_FREE}
-                >
-                  <UserPlus className="size-4" />
-                  Add Tutor ({database.tutors.length}/{MAX_TUTORS_FREE})
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-2 justify-start"
-                  onClick={() => setCourseDialogOpen(true)}
-                  disabled={
-                    database.tutors.length === 0 ||
-                    database.courses.length >= MAX_COURSES_FREE
-                  }
-                >
-                  <BookPlus className="size-4" />
-                  Add Course ({database.courses.length}/{MAX_COURSES_FREE})
-                </Button>
+              <CardContent className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">
+                    Class Name
+                  </Label>
+                  <Input
+                    value={className}
+                    onChange={(e) => setClassName(e.target.value)}
+                    placeholder="Enter class name"
+                    className="text-sm h-8"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-xs h-8"
+                    onClick={() => setTutorDialogOpen(true)}
+                    disabled={database.tutors.length >= MAX_TUTORS_FREE}
+                  >
+                    <UserPlus className="size-3" />
+                    Tutor ({database.tutors.length}/{MAX_TUTORS_FREE})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 text-xs h-8"
+                    onClick={() => setCourseDialogOpen(true)}
+                    disabled={
+                      database.tutors.length === 0 ||
+                      database.courses.length >= MAX_COURSES_FREE
+                    }
+                  >
+                    <BookPlus className="size-3" />
+                    Course ({database.courses.length}/{MAX_COURSES_FREE})
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -542,7 +540,7 @@ const QuickStart: React.FC = () => {
               <CardHeader>
                 <CardTitle className="text-base">Actions</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2 grid grid-cols-2 gap-2">
                 <Button
                   size="sm"
                   className="w-full gap-2"
