@@ -116,6 +116,8 @@ const QuickStart: React.FC = () => {
     cellContents,
     editingCell,
     tempCellText,
+    tempDefaultDuration,
+    editingDefaultDuration,
     handleCellClick,
     handleCellDoubleClick,
     mergeCells,
@@ -124,6 +126,8 @@ const QuickStart: React.FC = () => {
     startEditingDuration,
     saveDurationEdit,
     cancelDurationEdit,
+    saveDefaultDurationEdit,
+    cancelDefaultDurationEdit,
     setHoveredColumn,
     setOpenPopover,
     setTempCellText,
@@ -465,6 +469,74 @@ const QuickStart: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Time Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Time Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Default Slot Duration</Label>
+                  {editingDefaultDuration ? (
+                    <div className="flex gap-1">
+                      <Input
+                        type="number"
+                        value={tempDefaultDuration}
+                        onChange={(e) =>
+                          gridState.setTempDefaultDuration(e.target.value)
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") saveDefaultDurationEdit();
+                          if (e.key === "Escape") cancelDefaultDurationEdit();
+                        }}
+                        className="h-8 text-sm"
+                        autoFocus
+                        min="5"
+                        max="480"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={saveDefaultDurationEdit}
+                        className="h-8 px-2"
+                      >
+                        ✓
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={cancelDefaultDurationEdit}
+                        className="h-8 px-2"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">
+                        {defaultSlotDuration} minutes
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          gridState.setEditingDefaultDuration(true);
+                          gridState.setTempDefaultDuration(
+                            defaultSlotDuration.toString()
+                          );
+                        }}
+                        className="h-7 text-xs"
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Click column headers to edit individual durations
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Actions */}
             <Card>
               <CardHeader>
@@ -582,10 +654,17 @@ const QuickStart: React.FC = () => {
 
             <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
               <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-blue-900 dark:text-blue-100">
-                  💡 Start by adding tutors, then courses, then generate your
-                  timetable!
-                </p>
+                <div className="space-y-2 text-xs text-blue-900 dark:text-blue-100">
+                  <p>
+                    💡 <strong>Quick Tips:</strong>
+                  </p>
+                  <ul className="ml-4 space-y-1 list-disc">
+                    <li>Add tutors, then courses</li>
+                    <li>Adjust time durations as needed</li>
+                    <li>Click column headers to edit times</li>
+                    <li>Double-click cells to edit content</li>
+                  </ul>
+                </div>
               </CardContent>
             </Card>
           </div>
