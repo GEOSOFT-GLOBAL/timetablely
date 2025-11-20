@@ -23,10 +23,32 @@ import { useStorageString, useStorageBoolean } from "@/hooks/storage";
 
 const FONT_OPTIONS = [
   { value: "default", label: "System Default" },
-  { value: "inter", label: "Inter" },
-  { value: "roboto", label: "Roboto" },
-  { value: "open-sans", label: "Open Sans" },
-  { value: "lato", label: "Lato" },
+  // Body & UI Fonts
+  { value: "Montserrat", label: "Montserrat (Default)" },
+  { value: "Nunito Sans", label: "Nunito Sans" },
+  { value: "Titillium Web", label: "Titillium Web" },
+  { value: "Mozilla Text", label: "Mozilla Text" },
+  { value: "Oswald", label: "Oswald" },
+  // Display & Headings
+  { value: "Audiowide", label: "Audiowide" },
+  { value: "Orbitron", label: "Orbitron" },
+  { value: "Michroma", label: "Michroma" },
+  { value: "Syncopate", label: "Syncopate" },
+  { value: "Tektur", label: "Tektur" },
+  { value: "Goldman", label: "Goldman" },
+  { value: "Zen Tokyo Zoo", label: "Zen Tokyo Zoo" },
+  // Monospace
+  { value: "Fira Code", label: "Fira Code (Code)" },
+  // Decorative
+  { value: "CalSans", label: "CalSans" },
+  { value: "Rubik Distressed", label: "Rubik Distressed" },
+  { value: "Rubik Moonrocks", label: "Rubik Moonrocks" },
+  { value: "Special Gothic Expanded One", label: "Special Gothic" },
+  { value: "Winky Rough", label: "Winky Rough" },
+  { value: "Tagesschrift", label: "Tagesschrift" },
+  // Script & Calligraphy
+  { value: "Snell BT", label: "Snell BT (Script)" },
+  { value: "Desirable Calligraphy", label: "Desirable Calligraphy" },
 ];
 
 const FONT_SIZE_OPTIONS = [
@@ -70,8 +92,11 @@ const Settings = () => {
   // Apply settings on mount and when values change
   React.useEffect(() => {
     if (font) {
-      document.documentElement.style.fontFamily =
-        font === "default" ? "" : font;
+      if (font === "default") {
+        document.documentElement.style.fontFamily = "";
+      } else {
+        document.documentElement.style.fontFamily = `"${font}", sans-serif`;
+      }
     }
   }, [font]);
 
