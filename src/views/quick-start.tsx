@@ -647,6 +647,23 @@ const QuickStart: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Quick Tips */}
+              <Card className="bg-blue-50/50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800">
+                <CardContent className="pt-3 pb-3 px-3">
+                  <div className="space-y-1 text-xs text-blue-900 dark:text-blue-100">
+                    <p className="font-medium flex items-center gap-1">
+                      <span>💡</span> Quick Tips
+                    </p>
+                    <ul className="ml-4 space-y-0.5 text-xs leading-tight">
+                      <li>• Add tutors, then courses</li>
+                      <li>• Double-click cells to edit</li>
+                      <li>• Select cells to merge/color</li>
+                      <li>• Click headers to edit times</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Timetable Grid */}
