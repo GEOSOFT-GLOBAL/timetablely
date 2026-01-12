@@ -1,31 +1,52 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { useNavigate } from "react-router-dom"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const navigation = useNavigate();
-  const handleSubmit = () => 
-  {
-    sessionStorage.setItem("token", "123456789jgjgnkvn");
-    navigation("/app/dashboard")
-  }
+  const navigate = useNavigate();
+  const { signin, initiateGoogleAuth, isLoading, error, clearError } =
+    useAuthStore();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signin(email, password);
+      navigate("/app/dashboard");
+    } catch {
+      // Error is handled by the store
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await initiateGoogleAuth();
+    } catch {
+      // Error is handled by the store
+    }
+  };
+
   return (
     <div className={cn("flex flex-col w-[550px] gap-6", className)} {...props}>
       <Card>
@@ -38,13 +59,28 @@ export function LoginForm({
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FieldGroup>
+              {error && (
+                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                  {error}
+                  <button
+                    type="button"
+                    onClick={clearError}
+                    className="ml-2 underline"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </Field>
               <Field>
@@ -57,15 +93,30 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
-                <Button variant="outline" type="button" onClick={handleSubmit}>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </Button>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={isLoading}
+                >
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/#/auth/signup">Sign up</a>
+                  Don&apos;t have an account?{" "}
+                  <a href="/#/auth/signup">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -73,5 +124,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
