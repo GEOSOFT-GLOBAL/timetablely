@@ -29,13 +29,16 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      await signin(email, password);
+    e.stopPropagation();
+
+    const success = await signin(email, password)
+      .then(() => true)
+      .catch(() => false);
+
+    if (success) {
       navigate("/app/dashboard");
-    } catch {
-      // Error is handled by the store
     }
   };
 

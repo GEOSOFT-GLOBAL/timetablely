@@ -88,6 +88,8 @@ export const useAuthStore = create<AuthState>()(
             token: res.data.accessToken,
             isLoading: false,
           });
+
+          sessionStorage.setItem("token", res?.data?.accessToken);
         } catch (err: unknown) {
           const message = axios.isAxiosError(err)
             ? (err.response?.data?.message as string) || err.message
