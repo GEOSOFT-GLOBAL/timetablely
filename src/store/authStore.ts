@@ -14,6 +14,7 @@ export interface User {
   avatar?: string;
   role?: string;
   plan?: string;
+  registeredApps?: string[];
 }
 
 interface SignupData {
@@ -22,6 +23,12 @@ interface SignupData {
   username: string;
   firstname?: string;
   lastname?: string;
+  linkAccount?: boolean;
+}
+
+export interface AccountLinkPrompt {
+  existingApps: string[];
+  prompt: string;
 }
 
 interface AuthState {
@@ -29,12 +36,14 @@ interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  accountLinkPrompt: AccountLinkPrompt | null;
   signup: (data: SignupData) => Promise<void>;
   signin: (email: string, password: string) => Promise<void>;
   initiateGoogleAuth: () => Promise<void>;
   handleGoogleCallback: (code: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  clearAccountLinkPrompt: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -44,9 +53,10 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isLoading: false,
       error: null,
+      accountLinkPrompt: null,
 
       signup: async (data: SignupData) => {
-        set({ isLoading: true, error: null });
+        set({ isLoading: true, error: null, accountLinkPrompt: null });
         try {
           const { data: res } = await axios.post(`${API_BASE}/auth/signup`, {
             ...data,
@@ -63,11 +73,29 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
         } catch (err: unknown) {
-          const message = axios.isAxiosError(err)
-            ? (err.response?.data?.message as string) || err.message
-            : "Signup failed";
-          set({ error: message, isLoading: false });
-          throw new Error(message);
+          if (axios.isAxiosError(err)) {
+            const errorData = err.response?.data;
+
+            // Check for account linking prompt
+            if (errorData?.code === "ACCOUNT_EXISTS_LINK_PROMPT") {
+              set({
+                isLoading: false,
+                accountLinkPrompt: {
+                  existingApps: errorData.errorData?.existingApps || [],
+                  prompt:
+                    errorData.errorData?.prompt ||
+                    "Account exists. Link accounts?",
+                },
+              });
+              throw new Error("ACCOUNT_LINK_REQUIRED");
+            }
+
+            const message = (errorData?.message as string) || err.message;
+            set({ error: message, isLoading: false });
+            throw new Error(message);
+          }
+          set({ error: "Signup failed", isLoading: false });
+          throw new Error("Signup failed");
         }
       },
 
@@ -145,11 +173,15 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        set({ user: null, token: null, error: null });
+        set({ user: null, token: null, error: null, accountLinkPrompt: null });
       },
 
       clearError: () => {
         set({ error: null });
+      },
+
+      clearAccountLinkPrompt: () => {
+        set({ accountLinkPrompt: null });
       },
     }),
     {
