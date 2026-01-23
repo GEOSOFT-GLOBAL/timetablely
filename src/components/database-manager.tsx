@@ -54,13 +54,13 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <DatabaseIcon className="size-5" />
           <h2 className="text-lg font-semibold">Database Overview</h2>
         </div>
         {onLoadSampleData && (
-          <Button variant="outline" size="sm" onClick={onLoadSampleData}>
+          <Button variant="outline" size="sm" onClick={onLoadSampleData} className="w-full sm:w-auto">
             Load Sample Data
           </Button>
         )}
@@ -70,23 +70,23 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
         {stats.map((stat) => (
           <Card key={stat.title} className="relative overflow-hidden">
             <CardContent>
-              <div className="flex items-end justify-between">
-                <div className="flex items-center justify-start flex-1 gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3">
+                <div className="flex items-center justify-start flex-1 gap-3 sm:gap-4">
                   <div className={`p-2 rounded-lg ${stat.bgColor}`}>
                     <stat.icon className={`size-4 ${stat.color}`} />
                   </div>
-                  <CardTitle className="text-md font-medium">
-                    {stat.title}
-                  </CardTitle>
-                  <div>
-                    <div className="text-2xl font-bold">{stat.count}</div>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                    <CardTitle className="text-sm sm:text-md font-medium">
+                      {stat.title}
+                    </CardTitle>
+                    <div className="text-xl sm:text-2xl font-bold">{stat.count}</div>
                   </div>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => navigate(stat.route)}
-                  className="gap-1"
+                  className="gap-1 w-full sm:w-auto"
                 >
                   <PlusIcon className="size-4" />
                   Add
@@ -100,21 +100,21 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
       {(onGenerateTimetable || onGenerateAITimetable) && (
         <Card>
           <CardContent className="pt-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h3 className="font-semibold">Generate Timetable</h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h3 className="font-semibold text-base sm:text-lg">Generate Timetable</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   Create timetables based on your database
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 {onGenerateTimetable && (
-                  <Button variant="outline" onClick={onGenerateTimetable}>
+                  <Button variant="outline" onClick={onGenerateTimetable} className="w-full sm:w-auto">
                     Generate
                   </Button>
                 )}
                 {onGenerateAITimetable && (
-                  <Button onClick={onGenerateAITimetable} className="gap-2">
+                  <Button onClick={onGenerateAITimetable} className="gap-2 w-full sm:w-auto">
                     <IconSparkles className="h-4 w-4" />
                     AI Generate
                   </Button>
