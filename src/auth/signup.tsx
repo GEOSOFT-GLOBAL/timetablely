@@ -2,8 +2,8 @@ import { SignupForm } from "@/components/signup-form";
 
 const Signup = () => {
   return (
-    <div className="flex items-center justify-center w-screen min-h-screen">
-      <SignupForm className="w-[550px]" />
+    <div className="flex items-center justify-center w-screen min-h-screen px-4 sm:px-6">
+      <SignupForm className="w-full max-w-[550px]" />
     </div>
   );
 };

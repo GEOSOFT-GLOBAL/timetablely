@@ -161,13 +161,13 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
   return (
     <Card {...props}>
-      <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="text-xl sm:text-2xl">Create an account</CardTitle>
+        <CardDescription className="text-sm">
           Enter your information below to create your account
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-4 sm:px-6">
         <form onSubmit={(e) => handleSubmit(e)}>
           <FieldGroup>
             {displayError && (
@@ -185,7 +185,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 </button>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="firstname">First Name</FieldLabel>
                 <Input
@@ -264,7 +264,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               />
             </Field>
             <Field>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? "Creating account..." : "Create Account"}
               </Button>
               <Button
@@ -272,11 +272,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={isLoading}
+                className="w-full"
               >
                 Sign up with Google
               </Button>
-              <FieldDescription className="px-6 text-center">
-                Already have an account? <a href="#/auth/login">Sign in</a>
+              <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
+                Already have an account? <a href="#/auth/login" className="underline">Sign in</a>
               </FieldDescription>
             </Field>
           </FieldGroup>

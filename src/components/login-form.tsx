@@ -51,15 +51,15 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn("flex flex-col w-[550px] gap-6", className)} {...props}>
+    <div className={cn("flex flex-col w-full max-w-[550px] gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="text-xl sm:text-2xl">Login to your account</CardTitle>
+          <CardDescription className="text-sm">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6">
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               {error && (
@@ -87,11 +87,11 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <div className="flex items-center">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <a
                     href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    className="sm:ml-auto text-xs sm:text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
                   </a>
@@ -106,7 +106,7 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading} className="w-full">
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
                 <Button
@@ -114,12 +114,13 @@ export function LoginForm({
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={isLoading}
+                  className="w-full"
                 >
                   Login with Google
                 </Button>
-                <FieldDescription className="text-center">
+                <FieldDescription className="text-center text-xs sm:text-sm">
                   Don&apos;t have an account?{" "}
-                  <a href="/#/auth/signup">Sign up</a>
+                  <a href="/#/auth/signup" className="underline">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
