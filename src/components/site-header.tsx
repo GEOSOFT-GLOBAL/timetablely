@@ -1,6 +1,8 @@
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { IconBell } from "@tabler/icons-react";
+import { NavLink } from "react-router-dom";
 
 export function SiteHeader() {
   return (
@@ -13,18 +15,14 @@ export function SiteHeader() {
         />
         <h1 className="text-base font-medium">Documents</h1>
         <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <a
-              href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
-              rel="noopener noreferrer"
-              target="_blank"
-              className="dark:text-foreground"
-            >
-              GitHub
-            </a>
+          <Button variant="ghost" size="icon" asChild>
+            <NavLink to="/app/notifications" className="relative">
+              <IconBell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+            </NavLink>
           </Button>
         </div>
       </div>
     </header>
-  )
+  );
 }

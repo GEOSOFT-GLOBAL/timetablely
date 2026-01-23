@@ -80,19 +80,19 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <NavLink to="/account">
+                <NavLink to="/app/account">
                   <IconUserCircle />
                   Account
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/billing">
+                <NavLink to="/app/billing">
                   <IconCreditCard />
                   Billing
                 </NavLink>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <NavLink to="/notifications">
+                <NavLink to="/app/notifications">
                   <IconNotification />
                   Notifications
                 </NavLink>
