@@ -58,10 +58,19 @@ export const useAuthStore = create<AuthState>()(
       signup: async (data: SignupData) => {
         set({ isLoading: true, error: null, accountLinkPrompt: null });
         try {
-          const { data: res } = await axios.post(`${API_BASE}/auth/signup`, {
-            ...data,
-            appSource: APP_SOURCE,
-          });
+          const { data: res } = await axios.post(
+            `${API_BASE}/auth/signup`,
+            {
+              ...data,
+              appSource: APP_SOURCE,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              timeout: 10000, // 10 second timeout
+            },
+          );
 
           if (!res.success) {
             throw new Error(res.message || "Signup failed");
@@ -90,7 +99,16 @@ export const useAuthStore = create<AuthState>()(
               throw new Error("ACCOUNT_LINK_REQUIRED");
             }
 
-            const message = (errorData?.message as string) || err.message;
+            let message = "Signup failed";
+            if (err.code === "ECONNABORTED" || err.code === "ERR_NETWORK") {
+              message =
+                "Network error. Please check your connection and try again.";
+            } else if (errorData?.message) {
+              message = errorData.message;
+            } else if (err.message) {
+              message = err.message;
+            }
+
             set({ error: message, isLoading: false });
             throw new Error(message);
           }
@@ -102,10 +120,23 @@ export const useAuthStore = create<AuthState>()(
       signin: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const { data: res } = await axios.post(`${API_BASE}/auth/signin`, {
-            email,
-            password,
-          });
+          console.log("Attempting signin to:", `${API_BASE}/auth/signin`);
+
+          const { data: res } = await axios.post(
+            `${API_BASE}/auth/signin`,
+            {
+              email,
+              password,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              timeout: 30000, // 30 second timeout for cold starts
+            },
+          );
+
+          console.log("Signin response:", res);
 
           if (!res.success) {
             throw new Error(res.message || "Sign in failed");
@@ -119,9 +150,22 @@ export const useAuthStore = create<AuthState>()(
 
           sessionStorage.setItem("token", res?.data?.accessToken);
         } catch (err: unknown) {
-          const message = axios.isAxiosError(err)
-            ? (err.response?.data?.message as string) || err.message
-            : "Sign in failed";
+          console.error("Signin error:", err);
+          let message = "Sign in failed";
+
+          if (axios.isAxiosError(err)) {
+            if (err.code === "ECONNABORTED") {
+              message =
+                "Request timeout. The server might be starting up. Please try again in a moment.";
+            } else if (err.code === "ERR_NETWORK") {
+              message = "Network error. Please check your internet connection.";
+            } else if (err.response?.data?.message) {
+              message = err.response.data.message;
+            } else if (err.message) {
+              message = err.message;
+            }
+          }
+
           set({ error: message, isLoading: false });
           throw new Error(message);
         }
@@ -151,7 +195,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const { data: res } = await axios.get(
             `${API_BASE}/auth/google/callback`,
-            { params: { code, appSource: APP_SOURCE } }
+            { params: { code, appSource: APP_SOURCE } },
           );
 
           if (!res.success) {
@@ -187,6 +231,6 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "timetablely-auth",
       partialize: (state) => ({ user: state.user, token: state.token }),
-    }
-  )
+    },
+  ),
 );

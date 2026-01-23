@@ -309,6 +309,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                       Next
                     </Button>
                   </div>
+                  <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
+                    Already have an account?{" "}
+                    <a href="#/auth/login" className="underline">
+                      Sign in
+                    </a>
+                  </FieldDescription>
                 </FieldGroup>
               </StepperContent>
 
@@ -348,6 +354,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                       Next
                     </Button>
                   </div>
+                  <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
+                    Already have an account?{" "}
+                    <a href="#/auth/login" className="underline">
+                      Sign in
+                    </a>
+                  </FieldDescription>
                 </FieldGroup>
               </StepperContent>
 
