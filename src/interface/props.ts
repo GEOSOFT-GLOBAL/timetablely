@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { applyTemplate } from "@/lib/template";
 import type { ISession, ITimetableDatabase } from "./database";
 import type { ICellContent, IMergeInfo } from "./types";
 
@@ -60,9 +59,18 @@ export interface GridCellProps {
   onCellDoubleClick: (row: number, col: number) => void;
   onSetCellAlignment: (
     cellKey: string,
-    alignment: "left" | "center" | "right"
+    alignment: "left" | "center" | "right",
   ) => void;
   onSetCellBackgroundColor: (cellKey: string, color: string) => void;
+}
+
+export interface AppliedTemplateResult {
+  cellContents: Map<string, ICellContent>;
+  columnCount: number;
+  columnDurations: { [key: number]: number };
+  defaultSlotDuration: number;
+  mergedCells: Map<string, any>;
+  hiddenCells: Set<string>;
 }
 
 export interface TemplateManagerProps {
@@ -74,7 +82,7 @@ export interface TemplateManagerProps {
   cellContents: Map<string, ICellContent>;
   columnDurations: { [key: number]: number };
   onDatabaseUpdate: (database: ITimetableDatabase) => void;
-  onApplyTemplate: (template: ReturnType<typeof applyTemplate>) => void;
+  onApplyTemplate: (template: AppliedTemplateResult) => void;
 }
 
 export interface ClassTimetableProps {
