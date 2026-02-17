@@ -1,6 +1,7 @@
 import Login from "@/auth/login";
 import Signup from "@/auth/signup";
 import ForgotPassword from "@/auth/forgot-password";
+import ResetPassword from "@/auth/reset-password";
 
 export const authRoutes = [
   {
@@ -14,5 +15,9 @@ export const authRoutes = [
   {
     path: "forgot-password",
     element: <ForgotPassword />,
+  },
+  {
+    path: "reset-password",
+    element: <ResetPassword />,
   },
 ];
