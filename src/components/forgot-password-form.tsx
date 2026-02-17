@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,6 +16,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
+const APP_SOURCE = "timetablely";
 
 export function ForgotPasswordForm({
   className,
@@ -32,11 +36,39 @@ export function ForgotPasswordForm({
     setIsLoading(true);
 
     try {
-      // TODO: Implement password reset API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const { data: res } = await axios.post(
+        `${API_BASE}/auth/forgot-password`,
+        {
+          email,
+          appSource: APP_SOURCE,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 10000, // 10 second timeout
+        },
+      );
+
+      if (!res.success) {
+        throw new Error(res.message || "Failed to send reset email");
+      }
+
       setIsSubmitted(true);
-    } catch {
-      setError("Failed to send reset email. Please try again.");
+    } catch (err: unknown) {
+      let message = "Failed to send reset email. Please try again.";
+
+      if (axios.isAxiosError(err)) {
+        if (err.code === "ECONNABORTED" || err.code === "ERR_NETWORK") {
+          message = "Network error. Please check your connection and try again.";
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        } else if (err.message) {
+          message = err.message;
+        }
+      }
+
+      setError(message);
     } finally {
       setIsLoading(false);
     }
