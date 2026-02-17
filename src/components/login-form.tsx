@@ -90,7 +90,7 @@ export function LoginForm({
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <a
-                    href="#"
+                    href="/#/auth/forgot-password"
                     className="sm:ml-auto text-xs sm:text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
