@@ -174,7 +174,7 @@ export const useAuthStore = create<AuthState>()(
       initiateGoogleAuth: async () => {
         set({ isLoading: true, error: null });
         try {
-          const { data: res } = await axios.get(`${API_BASE}/auth/google`);
+          const { data: res } = await axios.get(`${API_BASE}/auth/google?appSource=${APP_SOURCE}`);
 
           if (!res.success) {
             throw new Error(res.message || "Failed to initiate Google auth");
@@ -203,7 +203,7 @@ export const useAuthStore = create<AuthState>()(
           if (state && storedState && state !== storedState) {
             throw new Error("Invalid state parameter. Possible CSRF attack.");
           }
-          
+
           // Clear stored state after validation
           sessionStorage.removeItem('oauth_state');
 
