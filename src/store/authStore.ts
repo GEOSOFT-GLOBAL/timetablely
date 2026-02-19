@@ -40,7 +40,7 @@ interface AuthState {
   signup: (data: SignupData) => Promise<void>;
   signin: (email: string, password: string) => Promise<void>;
   initiateGoogleAuth: () => Promise<void>;
-  handleGoogleCallback: (code: string) => Promise<void>;
+  handleGoogleCallback: (code: string, state?: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
   clearAccountLinkPrompt: () => void;
@@ -180,6 +180,11 @@ export const useAuthStore = create<AuthState>()(
             throw new Error(res.message || "Failed to initiate Google auth");
           }
 
+          // Store state in session storage for CSRF protection
+          if (res.data.state) {
+            sessionStorage.setItem('oauth_state', res.data.state);
+          }
+
           window.location.href = res.data.authUrl;
         } catch (err: unknown) {
           const message = axios.isAxiosError(err)
@@ -190,12 +195,21 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      handleGoogleCallback: async (code: string) => {
+      handleGoogleCallback: async (code: string, state?: string) => {
         set({ isLoading: true, error: null });
         try {
+          // Validate state parameter for CSRF protection
+          const storedState = sessionStorage.getItem('oauth_state');
+          if (state && storedState && state !== storedState) {
+            throw new Error("Invalid state parameter. Possible CSRF attack.");
+          }
+          
+          // Clear stored state after validation
+          sessionStorage.removeItem('oauth_state');
+
           const { data: res } = await axios.get(
             `${API_BASE}/auth/google/callback`,
-            { params: { code, appSource: APP_SOURCE } },
+            { params: { code, appSource: APP_SOURCE, state } },
           );
 
           if (!res.success) {
