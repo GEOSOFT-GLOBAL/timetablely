@@ -307,12 +307,69 @@ export const offlineSyncService = {
 };
 
 /**
- * Auto-sync when back online
+ * Auto-sync when back online + periodic sync every 5 minutes
  */
 export const setupAutoSync = (
   getAuthToken: () => string | null,
-  onSyncComplete?: () => void
+  onSyncComplete?: () => void,
+  onSyncError?: (error: Error) => void
 ) => {
+  const SYNC_INTERVAL = 0.5 * 60 * 1000; // 5 minutes in milliseconds
+  let syncIntervalId: ReturnType<typeof setInterval> | null = null;
+
+  // Function to perform sync
+  const performSync = async () => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    const { isSyncing, pendingChanges } = useNetworkStore.getState();
+    
+    if (isSyncing) return;
+
+    console.log("[AutoSync] Starting periodic sync...");
+    useNetworkStore.getState().setSyncing(true);
+
+    try {
+      // First, process any pending changes in the queue
+      const queueResult = await offlineSyncService.processSyncQueue(token);
+      console.log("[AutoSync] Queue processing result:", queueResult);
+      
+      // Then, fetch latest data from server to keep local cache updated
+      const api = createApiClient(token);
+      try {
+        const response = await api.get("/data");
+        if (response.data.success && response.data.data) {
+          const serverData = response.data.data;
+          await offlineSyncService.saveTimetableData({
+            tutors: (serverData.tutors || []) as ITutor[],
+            courses: (serverData.courses || []) as ICourse[],
+            sessions: (serverData.sessions || []) as ISession[],
+            blockedSlots: [],
+            blockedTexts: [],
+            templates: (serverData.templates || []) as ITimetableTemplate[],
+          });
+          console.log("[AutoSync] Local cache updated from server");
+        }
+      } catch {
+        // Continue even if fetch fails - we still processed the queue
+        console.log("[AutoSync] Could not fetch latest data, using cached data");
+      }
+
+      if (queueResult.success > 0 || pendingChanges > 0) {
+        useNetworkStore.getState().setLastSyncTime(Date.now());
+      }
+
+      onSyncComplete?.();
+    } catch (error) {
+      console.error("[AutoSync] Sync failed:", error);
+      const errorObj = error instanceof Error ? error : new Error("Sync failed");
+      onSyncError?.(errorObj);
+    } finally {
+      useNetworkStore.getState().setSyncing(false);
+    }
+  };
+
+  // Handle network coming back online
   const handleOnline = async () => {
     const token = getAuthToken();
     if (!token) return;
@@ -321,30 +378,25 @@ export const setupAutoSync = (
     
     if (isSyncing || pendingChanges === 0) return;
 
-    console.log("Network restored, processing sync queue...");
-    useNetworkStore.getState().setSyncing(true);
-
-    try {
-      const result = await offlineSyncService.processSyncQueue(token);
-      console.log("Sync result:", result);
-      
-      if (result.success > 0) {
-        useNetworkStore.getState().setLastSyncTime(Date.now());
-      }
-
-      onSyncComplete?.();
-    } catch (error) {
-      console.error("Auto-sync failed:", error);
-    } finally {
-      useNetworkStore.getState().setSyncing(false);
-    }
+    console.log("[AutoSync] Network restored, processing sync queue...");
+    await performSync();
   };
 
+  // Setup online listener
   window.addEventListener("online", handleOnline);
+
+  // Start periodic sync interval (every 5 minutes)
+  syncIntervalId = setInterval(performSync, SYNC_INTERVAL);
+  console.log(`[AutoSync] Periodic sync started - checking every ${SYNC_INTERVAL / 1000} seconds`);
 
   // Return cleanup function
   return () => {
     window.removeEventListener("online", handleOnline);
+    if (syncIntervalId) {
+      clearInterval(syncIntervalId);
+      syncIntervalId = null;
+      console.log("[AutoSync] Periodic sync stopped");
+    }
   };
 };
 

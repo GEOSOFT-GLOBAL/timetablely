@@ -1,32 +1,91 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNetworkStore } from "@/lib/offline-storage";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { useAuthStore } from "@/store/authStore";
-import { setupAutoSync } from "@/lib/offline-sync";
+import { offlineSyncService } from "@/lib/offline-sync";
+import { createApiClient } from "@/config/axios";
 import { Cloud, CloudOff, RefreshCw, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+
+const SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 /**
  * Sync Status Indicator Component
  * Shows current sync status and provides manual sync button
+ * Auto-syncs every 5 minutes
  */
 export function SyncStatus() {
   const { isOnline, isSyncing, pendingChanges, lastSyncTime } = useNetworkStore();
   const { isLoading: isDbLoading } = useDatabaseStore();
   const token = useAuthStore((state) => state.token);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Setup auto-sync when component mounts
+  // Function to perform sync
+  const performSync = async () => {
+    if (!token) return;
+    
+    const { isSyncing: currentlySyncing } = useNetworkStore.getState();
+    if (currentlySyncing) return;
+
+    console.log("[SyncStatus] Starting periodic sync...");
+    useNetworkStore.getState().setSyncing(true);
+
+    try {
+      // First, process any pending changes in the queue
+      const queueResult = await offlineSyncService.processSyncQueue(token);
+      console.log("[SyncStatus] Queue processing result:", queueResult);
+      
+      // Then, fetch latest data from server to keep local cache updated
+      const api = createApiClient(token);
+      try {
+        const response = await api.get("/data");
+        if (response.data.success && response.data.data) {
+          const serverData = response.data.data;
+          await offlineSyncService.saveTimetableData({
+            tutors: serverData.tutors || [],
+            courses: serverData.courses || [],
+            sessions: serverData.sessions || [],
+            blockedSlots: [],
+            blockedTexts: [],
+            templates: serverData.templates || [],
+          });
+          console.log("[SyncStatus] Local cache updated from server");
+        }
+      } catch {
+        // Continue even if fetch fails - we still processed the queue
+        console.log("[SyncStatus] Could not fetch latest data, using cached data");
+      }
+
+      if (queueResult.success > 0 || pendingChanges > 0) {
+        useNetworkStore.getState().setLastSyncTime(Date.now());
+      }
+
+      toast.success("Data synced successfully!");
+    } catch (error) {
+      console.error("[SyncStatus] Sync failed:", error);
+    } finally {
+      useNetworkStore.getState().setSyncing(false);
+    }
+  };
+
+  // Setup auto-sync interval when component mounts
   useEffect(() => {
     if (!token) return;
 
-    const cleanup = setupAutoSync(
-      () => token,
-      () => {
-        toast.success("Data synced successfully!");
-      }
-    );
+    // Start periodic sync
+    intervalRef.current = setInterval(performSync, SYNC_INTERVAL);
+    console.log(`[SyncStatus] Periodic sync started - every ${SYNC_INTERVAL / 1000 / 60} minutes`);
 
-    return cleanup;
+    // Also run sync immediately
+    performSync();
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        console.log("[SyncStatus] Periodic sync stopped");
+      }
+    };
   }, [token]);
 
   // Show offline indicator when offline
@@ -38,15 +97,7 @@ export function SyncStatus() {
 
   const handleManualSync = async () => {
     if (!token || isSyncing || isDbLoading) return;
-
-    const { syncWithServer } = useDatabaseStore.getState();
-    const result = await syncWithServer();
-
-    if (result.success) {
-      toast.success("Data synced successfully!");
-    } else {
-      toast.error(result.error || "Sync failed");
-    }
+    await performSync();
   };
 
   const formatLastSync = () => {
