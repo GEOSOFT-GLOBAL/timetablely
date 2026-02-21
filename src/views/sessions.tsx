@@ -202,7 +202,8 @@ const Sessions: React.FC<SessionsProps> = () => {
 
         <Card className="w-full h-[calc(100vh-220px)] flex flex-col px-4 overflow-y-auto">
           {database.sessions.map((session) => {
-            const courseNames = session.subjects.map((subjectId) => {
+            const sessionSubjects = session.subjects || [];
+            const courseNames = sessionSubjects.map((subjectId) => {
               const course = database.courses.find((c) => c.id === subjectId);
               return course?.name || subjectId;
             });

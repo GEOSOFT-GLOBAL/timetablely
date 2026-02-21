@@ -65,6 +65,8 @@ export function SyncStatus() {
         const response = await api.get("/data");
         if (response.data.success && response.data.data) {
           const serverData = response.data.data;
+          
+          // Save to offline storage
           await offlineSyncService.saveTimetableData({
             tutors: serverData.tutors || [],
             courses: serverData.courses || [],
@@ -73,7 +75,18 @@ export function SyncStatus() {
             blockedTexts: [],
             templates: serverData.templates || [],
           });
-          console.log("[SyncStatus] Local cache updated from server");
+          
+          // Update the Zustand store so UI updates (don't queue for sync)
+          useDatabaseStore.getState().setDatabaseFromServer({
+            tutors: serverData.tutors || [],
+            courses: serverData.courses || [],
+            sessions: serverData.sessions || [],
+            blockedSlots: [],
+            blockedTexts: [],
+            templates: serverData.templates || [],
+          });
+          
+          console.log("[SyncStatus] Store and cache updated from server");
         }
       } catch {
         // Continue even if fetch fails - we still processed the queue

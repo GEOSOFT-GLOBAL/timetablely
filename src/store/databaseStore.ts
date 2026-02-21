@@ -10,6 +10,7 @@ interface DatabaseState {
   isLoading: boolean;
   isInitialized: boolean;
   setDatabase: (database: ITimetableDatabase) => Promise<void>;
+  setDatabaseFromServer: (database: ITimetableDatabase) => Promise<void>;
   initializeDatabase: () => Promise<void>;
   saveToOffline: () => Promise<void>;
   syncWithServer: () => Promise<{ success: boolean; error?: string }>;
@@ -47,6 +48,23 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
       } catch (error) {
         console.error("[DatabaseStore] Failed to save data:", error);
       }
+    }
+  },
+
+  // Set database from server (don't queue for sync)
+  setDatabaseFromServer: async (database) => {
+    set({ database });
+    
+    // Save to offline storage but don't queue for sync
+    try {
+      await offlineSyncService.saveTimetableData(database);
+      // Clear the sync queue since this is server data
+      await offlineSyncService.clearSyncQueue();
+      useNetworkStore.getState().setPendingChanges(0);
+      
+      console.log("[DatabaseStore] Data loaded from server, queue cleared");
+    } catch (error) {
+      console.error("[DatabaseStore] Failed to save server data:", error);
     }
   },
 
