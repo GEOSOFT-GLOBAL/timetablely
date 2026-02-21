@@ -20,6 +20,21 @@ export function SyncStatus() {
   const token = useAuthStore((state) => state.token);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Load initial pending changes count on mount
+  useEffect(() => {
+    const loadPendingCount = async () => {
+      try {
+        const queue = await offlineSyncService.getSyncQueue();
+        useNetworkStore.getState().setPendingChanges(queue.length);
+        console.log("[SyncStatus] Initial pending changes:", queue.length);
+      } catch (error) {
+        console.error("[SyncStatus] Failed to load pending count:", error);
+      }
+    };
+    
+    loadPendingCount();
+  }, []);
+
   // Function to perform sync
   const performSync = async () => {
     if (!token) return;

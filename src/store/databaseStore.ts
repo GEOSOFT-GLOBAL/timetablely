@@ -3,12 +3,13 @@ import type { ITimetableDatabase } from "@/interface/database";
 import { defaultBlockedTexts } from "@/lib/timetable";
 import { offlineSyncService } from "@/lib/offline-storage";
 import { useAuthStore } from "./authStore";
+import { useNetworkStore } from "@/lib/offline-storage";
 
 interface DatabaseState {
   database: ITimetableDatabase;
   isLoading: boolean;
   isInitialized: boolean;
-  setDatabase: (database: ITimetableDatabase) => void;
+  setDatabase: (database: ITimetableDatabase) => Promise<void>;
   initializeDatabase: () => Promise<void>;
   saveToOffline: () => Promise<void>;
   syncWithServer: () => Promise<{ success: boolean; error?: string }>;
@@ -27,7 +28,27 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   isLoading: false,
   isInitialized: false,
 
-  setDatabase: (database) => set({ database }),
+  // Set database and auto-save to offline storage
+  setDatabase: async (database) => {
+    set({ database });
+    
+    // Auto-save to offline storage and queue for sync
+    const token = useAuthStore.getState().token;
+    if (token) {
+      try {
+        await offlineSyncService.saveTimetableData(database);
+        await offlineSyncService.queueForSync(database);
+        
+        // Update pending changes count
+        const queue = await offlineSyncService.getSyncQueue();
+        useNetworkStore.getState().setPendingChanges(queue.length);
+        
+        console.log("[DatabaseStore] Data saved and queued for sync");
+      } catch (error) {
+        console.error("[DatabaseStore] Failed to save data:", error);
+      }
+    }
+  },
 
   // Initialize database - load from cache or server
   initializeDatabase: async () => {
@@ -93,12 +114,21 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
     }
   },
 
-  // Save current database to offline storage
+  // Save current database to offline storage and queue for sync
   saveToOffline: async () => {
     const { database } = get();
+    const token = useAuthStore.getState().token;
+    
     try {
+      // Save locally
       await offlineSyncService.saveTimetableData(database);
       console.log("Database saved to offline storage");
+      
+      // If we have a token, also queue for sync
+      if (token) {
+        await offlineSyncService.queueForSync(database);
+        console.log("Changes queued for sync");
+      }
     } catch (error) {
       console.error("Failed to save to offline storage:", error);
     }
