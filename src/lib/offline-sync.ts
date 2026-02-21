@@ -220,6 +220,9 @@ export const offlineSyncService = {
 
   // Queue current data for sync
   async queueForSync(data: ITimetableDatabase): Promise<void> {
+    // Clear existing queue to avoid duplicates
+    await this.clearSyncQueue();
+    
     // Save current data locally first
     await this.saveTimetableData(data);
 

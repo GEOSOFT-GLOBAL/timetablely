@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useNetworkStore } from "@/lib/offline-storage";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { useAuthStore } from "@/store/authStore";
@@ -20,20 +20,29 @@ export function SyncStatus() {
   const token = useAuthStore((state) => state.token);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Load initial pending changes count on mount
-  useEffect(() => {
-    const loadPendingCount = async () => {
-      try {
-        const queue = await offlineSyncService.getSyncQueue();
-        useNetworkStore.getState().setPendingChanges(queue.length);
-        console.log("[SyncStatus] Initial pending changes:", queue.length);
-      } catch (error) {
-        console.error("[SyncStatus] Failed to load pending count:", error);
-      }
-    };
-    
-    loadPendingCount();
+  // Poll for pending changes count
+  const refreshPendingCount = useCallback(async () => {
+    try {
+      const queue = await offlineSyncService.getSyncQueue();
+      const count = queue.length;
+      useNetworkStore.getState().setPendingChanges(count);
+      console.log("[SyncStatus] Pending changes:", count);
+      return count;
+    } catch (error) {
+      console.error("[SyncStatus] Failed to get pending count:", error);
+      return 0;
+    }
   }, []);
+
+  // Load initial pending changes count on mount and set up polling
+  useEffect(() => {
+    refreshPendingCount();
+    
+    // Poll every 2 seconds to check for new pending changes
+    const pollInterval = setInterval(refreshPendingCount, 2000);
+    
+    return () => clearInterval(pollInterval);
+  }, [refreshPendingCount]);
 
   // Function to perform sync
   const performSync = async () => {
