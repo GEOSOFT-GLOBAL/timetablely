@@ -4,12 +4,21 @@ import axios, { type AxiosInstance, type AxiosRequestConfig } from "axios";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 const APP_SOURCE = "timetablely";
 
+// API Path enum for different endpoints
+export enum ApiPath {
+  AUTH = "/auth",
+  TIMETABLELY = "/timetablely/sync",
+}
+
 /**
  * Create axios instance with default configuration for timetablely app
  */
-export const createApiClient = (token?: string): AxiosInstance => {
+export const createApiClient = (
+  token?: string,
+  basePath: ApiPath = ApiPath.TIMETABLELY
+): AxiosInstance => {
   const config: AxiosRequestConfig = {
-    baseURL: `${API_BASE_URL}/timetablely/sync`,
+    baseURL: `${API_BASE_URL}${basePath}`,
     timeout: 30000,
     headers: {
       "Content-Type": "application/json",
@@ -29,10 +38,22 @@ export const createApiClient = (token?: string): AxiosInstance => {
 };
 
 /**
+ * Create auth API client (for /auth endpoints)
+ */
+export const createAuthApiClient = (): AxiosInstance => {
+  return createApiClient(undefined, ApiPath.AUTH);
+};
+
+/**
  * Default API client instance
  * Use this for quick API calls
  */
 export const apiClient = createApiClient();
+
+/**
+ * Auth API client for authentication endpoints
+ */
+export const authApi = createAuthApiClient();
 
 /**
  * Get API client with authentication

@@ -1,8 +1,8 @@
-import axios from "axios";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { AxiosError } from "axios";
+import { authApi } from "@/config/axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 const APP_SOURCE = "timetablely";
 
 export interface User {
@@ -58,18 +58,15 @@ export const useAuthStore = create<AuthState>()(
       signup: async (data: SignupData) => {
         set({ isLoading: true, error: null, accountLinkPrompt: null });
         try {
-          const { data: res } = await axios.post(
-            `${API_BASE}/auth/signup`,
+          const { data: res } = await authApi.post(
+            "/signup",
             {
               ...data,
               appSource: APP_SOURCE,
             },
             {
-              headers: {
-                "Content-Type": "application/json",
-              },
               timeout: 10000, // 10 second timeout
-            },
+            }
           );
 
           if (!res.success) {
@@ -82,7 +79,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
         } catch (err: unknown) {
-          if (axios.isAxiosError(err)) {
+          if (err instanceof AxiosError) {
             const errorData = err.response?.data;
 
             // Check for account linking prompt
@@ -120,20 +117,17 @@ export const useAuthStore = create<AuthState>()(
       signin: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          console.log("Attempting signin to:", `${API_BASE}/auth/signin`);
+          console.log("Attempting signin to: /auth/signin");
 
-          const { data: res } = await axios.post(
-            `${API_BASE}/auth/signin`,
+          const { data: res } = await authApi.post(
+            "/signin",
             {
               email,
               password,
             },
             {
-              headers: {
-                "Content-Type": "application/json",
-              },
               timeout: 30000, // 30 second timeout for cold starts
-            },
+            }
           );
 
           console.log("Signin response:", res);
@@ -153,7 +147,7 @@ export const useAuthStore = create<AuthState>()(
           console.error("Signin error:", err);
           let message = "Sign in failed";
 
-          if (axios.isAxiosError(err)) {
+          if (err instanceof AxiosError) {
             if (err.code === "ECONNABORTED") {
               message =
                 "Request timeout. The server might be starting up. Please try again in a moment.";
@@ -174,7 +168,7 @@ export const useAuthStore = create<AuthState>()(
       initiateGoogleAuth: async () => {
         set({ isLoading: true, error: null });
         try {
-          const { data: res } = await axios.get(`${API_BASE}/auth/google?appSource=${APP_SOURCE}`);
+          const { data: res } = await authApi.get(`/google?appSource=${APP_SOURCE}`);
 
           if (!res.success) {
             throw new Error(res.message || "Failed to initiate Google auth");
@@ -187,7 +181,7 @@ export const useAuthStore = create<AuthState>()(
 
           window.location.href = res.data.authUrl;
         } catch (err: unknown) {
-          const message = axios.isAxiosError(err)
+          const message = err instanceof AxiosError
             ? (err.response?.data?.message as string) || err.message
             : "Google auth failed";
           set({ error: message, isLoading: false });
@@ -207,9 +201,9 @@ export const useAuthStore = create<AuthState>()(
           // Clear stored state after validation
           sessionStorage.removeItem('oauth_state');
 
-          const { data: res } = await axios.get(
-            `${API_BASE}/auth/google/callback`,
-            { params: { code, appSource: APP_SOURCE, state } },
+          const { data: res } = await authApi.get(
+            "/google/callback",
+            { params: { code, appSource: APP_SOURCE, state } }
           );
 
           if (!res.success) {
@@ -222,7 +216,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
         } catch (err: unknown) {
-          const message = axios.isAxiosError(err)
+          const message = err instanceof AxiosError
             ? (err.response?.data?.message as string) || err.message
             : "Google auth failed";
           set({ error: message, isLoading: false });
