@@ -10,7 +10,8 @@ const Layout = () => {
       <SidebarProvider
         style={
           {
-            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--sidebar-width": "calc(var(--spacing) * 56)",
+            "--sidebar-width-icon": "calc(var(--spacing) * 16)",
             "--header-height": "calc(var(--spacing) * 12)",
           } as React.CSSProperties
         }

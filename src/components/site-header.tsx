@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { IconBell } from "@tabler/icons-react";
 import { NavLink } from "react-router-dom";
+import { SyncStatus } from "./sync-status";
 
 export function SiteHeader() {
   return (
@@ -15,6 +16,7 @@ export function SiteHeader() {
         />
         <h1 className="text-base font-medium">Documents</h1>
         <div className="ml-auto flex items-center gap-2">
+          <SyncStatus />
           <Button variant="ghost" size="icon" asChild>
             <NavLink to="/app/notifications" className="relative">
               <IconBell className="h-5 w-5" />
