@@ -1,6 +1,7 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { create } from "zustand";
 import type { ITimetableDatabase, ITimetableTemplate, ITutor, ICourse, ISession } from "@/interface/database";
+import { createApiClient } from "@/config/axios";
 
 // Database name and version
 const DB_NAME = "timetablely-offline";
@@ -169,20 +170,17 @@ interface TimetableDataWithMeta {
   templates: ITimetableTemplate[];
 }
 
-// API Configuration
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
-
-// Create axios instance
-const createApiClient = (token?: string) => {
-  return axios.create({
-    baseURL: `${API_BASE}/timetablely/sync`,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    timeout: 30000,
-  });
-};
+// Extended timetable data with metadata for storage
+interface TimetableDataWithMeta {
+  id: string;
+  lastUpdated: number;
+  tutors: ITutor[];
+  courses: ICourse[];
+  sessions: ISession[];
+  blockedSlots: string[];
+  blockedTexts: string[];
+  templates: ITimetableTemplate[];
+}
 
 // Network status store
 interface NetworkState {
