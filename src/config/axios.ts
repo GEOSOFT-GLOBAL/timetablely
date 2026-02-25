@@ -8,6 +8,7 @@ const APP_SOURCE = "timetablely";
 export enum ApiPath {
   AUTH = "/auth",
   TIMETABLELY = "/timetablely/sync",
+  TIMETABLELY_EXPORT = "/timetablely/export",
 }
 
 /**
@@ -42,6 +43,13 @@ export const createApiClient = (
  */
 export const createAuthApiClient = (): AxiosInstance => {
   return createApiClient(undefined, ApiPath.AUTH);
+};
+
+/**
+ * Create export API client (for /timetablely/export endpoints)
+ */
+export const createExportApiClient = (): AxiosInstance => {
+  return createApiClient(undefined, ApiPath.TIMETABLELY_EXPORT);
 };
 
 /**
