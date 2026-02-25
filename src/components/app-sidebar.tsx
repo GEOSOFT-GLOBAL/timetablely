@@ -1,4 +1,5 @@
 import * as React from "react";
+import { NavLink } from "react-router-dom";
 import {
   IconCalendar,
   IconChartBar,
@@ -121,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-2 hover:bg-sidebar-accent/50 transition-colors"
             >
-              <a href="/app/dashboard" className="flex items-center gap-3">
+              <NavLink to="/app/dashboard" className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <IconCalendar className="h-5 w-5" />
                 </div>
@@ -133,7 +134,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     Schedule Manager
                   </span>
                 </div>
-              </a>
+              </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -160,10 +161,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   tooltip={item.title}
                   className="h-10 gap-3 rounded-lg transition-all hover:bg-sidebar-accent/70 hover:translate-x-0.5"
                 >
-                  <a href={item.url} className="flex items-center gap-3">
+                  <NavLink to={item.url} className="flex items-center gap-3">
                     <item.icon className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">{item.title}</span>
-                  </a>
+                  </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -185,10 +186,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   tooltip={item.title}
                   className="h-10 gap-3 rounded-lg transition-all hover:bg-sidebar-accent/70 hover:translate-x-0.5"
                 >
-                  <a href={item.url} className="flex items-center gap-3">
+                  <NavLink to={item.url} className="flex items-center gap-3">
                     <item.icon className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">{item.title}</span>
-                  </a>
+                  </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
