@@ -215,6 +215,7 @@ export const useAuthStore = create<AuthState>()(
             token: res.data.accessToken,
             isLoading: false,
           });
+          sessionStorage.setItem("token", res?.data?.accessToken);
         } catch (err: unknown) {
           const message = err instanceof AxiosError
             ? (err.response?.data?.message as string) || err.message
