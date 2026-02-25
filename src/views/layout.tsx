@@ -27,7 +27,7 @@ const Layout = () => {
       defaultOpen
       style={
         {
-          "--sidebar-width": "280px",
+          "--sidebar-width": "240px",
           "--sidebar-width-icon": "72px",
           "--header-height": "64px",
         } as React.CSSProperties

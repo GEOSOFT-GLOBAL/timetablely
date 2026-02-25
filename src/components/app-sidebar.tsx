@@ -161,9 +161,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   tooltip={item.title}
                   className="h-10 gap-3 rounded-lg transition-all hover:bg-sidebar-accent/70 hover:translate-x-0.5"
                 >
-                  <NavLink to={item.url} className="flex items-center gap-3">
-                    <item.icon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">{item.title}</span>
+                  <NavLink
+                    to={item.url}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 ${
+                        isActive
+                          ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`
+                    }
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="text-sm">{item.title}</span>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -186,9 +195,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   tooltip={item.title}
                   className="h-10 gap-3 rounded-lg transition-all hover:bg-sidebar-accent/70 hover:translate-x-0.5"
                 >
-                  <NavLink to={item.url} className="flex items-center gap-3">
-                    <item.icon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">{item.title}</span>
+                  <NavLink
+                    to={item.url}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 ${
+                        isActive
+                          ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`
+                    }
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="text-sm">{item.title}</span>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
