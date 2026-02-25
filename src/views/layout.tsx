@@ -12,6 +12,7 @@ const pageTitles: Record<string, string> = {
   "/app/sessions": "Sessions",
   "/app/templates": "Templates",
   "/app/analytics": "Analytics",
+  "/app/how-to-use": "How to Use",
   "/app/settings": "Settings",
   "/app/account": "Account",
   "/app/billing": "Billing",

@@ -5,12 +5,11 @@ import {
   IconChartBar,
   IconDashboard,
   IconFileText,
-  IconHelpCircle,
   IconSearch,
   IconSettings,
   IconTemplate,
-  IconUsersGroup,
   IconUsers,
+  IconBook,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -52,7 +51,7 @@ const data = {
     {
       title: "Tutors",
       url: "/app/tutors",
-      icon: IconUsersGroup,
+      icon: IconUsers,
     },
     {
       title: "Sessions",
@@ -74,14 +73,14 @@ const data = {
   ],
   navSecondary: [
     {
+      title: "How to Use",
+      url: "/app/how-to-use",
+      icon: IconBook,
+    },
+    {
       title: "Settings",
       url: "/app/settings",
       icon: IconSettings,
-    },
-    {
-      title: "Help & Support",
-      url: "#",
-      icon: IconHelpCircle,
     },
     {
       title: "Search",
