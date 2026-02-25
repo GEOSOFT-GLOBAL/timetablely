@@ -19,6 +19,7 @@ const GridControlls: React.FC<GridControlsProps> = ({
   onResetGrid,
   onExportData,
   onExportPDF,
+  onExportProPDF,
   onMergeCells,
   selectedCellsCount,
   tempDefaultDuration,
@@ -180,8 +181,19 @@ const GridControlls: React.FC<GridControlsProps> = ({
             onClick={onExportPDF}
           >
             <IconFileTypePdf className="size-4" />
-            Export PDF
+            Export PDF (Lite)
           </Button>
+
+          {onExportProPDF && (
+            <Button
+              variant="default"
+              className="w-full gap-2"
+              onClick={onExportProPDF}
+            >
+              <IconFileTypePdf className="size-4" />
+              Export PDF (Pro)
+            </Button>
+          )}
 
           <Button
             variant="destructive"
