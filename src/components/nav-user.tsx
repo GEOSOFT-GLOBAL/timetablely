@@ -5,7 +5,7 @@ import {
   IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/store/authStore";
 
 export function NavUser({
   user,
@@ -34,6 +35,8 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
 
   // Get initials for avatar fallback
   const initials = user.name
@@ -42,6 +45,11 @@ export function NavUser({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <SidebarMenu>
@@ -111,7 +119,10 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-500 focus:bg-red-50">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="cursor-pointer text-red-500 focus:text-red-500 focus:bg-red-50"
+            >
               <IconLogout className="h-4 w-4 mr-2" />
               Log out
             </DropdownMenuItem>
