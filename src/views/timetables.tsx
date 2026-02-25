@@ -266,17 +266,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
 
   const handleExportProPDF = async () => {
     try {
-      // Generate HTML for the timetable
-      const timetableData = extractTimetableData(
-        cellContents,
-        hiddenCells,
-        columnCount,
-        columnDurations,
-        defaultSlotDuration,
-        mergedCells
-      );
-
-      // Create HTML content
+      // Create HTML content for the timetable
       const htmlContent = `
         <!DOCTYPE html>
         <html>
