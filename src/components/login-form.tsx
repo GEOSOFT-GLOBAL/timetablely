@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 
 export function LoginForm({
@@ -90,12 +90,12 @@ export function LoginForm({
               <Field>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="/#/auth/forgot-password"
+                  <Link
+                    to="/auth/forgot-password"
                     className="sm:ml-auto text-xs sm:text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <PasswordInput
                   id="password"
@@ -120,7 +120,7 @@ export function LoginForm({
                 </Button>
                 <FieldDescription className="text-center text-xs sm:text-sm">
                   Don&apos;t have an account?{" "}
-                  <a href="/auth/signup" className="underline">Sign up</a>
+                  <Link to="/auth/signup" className="underline">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

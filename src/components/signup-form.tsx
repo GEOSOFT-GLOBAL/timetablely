@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import {
@@ -312,9 +312,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   </div>
                   <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
                     Already have an account?{" "}
-                    <a href="/auth/login" className="underline">
+                    <Link to="/auth/login" className="underline">
                       Sign in
-                    </a>
+                    </Link>
                   </FieldDescription>
                 </FieldGroup>
               </StepperContent>
@@ -357,9 +357,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   </div>
                   <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
                     Already have an account?{" "}
-                    <a href="#/auth/login" className="underline">
+                    <Link to="/auth/login" className="underline">
                       Sign in
-                    </a>
+                    </Link>
                   </FieldDescription>
                 </FieldGroup>
               </StepperContent>
@@ -419,9 +419,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   </Button>
                   <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
                     Already have an account?{" "}
-                    <a href="/auth/login" className="underline">
+                    <Link to="/auth/login" className="underline">
                       Sign in
-                    </a>
+                    </Link>
                   </FieldDescription>
                 </FieldGroup>
               </StepperContent>
