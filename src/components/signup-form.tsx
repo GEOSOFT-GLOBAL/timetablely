@@ -16,6 +16,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Stepper,
   StepperContent,
@@ -367,9 +368,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="password"
-                      type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={isLoading}
@@ -383,9 +383,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                     <FieldLabel htmlFor="confirm-password">
                       Confirm Password
                     </FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="confirm-password"
-                      type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       disabled={isLoading}
