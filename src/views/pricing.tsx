@@ -3,7 +3,7 @@ import React from "react";
 
 const Pricing = () => {
   return (
-    <div className="flex items-center justify-center w-screen">
+    <div className="flex flex-col w-full py-6">
       <Pricing4 />
     </div>
   );

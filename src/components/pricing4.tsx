@@ -27,47 +27,78 @@ interface Pricing4Props {
 }
 
 const Pricing4 = ({
-  title = "Pricing",
-  description = "Check out our affordable pricing plans.",
+  title = "Simple, Transparent Pricing",
+  description = "Choose the perfect plan for your school's timetable management needs. All plans include our core features.",
   plans = [
     {
-      name: "Free",
+      name: "Starter",
       badge: "Free",
       monthlyPrice: "$0",
       yearlyPrice: "$0",
       features: [
-        "Unlimited Integrations",
-        "Windows, Linux, Mac support",
-        "24/7 Support",
-        "Free updates",
+        "Up to 5 tutors",
+        "Up to 10 courses",
+        "Basic timetable generation",
+        "Manual timetable editing",
+        "PDF export (1 timetable per month)",
+        "Email support",
+        "7-day free trial of Pro features",
       ],
       buttonText: "Get Started",
     },
     {
-      name: "Pro",
-      badge: "Pro",
-      monthlyPrice: "$29",
-      yearlyPrice: "$249",
+      name: "Basic",
+      badge: "Basic",
+      monthlyPrice: "$19",
+      yearlyPrice: "$190",
       features: [
-        "Everything in FREE",
-        "Live call suport every month",
-        "Unlimited Storage",
+        "Everything in Starter",
+        "Up to 20 tutors",
+        "Up to 50 courses",
+        "Advanced timetable generation",
+        "Unlimited PDF exports",
+        "Timetable templates",
+        "Priority email support",
+        "Analytics dashboard",
       ],
-      buttonText: "Purchase",
+      buttonText: "Choose Basic",
     },
     {
-      name: "Elite",
-      badge: "Elite",
-      monthlyPrice: "$59",
-      yearlyPrice: "$549",
+      name: "Pro",
+      badge: "Pro",
+      monthlyPrice: "$49",
+      yearlyPrice: "$490",
       features: [
-        "Everything in PRO",
-        "Advanced analytics",
-        "Custom branding",
-        "Unlimited users",
+        "Everything in Basic",
+        "Unlimited tutors",
+        "Unlimited courses",
+        "AI-powered scheduling",
+        "Custom blocked time slots",
+        "Offline support",
+        "Priority email & chat support",
+        "Advanced analytics & reports",
+        "API access",
       ],
-      buttonText: "Purchase",
+      buttonText: "Choose Pro",
       isPopular: true,
+    },
+    {
+      name: "Enterprise",
+      badge: "Enterprise",
+      monthlyPrice: "$99",
+      yearlyPrice: "$990",
+      features: [
+        "Everything in Pro",
+        "Unlimited everything",
+        "Dedicated account manager",
+        "Custom integrations",
+        "Onboarding & training",
+        "24/7 phone & email support",
+        "White-label option",
+        "Custom feature development",
+        "SSO integration",
+      ],
+      buttonText: "Contact Sales",
     },
   ],
   className = "",
@@ -121,7 +152,7 @@ const Pricing4 = ({
               </RadioGroup>
             </div>
           </div>
-          <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
             {plans.map((plan) => (
               <div
                 key={plan.name}
