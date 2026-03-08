@@ -1,5 +1,4 @@
 import { Pricing4 } from "@/components/pricing4";
-import React from "react";
 
 const Pricing = () => {
   return (

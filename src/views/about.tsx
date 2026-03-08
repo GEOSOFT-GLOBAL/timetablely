@@ -60,7 +60,7 @@ const About = () => {
   return (
     <div className="flex w-full flex-col gap-6 py-6">
       {/* Hero Section */}
-      <div className="px-4 lg:px-6 py-8 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg">
+      <div className="px-4 lg:px-6 py-8 bg-linear-to-r from-primary/5 to-secondary/5 rounded-lg">
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex justify-center mb-4">
             <CalendarIcon className="size-12 text-primary" />
@@ -147,7 +147,7 @@ const About = () => {
             <Card key={index}>
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center font-bold text-primary">
+                  <div className="shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center font-bold text-primary">
                     {milestone.year}
                   </div>
                   <div className="flex-1">

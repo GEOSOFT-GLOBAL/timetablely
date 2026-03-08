@@ -138,7 +138,7 @@ const Features = () => {
   ];
 
   return (
-    <div className="flex w-full flex-col gap-6 py-6">
+    <div className="flex w-full flex-col gap-6 py-24">
       <div className="px-4 lg:px-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Timetablely Features</h1>
