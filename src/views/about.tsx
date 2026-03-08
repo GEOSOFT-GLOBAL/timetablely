@@ -58,7 +58,7 @@ const About = () => {
   ];
 
   return (
-    <div className="flex w-full flex-col gap-6 py-6">
+    <div className="flex w-full flex-col gap-6 py-24">
       {/* Hero Section */}
       <div className="px-4 lg:px-6 py-8 bg-linear-to-r from-primary/5 to-secondary/5 rounded-lg">
         <div className="max-w-3xl mx-auto text-center">

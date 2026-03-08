@@ -2,7 +2,7 @@ import { Pricing4 } from "@/components/pricing4";
 
 const Pricing = () => {
   return (
-    <div className="flex flex-col w-full py-6">
+    <div className="flex flex-col w-full py-24">
       <Pricing4 />
     </div>
   );
