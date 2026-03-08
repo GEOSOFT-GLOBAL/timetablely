@@ -311,7 +311,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   </div>
                   <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
                     Already have an account?{" "}
-                    <a href="#/auth/login" className="underline">
+                    <a href="/auth/login" className="underline">
                       Sign in
                     </a>
                   </FieldDescription>
@@ -335,7 +335,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                       We&apos;ll use this to contact you.
                     </FieldDescription>
                   </Field>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Button
                       type="button"
                       variant="outline"
@@ -391,7 +391,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                       disabled={isLoading}
                     />
                   </Field>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Button
                       type="button"
                       variant="outline"
@@ -420,7 +420,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   </Button>
                   <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
                     Already have an account?{" "}
-                    <a href="#/auth/login" className="underline">
+                    <a href="/auth/login" className="underline">
                       Sign in
                     </a>
                   </FieldDescription>

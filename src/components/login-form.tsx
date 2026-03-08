@@ -120,7 +120,7 @@ export function LoginForm({
                 </Button>
                 <FieldDescription className="text-center text-xs sm:text-sm">
                   Don&apos;t have an account?{" "}
-                  <a href="/#/auth/signup" className="underline">Sign up</a>
+                  <a href="/auth/signup" className="underline">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>
