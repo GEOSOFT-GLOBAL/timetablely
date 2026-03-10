@@ -34,6 +34,7 @@ import {
 } from "@/lib/timetable";
 import { generateAITimetable } from "@/lib/ai-timetable";
 import { exportTimetableToPDF } from "@/lib/pdf-export";
+import { createExportApiClient } from "@/config/axios";
 import { sampleDatabase } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { IconCheck, IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
@@ -260,6 +261,77 @@ const Timetables: React.FC<TimetablesProps> = () => {
     } catch (error) {
       console.error("PDF Export Error:", error);
       showDialog("Error", "Failed to export PDF. Please try again.", "error");
+    }
+  };
+
+  const handleExportProPDF = async () => {
+    try {
+      // Create HTML content for the timetable
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+            th { background-color: #4a5568; color: white; }
+            .time-column { background-color: #e2e8f0; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h1>Weekly Timetable</h1>
+          <h2>Master Schedule</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Time / Day</th>
+                ${timeLabels.map((t) => `<th>${t}</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${Array.from({ length: 5 }, (_, row) => `
+                <tr>
+                  <td class="time-column">${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][row]}</td>
+                  ${Array.from({ length: columnCount }, (_, col) => {
+                    const key = `${row}-${col}`;
+                    const content = cellContents.get(key);
+                    return `<td>${content?.text || "-"}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      // Call the Pro API to export PDF
+      const exportApi = createExportApiClient();
+      const response = await exportApi.post("/export-pdf", {
+        html: htmlContent,
+        filename: "timetable-pro",
+      });
+
+      // Handle the blob response
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "timetable-pro.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showDialog(
+        "Success",
+        "Timetable exported as Pro PDF successfully!",
+        "success"
+      );
+    } catch (error) {
+      console.error("Pro PDF Export Error:", error);
+      showDialog("Error", "Failed to export Pro PDF. Please try again.", "error");
     }
   };
 
@@ -541,6 +613,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
         onResetGrid={resetGrid}
         onExportData={handleExportData}
         onExportPDF={handleExportPDF}
+        onExportProPDF={handleExportProPDF}
         onMergeCells={mergeCells}
         onTempDefaultDurationChange={gridState.setTempDefaultDuration}
         onSaveDefaultDurationEdit={saveDefaultDurationEdit}

@@ -1,9 +1,8 @@
 import { Pricing4 } from "@/components/pricing4";
-import React from "react";
 
 const Pricing = () => {
   return (
-    <div className="flex items-center justify-center w-screen">
+    <div className="flex flex-col w-full py-24">
       <Pricing4 />
     </div>
   );

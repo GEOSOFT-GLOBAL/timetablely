@@ -18,6 +18,7 @@ interface TutorItemProps {
 }
 
 const TutorItem: React.FC<TutorItemProps> = ({ tutor, onRemove, onEdit }) => {
+  const subjects = tutor.subjects || [];
   return (
     <Item variant="outline" className="my-2">
       <ItemMedia>
@@ -27,7 +28,7 @@ const TutorItem: React.FC<TutorItemProps> = ({ tutor, onRemove, onEdit }) => {
         <ItemTitle>{tutor.name}</ItemTitle>
         <ItemDescription>
           Max periods: {tutor.maxPeriodsPerDay || 3} | Subjects:{" "}
-          {tutor.subjects.length > 0 ? tutor.subjects.join(", ") : "None"}
+          {subjects.length > 0 ? subjects.join(", ") : "None"}
         </ItemDescription>
       </ItemContent>
       <ItemActions>
