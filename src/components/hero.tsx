@@ -39,10 +39,10 @@ const Hero: React.FC = () => {
           centers.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 sm:flex-row px-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 w-full max-w-md mx-auto">
           <Button
             size="lg"
-            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto"
+            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto min-w-[160px]"
             onClick={() => navigate("/auth/login")}
           >
             <Calendar className="size-4 sm:size-5" />
@@ -51,7 +51,7 @@ const Hero: React.FC = () => {
           <Button
             size="lg"
             variant="outline"
-            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto"
+            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto min-w-[160px]"
             onClick={() => navigate("/quick-start")}
           >
             <Clock className="size-4 sm:size-5" />
