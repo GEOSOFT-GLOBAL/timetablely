@@ -16,7 +16,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 ### Prerequisites
 
 -   [Node.js](https://nodejs.org/) (version 18 or higher)
--   [npm](https://pnpm.io/) (or your preferred package manager)
+-   [pnpm](https://pnpm.io/) (or your preferred package manager)
 
 ### Installation
 
@@ -30,11 +30,11 @@ Follow these instructions to get a copy of the project up and running on your lo
     ```
 3.  Install the dependencies:
     ```sh
-    npm install
+    pnpm install
     ```
 4.  Start the development server:
     ```sh
-    npm run dev
+    pnpm run dev
     ```
 
 The application should now be running on `http://localhost:5173`.
