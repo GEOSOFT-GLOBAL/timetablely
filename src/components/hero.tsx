@@ -18,7 +18,7 @@ const Hero: React.FC = () => {
       />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 sm:px-8 text-center">
-        <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
+        <div className="mt-10 sm:mt-0 mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white/80 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
           <Sparkles className="size-3 sm:size-4 text-blue-500" />
           <span className="text-neutral-700 michroma dark:text-neutral-300">
             Smart Timetable Generation
@@ -39,19 +39,20 @@ const Hero: React.FC = () => {
           centers.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 sm:flex-row px-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-sm mx-auto">
           <Button
             size="lg"
-            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto"
+            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto sm:min-w-[180px]"
             onClick={() => navigate("/auth/login")}
           >
             <Calendar className="size-4 sm:size-5" />
             Get Started Free
           </Button>
+
           <Button
             size="lg"
             variant="outline"
-            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto"
+            className="gap-2 text-sm sm:text-base goldman cursor-target w-full sm:w-auto sm:min-w-[180px]"
             onClick={() => navigate("/quick-start")}
           >
             <Clock className="size-4 sm:size-5" />
