@@ -21,6 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useDatabaseStore } from "@/store/databaseStore";
+import { useAppMode } from "@/hooks/use-app-mode";
 import type { ISession } from "@/interface/database";
 import { XIcon } from "lucide-react";
 
@@ -29,6 +30,7 @@ interface SessionsProps {
 }
 
 const Sessions: React.FC<SessionsProps> = () => {
+  const { labels } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newSession, setNewSession] = React.useState<Partial<ISession>>({
     name: "",
@@ -132,25 +134,25 @@ const Sessions: React.FC<SessionsProps> = () => {
       <div className="grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="sessionName">Class Name</Label>
+            <Label htmlFor="sessionName">{labels.session} Name</Label>
             <Input
               id="sessionName"
               value={newSession.name || ""}
               onChange={(e) =>
                 setNewSession({ ...newSession, name: e.target.value })
               }
-              placeholder="e.g., Class 1A, Grade 10B"
+              placeholder={`e.g., ${labels.session === "Group" ? "Morning Routine" : "Class 1A"}`}
             />
 
-            <Label htmlFor="course">Assign Courses</Label>
+            <Label htmlFor="course">Assign {labels.courses}</Label>
             <Select value={selectedCourse} onValueChange={addCourseToSession}>
               <SelectTrigger id="course" className="w-full">
-                <SelectValue placeholder="Select a course" />
+                <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent>
                 {database.courses.length === 0 ? (
                   <SelectItem value="no-courses" disabled>
-                    No courses available
+                    No {labels.courses.toLowerCase()} available
                   </SelectItem>
                 ) : (
                   database.courses.map((course) => (
@@ -219,7 +221,7 @@ const Sessions: React.FC<SessionsProps> = () => {
           })}
           {database.sessions.length === 0 && (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No classes added yet
+              No {labels.sessions.toLowerCase()} added yet
             </div>
           )}
         </Card>
@@ -228,16 +230,16 @@ const Sessions: React.FC<SessionsProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit Class</SheetTitle>
+            <SheetTitle>Edit {labels.session}</SheetTitle>
             <SheetDescription>
-              Make changes to the class details below.
+              Make changes to the {labels.session.toLowerCase()} details below.
             </SheetDescription>
           </SheetHeader>
 
           {editingSession && (
             <div className="flex flex-col gap-4 py-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-sessionName">Class Name</Label>
+                <Label htmlFor="edit-sessionName">{labels.session} Name</Label>
                 <Input
                   id="edit-sessionName"
                   value={editingSession.name}
@@ -247,23 +249,23 @@ const Sessions: React.FC<SessionsProps> = () => {
                       name: e.target.value,
                     })
                   }
-                  placeholder="e.g., Class 1A, Grade 10B"
+                  placeholder={`e.g., ${labels.session === "Group" ? "Morning Routine" : "Class 1A"}`}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-course">Assign Courses</Label>
+                <Label htmlFor="edit-course">Assign {labels.courses}</Label>
                 <Select
                   value={editSelectedCourse}
                   onValueChange={addCourseToEditingSession}
                 >
                   <SelectTrigger id="edit-course" className="w-full">
-                    <SelectValue placeholder="Select a course" />
+                    <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
                   </SelectTrigger>
                   <SelectContent>
                     {database.courses.length === 0 ? (
                       <SelectItem value="no-courses" disabled>
-                        No courses available
+                        No {labels.courses.toLowerCase()} available
                       </SelectItem>
                     ) : (
                       database.courses.map((course) => (
