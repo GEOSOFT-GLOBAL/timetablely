@@ -18,8 +18,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
-import { IconMoon, IconSun, IconDeviceDesktop } from "@tabler/icons-react";
+import { IconMoon, IconSun, IconDeviceDesktop, IconUser, IconActivity } from "@tabler/icons-react";
 import { useStorageString, useStorageBoolean } from "@/hooks/storage";
+import { useAppMode, type AppMode } from "@/hooks/use-app-mode";
 
 const FONT_OPTIONS = [
   { value: "default", label: "System Default" },
@@ -269,6 +270,43 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="general" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>App Mode</CardTitle>
+              <CardDescription>
+                Choose between Educational or Individual scheduling mode
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Usage Mode</Label>
+                <div className="flex gap-2">
+                  <Toggle
+                    pressed={useAppMode().mode === "education"}
+                    onPressedChange={() => useAppMode().setMode("education")}
+                    aria-label="Education mode"
+                    className="flex-1"
+                  >
+                    <IconUser className="mr-2 size-4" />
+                    Education
+                  </Toggle>
+                  <Toggle
+                    pressed={useAppMode().mode === "individual"}
+                    onPressedChange={() => useAppMode().setMode("individual")}
+                    aria-label="Individual mode"
+                    className="flex-1"
+                  >
+                    <IconActivity className="mr-2 size-4" />
+                    Individual
+                  </Toggle>
+                </div>
+                <p className="text-muted-foreground text-xs mt-2">
+                  Education mode uses terms like Tutors and Classes. Individual mode uses People and Activities.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Language & Region</CardTitle>
