@@ -16,6 +16,7 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import { useAuthStore } from "@/store/authStore";
+import { useAppMode } from "@/hooks/use-app-mode";
 import {
   Sidebar,
   SidebarContent,
@@ -35,28 +36,6 @@ const data = {
       title: "Overview",
       url: "/app/dashboard",
       icon: IconDashboard,
-    },
-  ],
-  navCore: [
-    {
-      title: "Timetables",
-      url: "/app/timetables",
-      icon: IconCalendar,
-    },
-    {
-      title: "Courses",
-      url: "/app/courses",
-      icon: IconFileText,
-    },
-    {
-      title: "Tutors",
-      url: "/app/tutors",
-      icon: IconUsers,
-    },
-    {
-      title: "Sessions",
-      url: "/app/sessions",
-      icon: IconUsers,
     },
   ],
   navManagement: [
@@ -90,23 +69,46 @@ const data = {
   ],
 };
 
+const getNavCore = (labels: any, icons: any) => [
+  {
+    title: "Timetables",
+    url: "/app/timetables",
+    icon: IconCalendar,
+  },
+  {
+    title: labels.courses,
+    url: "/app/courses",
+    icon: icons.courses,
+  },
+  {
+    title: labels.tutors,
+    url: "/app/tutors",
+    icon: icons.tutors,
+  },
+  {
+    title: labels.sessions,
+    url: "/app/sessions",
+    icon: icons.sessions,
+  },
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
 
   const userData = user
     ? {
-        name:
-          user.firstname && user.lastname
-            ? `${user.firstname} ${user.lastname}`
-            : user.username,
-        email: user.email,
-        avatar: user.avatar || "",
-      }
+      name:
+        user.firstname && user.lastname
+          ? `${user.firstname} ${user.lastname}`
+          : user.username,
+      email: user.email,
+      avatar: user.avatar || "",
+    }
     : {
-        name: "Guest",
-        email: "",
-        avatar: "",
-      };
+      name: "Guest",
+      email: "",
+      avatar: "",
+    };
 
   return (
     <Sidebar
@@ -153,7 +155,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             Core
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1">
-            {data.navCore.map((item) => (
+            {getNavCore(useAppMode().labels, useAppMode().icons).map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
@@ -163,10 +165,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <NavLink
                     to={item.url}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 ${
-                        isActive
-                          ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
-                          : "text-muted-foreground hover:text-foreground"
+                      `flex items-center gap-3 ${isActive
+                        ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
+                        : "text-muted-foreground hover:text-foreground"
                       }`
                     }
                   >
@@ -197,10 +198,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <NavLink
                     to={item.url}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 ${
-                        isActive
-                          ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
-                          : "text-muted-foreground hover:text-foreground"
+                      `flex items-center gap-3 ${isActive
+                        ? "bg-primary/15 text-primary font-semibold border-l-2 border-primary"
+                        : "text-muted-foreground hover:text-foreground"
                       }`
                     }
                   >
