@@ -24,12 +24,14 @@ import { useDatabaseStore } from "@/store/databaseStore";
 import type { ICourse } from "@/interface/database";
 import { PRIORITY } from "@/interface/enums";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAppMode } from "@/hooks/use-app-mode";
 
 interface CoursesProps {
   propName?: string;
 }
 
 const Courses: React.FC<CoursesProps> = () => {
+  const { labels } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newCourse, setNewCourse] = React.useState<Partial<ICourse>>({
     name: "",
@@ -103,17 +105,17 @@ const Courses: React.FC<CoursesProps> = () => {
       <div className="grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="courseName">Course Name</Label>
+            <Label htmlFor="courseName">{labels.course} Name</Label>
             <Input
               id="courseName"
               value={newCourse.name || ""}
               onChange={(e) =>
                 setNewCourse({ ...newCourse, name: e.target.value })
               }
-              placeholder="e.g., Mathematics"
+              placeholder={`e.g., ${labels.course === "Activity" ? "Morning Yoga" : "Mathematics"}`}
             />
 
-            <Label htmlFor="tutor">Assign Tutor</Label>
+            <Label htmlFor="tutor">Assign {labels.tutor}</Label>
             <Select
               value={newCourse.teacherId}
               onValueChange={(value) =>
@@ -121,12 +123,12 @@ const Courses: React.FC<CoursesProps> = () => {
               }
             >
               <SelectTrigger id="tutor" className="w-full">
-                <SelectValue placeholder="Select a tutor" />
+                <SelectValue placeholder={`Select a ${labels.tutor.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent>
                 {database.tutors.length === 0 ? (
                   <SelectItem value="no-tutors" disabled>
-                    No tutors available
+                    No {labels.tutors.toLowerCase()} available
                   </SelectItem>
                 ) : (
                   database.tutors.map((tutor) => (
@@ -221,7 +223,7 @@ const Courses: React.FC<CoursesProps> = () => {
           })}
           {database.courses.length === 0 && (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No courses added yet
+              No {labels.courses.toLowerCase()} added yet
             </div>
           )}
         </Card>
@@ -230,9 +232,9 @@ const Courses: React.FC<CoursesProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit Course</SheetTitle>
+            <SheetTitle>Edit {labels.course}</SheetTitle>
             <SheetDescription>
-              Make changes to the course details below.
+              Make changes to the {labels.course.toLowerCase()} details below.
             </SheetDescription>
           </SheetHeader>
 
