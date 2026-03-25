@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import * as React from "react";
 import { useDatabaseStore } from "@/store/databaseStore";
+import { useAppMode } from "@/hooks/use-app-mode";
 import type { ITutor } from "@/interface/database";
 import { RefreshCcwIcon, UserCircle, XIcon } from "lucide-react";
 import {
@@ -37,6 +38,7 @@ interface TutorsProps {
 }
 
 const Tutors: React.FC<TutorsProps> = () => {
+  const { labels } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newTutor, setNewTutor] = React.useState<Partial<ITutor>>({
     name: "",
@@ -145,16 +147,17 @@ const Tutors: React.FC<TutorsProps> = () => {
               onChange={(e) =>
                 setNewTutor({ ...newTutor, name: e.target.value })
               }
+              placeholder={`e.g., ${labels.tutor === "Person" ? "John Doe" : "Dr. Smith"}`}
             />
-            <Label htmlFor="course">Courses</Label>
+            <Label htmlFor="course">{labels.courses}</Label>
             <Select value={selectedCourse} onValueChange={addCourseToTutor}>
               <SelectTrigger id="course" className="w-full">
-                <SelectValue placeholder="Select a course" />
+                <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
               </SelectTrigger>
               <SelectContent>
                 {database.courses.length === 0 ? (
                   <SelectItem value="no-courses" disabled>
-                    No courses available
+                    No {labels.courses.toLowerCase()} available
                   </SelectItem>
                 ) : (
                   database.courses.map((course) => (
@@ -231,9 +234,9 @@ const Tutors: React.FC<TutorsProps> = () => {
                 <EmptyMedia variant="icon">
                   <UserCircle />
                 </EmptyMedia>
-                <EmptyTitle>No Tutor</EmptyTitle>
+                <EmptyTitle>No {labels.tutor}</EmptyTitle>
                 <EmptyDescription>
-                  No Tutors found, created and available tutors will appear here
+                  No {labels.tutors.toLowerCase()} found, created and available {labels.tutors.toLowerCase()} will appear here
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
@@ -250,9 +253,9 @@ const Tutors: React.FC<TutorsProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit Tutor</SheetTitle>
+            <SheetTitle>Edit {labels.tutor}</SheetTitle>
             <SheetDescription>
-              Make changes to the tutor details below.
+              Make changes to the {labels.tutor.toLowerCase()} details below.
             </SheetDescription>
           </SheetHeader>
 
@@ -270,18 +273,18 @@ const Tutors: React.FC<TutorsProps> = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-course">Courses</Label>
+                <Label htmlFor="edit-course">{labels.courses}</Label>
                 <Select
                   value={editSelectedCourse}
                   onValueChange={addCourseToEditingTutor}
                 >
                   <SelectTrigger id="edit-course" className="w-full">
-                    <SelectValue placeholder="Select a course" />
+                    <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
                   </SelectTrigger>
                   <SelectContent>
                     {database.courses.length === 0 ? (
                       <SelectItem value="no-courses" disabled>
-                        No courses available
+                        No {labels.courses.toLowerCase()} available
                       </SelectItem>
                     ) : (
                       database.courses.map((course) => (
