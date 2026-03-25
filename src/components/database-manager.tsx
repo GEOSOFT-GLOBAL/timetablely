@@ -11,6 +11,7 @@ import {
   DatabaseIcon,
 } from "lucide-react";
 import { IconSparkles } from "@tabler/icons-react";
+import { useAppMode } from "@/hooks/use-app-mode";
 import type { DatabaseManagerProps } from "@/interface/props";
 
 const DatabaseManager: React.FC<DatabaseManagerProps> = ({
@@ -25,27 +26,29 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
   // Use prop database if provided, otherwise use store database
   const activeDatabase = database || storeDatabase;
 
+  const { labels, icons } = useAppMode();
+
   const stats = [
     {
-      title: "Tutors",
+      title: labels.tutors,
       count: activeDatabase.tutors.length,
-      icon: UserIcon,
+      icon: icons.tutorsLucide,
       color: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-950",
       route: "/app/tutors",
     },
     {
-      title: "Courses",
+      title: labels.courses,
       count: activeDatabase.courses.length,
-      icon: BookOpenIcon,
+      icon: icons.coursesLucide,
       color: "text-green-500",
       bgColor: "bg-green-50 dark:bg-green-950",
       route: "/app/courses",
     },
     {
-      title: "Classes",
+      title: labels.sessions,
       count: activeDatabase.sessions.length,
-      icon: GraduationCapIcon,
+      icon: icons.sessionsLucide,
       color: "text-purple-500",
       bgColor: "bg-purple-50 dark:bg-purple-950",
       route: "/app/sessions",
