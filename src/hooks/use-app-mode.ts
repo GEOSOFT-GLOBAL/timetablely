@@ -4,7 +4,7 @@ import {
     IconActivity,
     IconFolder,
     IconFileText,
-    IconGraduationCap,
+    IconSchool,
     IconUser
 } from "@tabler/icons-react";
 import {
@@ -32,7 +32,7 @@ export const useAppMode = () => {
     const icons = {
         tutors: isIndividual ? IconUsers : IconUser,
         courses: isIndividual ? IconActivity : IconFileText,
-        sessions: isIndividual ? IconFolder : IconGraduationCap,
+        sessions: isIndividual ? IconFolder : IconSchool,
         // Lucide equivalents for DatabaseManager
         tutorsLucide: isIndividual ? UsersIcon : UsersIcon, // Users is fine for both
         coursesLucide: isIndividual ? IconActivity : BookOpenIcon,
