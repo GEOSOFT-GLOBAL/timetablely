@@ -113,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="bg-gradient-to-b from-sidebar to-sidebar/95"
+      className="bg-linear-to-b from-sidebar to-sidebar/95"
       {...props}
     >
       <SidebarHeader>
