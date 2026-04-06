@@ -20,6 +20,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { useAppMode } from "@/hooks/use-app-mode";
 import type { ITutor } from "@/interface/database";
@@ -38,6 +39,7 @@ interface TutorsProps {
 }
 
 const Tutors: React.FC<TutorsProps> = () => {
+  const { t } = useTranslation();
   const { labels } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newTutor, setNewTutor] = React.useState<Partial<ITutor>>({
@@ -140,24 +142,24 @@ const Tutors: React.FC<TutorsProps> = () => {
       <div className=" grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t('common.name')}</Label>
             <Input
               id="name"
               value={newTutor.name || ""}
               onChange={(e) =>
                 setNewTutor({ ...newTutor, name: e.target.value })
               }
-              placeholder={`e.g., ${labels.tutor === "Person" ? "John Doe" : "Dr. Smith"}`}
+              placeholder={labels.tutor === "Person" ? t('tutors.noPersonPlaceholder') : t('tutors.noTutorPlaceholder')}
             />
             <Label htmlFor="course">{labels.courses}</Label>
             <Select value={selectedCourse} onValueChange={addCourseToTutor}>
               <SelectTrigger id="course" className="w-full">
-                <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
+                <SelectValue placeholder={t('select.selectA', { item: labels.course.toLowerCase() })} />
               </SelectTrigger>
               <SelectContent>
                 {database.courses.length === 0 ? (
                   <SelectItem value="no-courses" disabled>
-                    No {labels.courses.toLowerCase()} available
+                    {t('select.noAvailable', { items: labels.courses.toLowerCase() })}
                   </SelectItem>
                 ) : (
                   database.courses.map((course) => (
@@ -192,7 +194,7 @@ const Tutors: React.FC<TutorsProps> = () => {
                 })}
               </div>
             )}
-            <Label htmlFor="maxPeriods">Max Periods Per Day</Label>
+            <Label htmlFor="maxPeriods">{t('tutors.maxPeriodsPerDay')}</Label>
             <Input
               id="maxPeriods"
               type="number"
@@ -207,7 +209,7 @@ const Tutors: React.FC<TutorsProps> = () => {
           </div>
           <CardFooter className="gap-4">
             <Button variant="outline" onClick={addTutor}>
-              Save
+              {t('common.save')}
             </Button>
             <Button
               variant="outline"
@@ -215,7 +217,7 @@ const Tutors: React.FC<TutorsProps> = () => {
                 setNewTutor({ name: "", subjects: [], maxPeriodsPerDay: 3 })
               }
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </CardFooter>
         </Card>
@@ -234,15 +236,15 @@ const Tutors: React.FC<TutorsProps> = () => {
                 <EmptyMedia variant="icon">
                   <UserCircle />
                 </EmptyMedia>
-                <EmptyTitle>No {labels.tutor}</EmptyTitle>
+                <EmptyTitle>{t('tutors.emptyTitle', { tutor: labels.tutor })}</EmptyTitle>
                 <EmptyDescription>
-                  No {labels.tutors.toLowerCase()} found, created and available {labels.tutors.toLowerCase()} will appear here
+                  {t('tutors.emptyDesc', { tutor: labels.tutor.toLowerCase(), tutors: labels.tutors.toLowerCase() })}
                 </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
                 <Button variant="outline" size="sm">
                   <RefreshCcwIcon />
-                  Refresh
+                  {t('common.refresh')}
                 </Button>
               </EmptyContent>
             </Empty>
@@ -253,16 +255,16 @@ const Tutors: React.FC<TutorsProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit {labels.tutor}</SheetTitle>
+            <SheetTitle>{t('tutors.editTitle', { tutor: labels.tutor })}</SheetTitle>
             <SheetDescription>
-              Make changes to the {labels.tutor.toLowerCase()} details below.
+              {t('tutors.editDesc', { tutor: labels.tutor.toLowerCase() })}
             </SheetDescription>
           </SheetHeader>
 
           {editingTutor && (
             <div className="flex flex-col gap-4 py-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-name">Name</Label>
+                <Label htmlFor="edit-name">{t('common.name')}</Label>
                 <Input
                   id="edit-name"
                   value={editingTutor.name}
@@ -279,12 +281,12 @@ const Tutors: React.FC<TutorsProps> = () => {
                   onValueChange={addCourseToEditingTutor}
                 >
                   <SelectTrigger id="edit-course" className="w-full">
-                    <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
+                    <SelectValue placeholder={t('select.selectA', { item: labels.course.toLowerCase() })} />
                   </SelectTrigger>
                   <SelectContent>
                     {database.courses.length === 0 ? (
                       <SelectItem value="no-courses" disabled>
-                        No {labels.courses.toLowerCase()} available
+                        {t('select.noAvailable', { items: labels.courses.toLowerCase() })}
                       </SelectItem>
                     ) : (
                       database.courses.map((course) => (
@@ -325,7 +327,7 @@ const Tutors: React.FC<TutorsProps> = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-maxPeriods">Max Periods Per Day</Label>
+                <Label htmlFor="edit-maxPeriods">{t('tutors.maxPeriodsPerDay')}</Label>
                 <Input
                   id="edit-maxPeriods"
                   type="number"
@@ -343,7 +345,7 @@ const Tutors: React.FC<TutorsProps> = () => {
 
           <SheetFooter>
             <Button variant="outline" onClick={updateTutor}>
-              Save Changes
+              {t('common.saveChanges')}
             </Button>
           </SheetFooter>
         </SheetContent>
