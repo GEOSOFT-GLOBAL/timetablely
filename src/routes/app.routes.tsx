@@ -41,7 +41,7 @@ export const appRoutes = [
     element: <Timetables />,
   },
   {
-    path: "walkthrough",
+    path: "how-to-use",
     element: <HowToUse />,
   },
   {

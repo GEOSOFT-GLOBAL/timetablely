@@ -1,14 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import {
   IconCalendar,
   IconChartBar,
   IconDashboard,
-  IconFileText,
   IconSearch,
   IconSettings,
   IconTemplate,
-  IconUsers,
   IconBook,
 } from "@tabler/icons-react";
 
