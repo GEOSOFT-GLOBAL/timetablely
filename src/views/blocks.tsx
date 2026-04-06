@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import SectionHeader from "@/components/section-header";
 import BlockItem from "@/components/block-item";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ interface BlocksProps {
 }
 
 const Blocks: React.FC<BlocksProps> = () => {
+  const { t } = useTranslation();
   const { database, setDatabase } = useDatabaseStore();
   const [blockType, setBlockType] = React.useState<"slot" | "text">("text");
   const [blockValue, setBlockValue] = React.useState("");
@@ -66,22 +68,22 @@ const Blocks: React.FC<BlocksProps> = () => {
       <div className="grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="blockType">Block Type</Label>
+            <Label htmlFor="blockType">{t('blocks.blockType')}</Label>
             <Select
               value={blockType}
               onValueChange={(value) => setBlockType(value as "slot" | "text")}
             >
               <SelectTrigger id="blockType" className="w-full">
-                <SelectValue placeholder="Select block type" />
+                <SelectValue placeholder={t('blocks.selectBlockType')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="text">Blocked Text</SelectItem>
-                <SelectItem value="slot">Blocked Slot</SelectItem>
+                <SelectItem value="text">{t('blocks.blockedText')}</SelectItem>
+                <SelectItem value="slot">{t('blocks.blockedSlot')}</SelectItem>
               </SelectContent>
             </Select>
 
             <Label htmlFor="blockValue">
-              {blockType === "slot" ? "Slot Identifier" : "Text to Block"}
+              {blockType === "slot" ? t('blocks.slotIdentifier') : t('blocks.textToBlock')}
             </Label>
             <Input
               id="blockValue"
@@ -89,41 +91,35 @@ const Blocks: React.FC<BlocksProps> = () => {
               onChange={(e) => setBlockValue(e.target.value)}
               placeholder={
                 blockType === "slot"
-                  ? "e.g., 1-3 (row-col)"
-                  : "e.g., Break, Devotion, Lunch"
+                  ? t('blocks.slotPlaceholder')
+                  : t('blocks.textPlaceholder')
               }
             />
 
             <div className="text-sm text-muted-foreground">
               {blockType === "slot" ? (
-                <p>
-                  Blocked slots are specific time slots that should be avoided
-                  (e.g., breaks, lunch). Use format: row-col (e.g., 1-3)
-                </p>
+                <p>{t('blocks.slotHint')}</p>
               ) : (
-                <p>
-                  Blocked texts are labels to avoid when auto-generating
-                  timetables (e.g., Break, Devotion, Lunch)
-                </p>
+                <p>{t('blocks.textHint')}</p>
               )}
             </div>
           </div>
           <CardFooter className="gap-4">
             <Button variant="outline" onClick={addBlock}>
-              Add Block
+              {t('blocks.addBlock')}
             </Button>
             <Button variant="outline" onClick={() => setBlockValue("")}>
-              Cancel
+              {t('common.cancel')}
             </Button>
           </CardFooter>
         </Card>
 
         <Card className="w-full h-[calc(100vh-220px)] flex flex-col px-4 overflow-y-auto">
           <div className="py-4">
-            <h3 className="text-sm font-semibold mb-2">Blocked Texts</h3>
+            <h3 className="text-sm font-semibold mb-2">{t('blocks.blockedTextsTitle')}</h3>
             {database.blockedTexts.length === 0 ? (
               <p className="text-sm text-muted-foreground mb-4">
-                No blocked texts
+                {t('blocks.noBlockedTexts')}
               </p>
             ) : (
               database.blockedTexts.map((text) => (
@@ -136,9 +132,9 @@ const Blocks: React.FC<BlocksProps> = () => {
               ))
             )}
 
-            <h3 className="text-sm font-semibold mt-6 mb-2">Blocked Slots</h3>
+            <h3 className="text-sm font-semibold mt-6 mb-2">{t('blocks.blockedSlotsTitle')}</h3>
             {database.blockedSlots.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No blocked slots</p>
+              <p className="text-sm text-muted-foreground">{t('blocks.noBlockedSlots')}</p>
             ) : (
               database.blockedSlots.map((slot) => (
                 <BlockItem
@@ -155,7 +151,7 @@ const Blocks: React.FC<BlocksProps> = () => {
             database.blockedSlots.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2">
                 <BanIcon className="size-12 opacity-20" />
-                <p>No blocks added yet</p>
+                <p>{t('blocks.noBlocksYet')}</p>
               </div>
             )}
         </Card>
