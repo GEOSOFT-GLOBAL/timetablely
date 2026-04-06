@@ -1,4 +1,5 @@
-import { useStorageString } from "./storage";
+import * as React from "react";
+import { AppModeContext, type AppMode } from "@/context/app-mode-context";
 import {
     IconUsers,
     IconActivity,
@@ -17,10 +18,14 @@ import {
     FolderKanbanIcon,
 } from "lucide-react";
 
-export type AppMode = "education" | "individual" | "company";
+// Re-export so existing imports of AppMode from this file keep working
+export type { AppMode };
 
 export const useAppMode = () => {
-    const { value: mode, set: setMode } = useStorageString("app-mode", "education");
+    const ctx = React.useContext(AppModeContext);
+    if (!ctx) throw new Error("useAppMode must be used inside <AppModeProvider>");
+
+    const { mode, setMode } = ctx;
 
     const isIndividual = mode === "individual";
     const isCompany = mode === "company";
@@ -49,7 +54,7 @@ export const useAppMode = () => {
     };
 
     return {
-        mode: (mode as AppMode) || "education",
+        mode,
         setMode,
         isIndividual,
         isCompany,

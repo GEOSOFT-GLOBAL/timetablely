@@ -6,12 +6,15 @@ import { ThemeProvider } from "./components/theme-provider.tsx";
 import { RouterProvider } from "react-router-dom";
 import { routes } from "./routes/router.tsx";
 import { Toaster } from "sonner";
+import { AppModeProvider } from "./context/app-mode-context.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <RouterProvider router={routes} />
-      <Toaster/>
-    </ThemeProvider>
+    <AppModeProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <RouterProvider router={routes} />
+        <Toaster/>
+      </ThemeProvider>
+    </AppModeProvider>
   </StrictMode>
 );
