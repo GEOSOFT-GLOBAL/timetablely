@@ -94,6 +94,7 @@ const getNavCore = (labels: any, icons: any) => [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
+  const { labels, icons } = useAppMode();
 
   const userData = user
     ? {
@@ -155,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             Core
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1">
-            {getNavCore(useAppMode().labels, useAppMode().icons).map((item) => (
+            {getNavCore(labels, icons).map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild

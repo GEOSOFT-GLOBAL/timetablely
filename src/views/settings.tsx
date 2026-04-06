@@ -89,6 +89,7 @@ const Settings = () => {
     "app-high-contrast",
     false
   );
+  const { mode: appMode, setMode: setAppMode } = useAppMode();
 
   // Apply settings on mount and when values change
   React.useEffect(() => {
@@ -282,8 +283,8 @@ const Settings = () => {
                 <Label>Usage Mode</Label>
                 <div className="flex gap-2">
                   <Toggle
-                    pressed={useAppMode().mode === "education"}
-                    onPressedChange={() => useAppMode().setMode("education")}
+                    pressed={appMode === "education"}
+                    onPressedChange={() => setAppMode("education")}
                     aria-label="Education mode"
                     className="flex-1"
                   >
@@ -291,8 +292,8 @@ const Settings = () => {
                     Education
                   </Toggle>
                   <Toggle
-                    pressed={useAppMode().mode === "individual"}
-                    onPressedChange={() => useAppMode().setMode("individual")}
+                    pressed={appMode === "individual"}
+                    onPressedChange={() => setAppMode("individual")}
                     aria-label="Individual mode"
                     className="flex-1"
                   >
