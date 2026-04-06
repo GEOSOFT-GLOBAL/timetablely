@@ -94,7 +94,6 @@ const Settings = () => {
   const changeMode = (newMode: AppMode) => {
     if (newMode === appMode) return;
     setAppMode(newMode);
-    window.location.reload();
   };
 
   // Apply settings on mount and when values change
@@ -318,7 +317,6 @@ const Settings = () => {
                 </div>
                 <p className="text-muted-foreground text-xs mt-2">
                   <strong>Education</strong> — Tutors, Courses &amp; Classes. <strong>Individual</strong> — People, Activities &amp; Groups. <strong>Company</strong> — Members, Tasks &amp; Projects.
-                  Changing mode will reload the app.
                 </p>
               </div>
             </CardContent>
