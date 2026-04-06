@@ -18,7 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Toggle } from "@/components/ui/toggle";
-import { IconMoon, IconSun, IconDeviceDesktop, IconUser, IconActivity } from "@tabler/icons-react";
+import { IconMoon, IconSun, IconDeviceDesktop, IconUser, IconActivity, IconLayoutKanban } from "@tabler/icons-react";
 import { useStorageString, useStorageBoolean } from "@/hooks/storage";
 import { useAppMode, type AppMode } from "@/hooks/use-app-mode";
 
@@ -300,9 +300,18 @@ const Settings = () => {
                     <IconActivity className="mr-2 size-4" />
                     Individual
                   </Toggle>
+                  <Toggle
+                    pressed={appMode === "company"}
+                    onPressedChange={() => setAppMode("company")}
+                    aria-label="Company mode"
+                    className="flex-1"
+                  >
+                    <IconLayoutKanban className="mr-2 size-4" />
+                    Company
+                  </Toggle>
                 </div>
                 <p className="text-muted-foreground text-xs mt-2">
-                  Education mode uses terms like Tutors and Classes. Individual mode uses People and Activities.
+                  <strong>Education</strong> — Tutors, Courses &amp; Classes. <strong>Individual</strong> — People, Activities &amp; Groups. <strong>Company</strong> — Members, Tasks &amp; Projects.
                 </p>
               </div>
             </CardContent>
