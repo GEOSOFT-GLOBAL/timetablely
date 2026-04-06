@@ -7,48 +7,76 @@ import {
   GraduationCapIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAppMode } from "@/hooks/use-app-mode";
 
 const HowToUse = () => {
+  const { labels, isIndividual } = useAppMode();
+
   const sections = [
     {
       title: "Getting Started",
       icon: DatabaseIcon,
-      steps: [
-        "Start by setting up your database with tutors, courses, and sessions",
-        "Navigate through the sidebar to access different sections",
-        "Use the Dashboard to get an overview and quick access to the timetable",
-      ],
+      steps: isIndividual
+        ? [
+            `Start by setting up your data with people, activities, and groups`,
+            "Navigate through the sidebar to access different sections",
+            "Use the Dashboard to get an overview and quick access to the schedule",
+          ]
+        : [
+            "Start by setting up your database with tutors, courses, and sessions",
+            "Navigate through the sidebar to access different sections",
+            "Use the Dashboard to get an overview and quick access to the timetable",
+          ],
     },
     {
-      title: "Managing Tutors",
+      title: `Managing ${labels.tutors}`,
       icon: UserIcon,
-      steps: [
-        "Add tutors with their names and availability preferences",
-        "Set maximum periods per day for each tutor",
-        "Mark unavailable time slots to prevent scheduling conflicts",
-      ],
+      steps: isIndividual
+        ? [
+            `Add people with their names and availability preferences`,
+            "Set maximum periods per day for each person",
+            "Mark unavailable time slots to avoid conflicts",
+          ]
+        : [
+            "Add tutors with their names and availability preferences",
+            "Set maximum periods per day for each tutor",
+            "Mark unavailable time slots to prevent scheduling conflicts",
+          ],
     },
     {
-      title: "Setting Up Courses",
+      title: `Setting Up ${labels.courses}`,
       icon: BookOpenIcon,
-      steps: [
-        "Create courses and assign them to tutors",
-        "Set the number of periods per week for each course",
-        "Define priority levels (HIGH, MEDIUM, LOW) for scheduling",
-        "Optionally set preferred time slots or avoid consecutive periods",
-      ],
+      steps: isIndividual
+        ? [
+            `Create activities and assign them to people`,
+            "Set the number of periods per week for each activity",
+            "Define priority levels (HIGH, MEDIUM, LOW) for scheduling",
+            "Optionally set preferred time slots or avoid consecutive periods",
+          ]
+        : [
+            "Create courses and assign them to tutors",
+            "Set the number of periods per week for each course",
+            "Define priority levels (HIGH, MEDIUM, LOW) for scheduling",
+            "Optionally set preferred time slots or avoid consecutive periods",
+          ],
     },
     {
-      title: "Creating Sessions (Classes)",
+      title: `Creating ${labels.sessions}`,
       icon: GraduationCapIcon,
-      steps: [
-        "Create class sessions and assign relevant courses to them",
-        "Each session can have multiple courses",
-        "Sessions help organize timetables by class groups",
-      ],
+      steps: isIndividual
+        ? [
+            `Create groups and assign relevant activities to them`,
+            "Each group can have multiple activities",
+            "Groups help organize schedules by team or category",
+          ]
+        : [
+            "Create class sessions and assign relevant courses to them",
+            "Each session can have multiple courses",
+            "Sessions help organize timetables by class groups",
+          ],
     },
     {
-      title: "Working with the Timetable Grid",
+      title: isIndividual ? "Working with the Schedule Grid" : "Working with the Timetable Grid",
       icon: CalendarIcon,
       steps: [
         "The grid displays 5 days (Monday-Friday) with customizable time slots",
@@ -66,28 +94,40 @@ const HowToUse = () => {
       steps: [
         "Set default slot duration for new columns",
         "Select multiple cells forming a rectangle and merge them",
-        "Export your timetable data for external use",
+        isIndividual ? "Export your schedule data for external use" : "Export your timetable data for external use",
         "Reset the grid to start fresh when needed",
       ],
     },
     {
-      title: "Automated Timetable Generation",
+      title: isIndividual ? "Automated Schedule Generation" : "Automated Timetable Generation",
       icon: CalendarIcon,
-      steps: [
-        "Use the Generate button to automatically create timetables",
-        "The system respects tutor availability and preferences",
-        "Blocked cells (breaks, lunch, etc.) are preserved",
-        "High-priority courses are scheduled first",
-        "Generate for all classes or select a specific session",
-      ],
+      steps: isIndividual
+        ? [
+            "Use the Generate button to automatically create schedules",
+            "The system respects people's availability and preferences",
+            "Blocked cells (breaks, lunch, etc.) are preserved",
+            "High-priority activities are scheduled first",
+            `Generate for all groups or select a specific group`,
+          ]
+        : [
+            "Use the Generate button to automatically create timetables",
+            "The system respects tutor availability and preferences",
+            "Blocked cells (breaks, lunch, etc.) are preserved",
+            "High-priority courses are scheduled first",
+            "Generate for all classes or select a specific session",
+          ],
     },
     {
       title: "Templates",
       icon: LayoutTemplateIcon,
       steps: [
-        "Save your current timetable layout as a reusable template",
+        isIndividual
+          ? "Save your current schedule layout as a reusable template"
+          : "Save your current timetable layout as a reusable template",
         "Add a name and description for easy identification",
-        "Apply saved templates to quickly set up new timetables",
+        isIndividual
+          ? "Apply saved templates to quickly set up new schedules"
+          : "Apply saved templates to quickly set up new timetables",
         "Delete templates you no longer need",
         "Templates preserve cell contents, merged cells, and layout",
       ],
@@ -95,12 +135,19 @@ const HowToUse = () => {
     {
       title: "Special Blocks",
       icon: DatabaseIcon,
-      steps: [
-        "Define blocked time slots (breaks, assemblies, lunch, etc.)",
-        "Blocked cells are automatically excluded from automated scheduling",
-        "Common blocks: break, lunch, devotion, assembly, sports",
-        "Add custom blocked texts specific to your institution",
-      ],
+      steps: isIndividual
+        ? [
+            "Define blocked time slots (breaks, lunch, personal time, etc.)",
+            "Blocked cells are automatically excluded from automated scheduling",
+            "Common blocks: break, lunch, rest, focus time",
+            "Add custom blocked texts specific to your routine",
+          ]
+        : [
+            "Define blocked time slots (breaks, assemblies, lunch, etc.)",
+            "Blocked cells are automatically excluded from automated scheduling",
+            "Common blocks: break, lunch, devotion, assembly, sports",
+            "Add custom blocked texts specific to your institution",
+          ],
     },
   ];
 
@@ -108,9 +155,13 @@ const HowToUse = () => {
     <div className="flex w-full flex-col gap-6 py-6">
       <div className="px-4 lg:px-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">How to Use Timetablely</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {isIndividual ? "How to Use Timetablely (Individual)" : "How to Use Timetablely"}
+          </h1>
           <p className="text-muted-foreground">
-            A comprehensive guide to creating and managing your school timetables
+            {isIndividual
+              ? "A comprehensive guide to creating and managing your personal schedules"
+              : "A comprehensive guide to creating and managing your school timetables"}
           </p>
         </div>
 
@@ -146,31 +197,35 @@ const HowToUse = () => {
               <li className="flex gap-2">
                 <span className="text-primary font-semibold">•</span>
                 <span className="text-sm">
-                  Set up your database completely before generating timetables
+                  {isIndividual
+                    ? "Set up your data completely before generating schedules"
+                    : "Set up your database completely before generating timetables"}
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-semibold">•</span>
                 <span className="text-sm">
-                  Use templates to save time when creating similar timetables
+                  Use templates to save time when creating similar {isIndividual ? "schedules" : "timetables"}
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-semibold">•</span>
                 <span className="text-sm">
-                  Mark tutor unavailability to avoid scheduling conflicts
+                  {isIndividual
+                    ? "Mark people's unavailability to avoid scheduling conflicts"
+                    : "Mark tutor unavailability to avoid scheduling conflicts"}
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-semibold">•</span>
                 <span className="text-sm">
-                  Use priority levels to ensure important courses get optimal time slots
+                  Use priority levels to ensure important {isIndividual ? "activities" : "courses"} get optimal time slots
                 </span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-semibold">•</span>
                 <span className="text-sm">
-                  Manually adjust generated timetables by double-clicking cells
+                  Manually adjust generated {isIndividual ? "schedules" : "timetables"} by double-clicking cells
                 </span>
               </li>
             </ul>
