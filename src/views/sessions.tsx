@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import SectionHeader from "@/components/section-header";
 import SessionItem from "@/components/session-item";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ interface SessionsProps {
 }
 
 const Sessions: React.FC<SessionsProps> = () => {
+  const { t } = useTranslation();
   const { labels } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newSession, setNewSession] = React.useState<Partial<ISession>>({
@@ -134,25 +136,25 @@ const Sessions: React.FC<SessionsProps> = () => {
       <div className="grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="sessionName">{labels.session} Name</Label>
+            <Label htmlFor="sessionName">{t('sessions.sessionName', { session: labels.session })}</Label>
             <Input
               id="sessionName"
               value={newSession.name || ""}
               onChange={(e) =>
                 setNewSession({ ...newSession, name: e.target.value })
               }
-              placeholder={`e.g., ${labels.session === "Group" ? "Morning Routine" : "Class 1A"}`}
+              placeholder={labels.session === "Group" ? t('sessions.individualPlaceholder') : t('sessions.educationPlaceholder')}
             />
 
-            <Label htmlFor="course">Assign {labels.courses}</Label>
+            <Label htmlFor="course">{t('sessions.assignCourses', { courses: labels.courses })}</Label>
             <Select value={selectedCourse} onValueChange={addCourseToSession}>
               <SelectTrigger id="course" className="w-full">
-                <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
+                <SelectValue placeholder={t('select.selectA', { item: labels.course.toLowerCase() })} />
               </SelectTrigger>
               <SelectContent>
                 {database.courses.length === 0 ? (
                   <SelectItem value="no-courses" disabled>
-                    No {labels.courses.toLowerCase()} available
+                    {t('select.noAvailable', { items: labels.courses.toLowerCase() })}
                   </SelectItem>
                 ) : (
                   database.courses.map((course) => (
@@ -191,13 +193,13 @@ const Sessions: React.FC<SessionsProps> = () => {
           </div>
           <CardFooter className="gap-4">
             <Button variant="outline" onClick={addSession}>
-              Save
+              {t('common.save')}
             </Button>
             <Button
               variant="outline"
               onClick={() => setNewSession({ name: "", subjects: [] })}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </CardFooter>
         </Card>
@@ -221,7 +223,7 @@ const Sessions: React.FC<SessionsProps> = () => {
           })}
           {database.sessions.length === 0 && (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No {labels.sessions.toLowerCase()} added yet
+              {t('sessions.noSessionsYet', { sessions: labels.sessions.toLowerCase() })}
             </div>
           )}
         </Card>
@@ -230,16 +232,16 @@ const Sessions: React.FC<SessionsProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit {labels.session}</SheetTitle>
+            <SheetTitle>{t('sessions.editTitle', { session: labels.session })}</SheetTitle>
             <SheetDescription>
-              Make changes to the {labels.session.toLowerCase()} details below.
+              {t('sessions.editDesc', { session: labels.session.toLowerCase() })}
             </SheetDescription>
           </SheetHeader>
 
           {editingSession && (
             <div className="flex flex-col gap-4 py-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-sessionName">{labels.session} Name</Label>
+                <Label htmlFor="edit-sessionName">{t('sessions.sessionName', { session: labels.session })}</Label>
                 <Input
                   id="edit-sessionName"
                   value={editingSession.name}
@@ -249,23 +251,23 @@ const Sessions: React.FC<SessionsProps> = () => {
                       name: e.target.value,
                     })
                   }
-                  placeholder={`e.g., ${labels.session === "Group" ? "Morning Routine" : "Class 1A"}`}
+                  placeholder={labels.session === "Group" ? t('sessions.individualPlaceholder') : t('sessions.educationPlaceholder')}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-course">Assign {labels.courses}</Label>
+                <Label htmlFor="edit-course">{t('sessions.assignCourses', { courses: labels.courses })}</Label>
                 <Select
                   value={editSelectedCourse}
                   onValueChange={addCourseToEditingSession}
                 >
                   <SelectTrigger id="edit-course" className="w-full">
-                    <SelectValue placeholder={`Select a ${labels.course.toLowerCase()}`} />
+                    <SelectValue placeholder={t('select.selectA', { item: labels.course.toLowerCase() })} />
                   </SelectTrigger>
                   <SelectContent>
                     {database.courses.length === 0 ? (
                       <SelectItem value="no-courses" disabled>
-                        No {labels.courses.toLowerCase()} available
+                        {t('select.noAvailable', { items: labels.courses.toLowerCase() })}
                       </SelectItem>
                     ) : (
                       database.courses.map((course) => (
@@ -310,7 +312,7 @@ const Sessions: React.FC<SessionsProps> = () => {
 
           <SheetFooter>
             <Button variant="outline" onClick={updateSession}>
-              Save Changes
+              {t('common.saveChanges')}
             </Button>
           </SheetFooter>
         </SheetContent>
