@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n/i18n";
 import { useTheme } from "@/components/theme-provider";
 import {
   Card,
@@ -67,6 +69,7 @@ const LANGUAGE_OPTIONS = [
 ];
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { value: font, set: setFont } = useStorageString("app-font", "default");
   const { value: fontSize, set: setFontSize } = useStorageString(
@@ -94,6 +97,12 @@ const Settings = () => {
   const changeMode = (newMode: AppMode) => {
     if (newMode === appMode) return;
     setAppMode(newMode);
+  };
+
+  const changeLanguage = (value: string) => {
+    setLanguage(value);
+    i18n.changeLanguage(value);
+    window.location.reload();
   };
 
   // Apply settings on mount and when values change
@@ -139,31 +148,31 @@ const Settings = () => {
     <div className="flex flex-1 flex-col md:py-6 py-4 gap-4 px-4 lg:px-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Settings</h1>
+          <h1 className="text-2xl font-semibold">{t('settings.title')}</h1>
           <p className="text-muted-foreground text-sm">
-            Manage your application preferences
+            {t('settings.subtitle')}
           </p>
         </div>
       </div>
 
       <Tabs defaultValue="appearance" className="w-full">
         <TabsList>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
+          <TabsTrigger value="appearance">{t('settings.tabs.appearance')}</TabsTrigger>
+          <TabsTrigger value="general">{t('settings.tabs.general')}</TabsTrigger>
+          <TabsTrigger value="accessibility">{t('settings.tabs.accessibility')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="appearance" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Theme</CardTitle>
+              <CardTitle>{t('settings.theme.title')}</CardTitle>
               <CardDescription>
-                Select your preferred color mode
+                {t('settings.theme.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Color Mode</Label>
+                <Label>{t('settings.theme.colorMode')}</Label>
                 <div className="flex gap-2">
                   <Toggle
                     pressed={theme === "light"}
@@ -172,7 +181,7 @@ const Settings = () => {
                     className="flex-1"
                   >
                     <IconSun className="mr-2 size-4" />
-                    Light
+                    {t('settings.theme.light')}
                   </Toggle>
                   <Toggle
                     pressed={theme === "dark"}
@@ -181,7 +190,7 @@ const Settings = () => {
                     className="flex-1"
                   >
                     <IconMoon className="mr-2 size-4" />
-                    Dark
+                    {t('settings.theme.dark')}
                   </Toggle>
                   <Toggle
                     pressed={theme === "system"}
@@ -190,12 +199,11 @@ const Settings = () => {
                     className="flex-1"
                   >
                     <IconDeviceDesktop className="mr-2 size-4" />
-                    System
+                    {t('settings.theme.system')}
                   </Toggle>
                 </div>
                 <p className="text-muted-foreground text-xs">
-                  Choose how the app looks. System will match your device
-                  settings.
+                  {t('settings.theme.hint')}
                 </p>
               </div>
             </CardContent>
@@ -203,17 +211,17 @@ const Settings = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Typography</CardTitle>
+              <CardTitle>{t('settings.typography.title')}</CardTitle>
               <CardDescription>
-                Customize font settings for the application
+                {t('settings.typography.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="font-select">Font Family</Label>
+                <Label htmlFor="font-select">{t('settings.typography.fontFamily')}</Label>
                 <Select value={font ?? "default"} onValueChange={setFont}>
                   <SelectTrigger id="font-select">
-                    <SelectValue placeholder="Select font" />
+                    <SelectValue placeholder={t('settings.typography.selectFont')} />
                   </SelectTrigger>
                   <SelectContent>
                     {FONT_OPTIONS.map((option) => (
@@ -228,13 +236,13 @@ const Settings = () => {
               <Separator />
 
               <div className="space-y-2">
-                <Label htmlFor="font-size-select">Font Size</Label>
+                <Label htmlFor="font-size-select">{t('settings.typography.fontSize')}</Label>
                 <Select
                   value={fontSize ?? "medium"}
                   onValueChange={setFontSize}
                 >
                   <SelectTrigger id="font-size-select">
-                    <SelectValue placeholder="Select size" />
+                    <SelectValue placeholder={t('settings.typography.selectSize')} />
                   </SelectTrigger>
                   <SelectContent>
                     {FONT_SIZE_OPTIONS.map((option) => (
@@ -250,17 +258,17 @@ const Settings = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Display</CardTitle>
+              <CardTitle>{t('settings.display.title')}</CardTitle>
               <CardDescription>
-                Adjust display and layout preferences
+                {t('settings.display.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Compact Mode</Label>
+                  <Label>{t('settings.display.compactMode')}</Label>
                   <p className="text-muted-foreground text-xs">
-                    Reduce spacing for a denser layout
+                    {t('settings.display.compactHint')}
                   </p>
                 </div>
                 <Toggle
@@ -268,7 +276,7 @@ const Settings = () => {
                   onPressedChange={setCompactMode}
                   aria-label="Toggle compact mode"
                 >
-                  {compactMode ? "On" : "Off"}
+                  {compactMode ? t('settings.display.on') : t('settings.display.off')}
                 </Toggle>
               </div>
             </CardContent>
@@ -278,14 +286,14 @@ const Settings = () => {
         <TabsContent value="general" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>App Mode</CardTitle>
+              <CardTitle>{t('settings.appMode.title')}</CardTitle>
               <CardDescription>
-                Choose between Educational or Individual scheduling mode
+                {t('settings.appMode.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Usage Mode</Label>
+                <Label>{t('settings.appMode.label')}</Label>
                 <div className="flex gap-2">
                   <Toggle
                     pressed={appMode === "education"}
@@ -294,7 +302,7 @@ const Settings = () => {
                     className="flex-1"
                   >
                     <IconUser className="mr-2 size-4" />
-                    Education
+                    {t('settings.appMode.education')}
                   </Toggle>
                   <Toggle
                     pressed={appMode === "individual"}
@@ -303,7 +311,7 @@ const Settings = () => {
                     className="flex-1"
                   >
                     <IconActivity className="mr-2 size-4" />
-                    Individual
+                    {t('settings.appMode.individual')}
                   </Toggle>
                   <Toggle
                     pressed={appMode === "company"}
@@ -312,29 +320,30 @@ const Settings = () => {
                     className="flex-1"
                   >
                     <IconLayoutKanban className="mr-2 size-4" />
-                    Company
+                    {t('settings.appMode.company')}
                   </Toggle>
                 </div>
-                <p className="text-muted-foreground text-xs mt-2">
-                  <strong>Education</strong> — Tutors, Courses &amp; Classes. <strong>Individual</strong> — People, Activities &amp; Groups. <strong>Company</strong> — Members, Tasks &amp; Projects.
-                </p>
+                <p
+                  className="text-muted-foreground text-xs mt-2"
+                  dangerouslySetInnerHTML={{ __html: t('settings.appMode.hint') }}
+                />
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Language & Region</CardTitle>
+              <CardTitle>{t('settings.language.title')}</CardTitle>
               <CardDescription>
-                Set your preferred language and regional settings
+                {t('settings.language.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="language-select">Language</Label>
-                <Select value={language ?? "en"} onValueChange={setLanguage}>
+                <Label htmlFor="language-select">{t('settings.language.label')}</Label>
+                <Select value={language ?? "en"} onValueChange={changeLanguage}>
                   <SelectTrigger id="language-select">
-                    <SelectValue placeholder="Select language" />
+                    <SelectValue placeholder={t('settings.language.selectLang')} />
                   </SelectTrigger>
                   <SelectContent>
                     {LANGUAGE_OPTIONS.map((option) => (
@@ -345,7 +354,7 @@ const Settings = () => {
                   </SelectContent>
                 </Select>
                 <p className="text-muted-foreground text-xs">
-                  Select your preferred language for the interface
+                  {t('settings.language.hint')}
                 </p>
               </div>
             </CardContent>
@@ -355,17 +364,17 @@ const Settings = () => {
         <TabsContent value="accessibility" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Accessibility</CardTitle>
+              <CardTitle>{t('settings.accessibility.title')}</CardTitle>
               <CardDescription>
-                Configure accessibility features for better usability
+                {t('settings.accessibility.desc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>High Contrast</Label>
+                  <Label>{t('settings.accessibility.highContrast')}</Label>
                   <p className="text-muted-foreground text-xs">
-                    Increase contrast for better visibility
+                    {t('settings.accessibility.highContrastHint')}
                   </p>
                 </div>
                 <Toggle
@@ -373,7 +382,7 @@ const Settings = () => {
                   onPressedChange={setHighContrast}
                   aria-label="Toggle high contrast"
                 >
-                  {highContrast ? "On" : "Off"}
+                  {highContrast ? t('settings.display.on') : t('settings.display.off')}
                 </Toggle>
               </div>
 
@@ -381,9 +390,9 @@ const Settings = () => {
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Animations</Label>
+                  <Label>{t('settings.accessibility.animations')}</Label>
                   <p className="text-muted-foreground text-xs">
-                    Enable smooth transitions and animations
+                    {t('settings.accessibility.animationsHint')}
                   </p>
                 </div>
                 <Toggle
@@ -391,7 +400,7 @@ const Settings = () => {
                   onPressedChange={setAnimations}
                   aria-label="Toggle animations"
                 >
-                  {animations ? "On" : "Off"}
+                  {animations ? t('settings.display.on') : t('settings.display.off')}
                 </Toggle>
               </div>
             </CardContent>
