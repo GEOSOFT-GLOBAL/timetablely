@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import SectionHeader from "@/components/section-header";
 import TemplateItem from "@/components/template-item";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ interface TemplatesProps {
 }
 
 const Templates: React.FC<TemplatesProps> = () => {
+  const { t } = useTranslation();
   const { database, setDatabase } = useDatabaseStore();
   const [newTemplate, setNewTemplate] = React.useState<
     Partial<ITimetableTemplate>
@@ -103,28 +105,28 @@ const Templates: React.FC<TemplatesProps> = () => {
       <div className="grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="templateName">Template Name</Label>
+            <Label htmlFor="templateName">{t('templates.templateName')}</Label>
             <Input
               id="templateName"
               value={newTemplate.name || ""}
               onChange={(e) =>
                 setNewTemplate({ ...newTemplate, name: e.target.value })
               }
-              placeholder="e.g., Weekly Schedule"
+              placeholder={t('templates.namePlaceholder')}
             />
 
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('common.description')}</Label>
             <Textarea
               id="description"
               value={newTemplate.description || ""}
               onChange={(e) =>
                 setNewTemplate({ ...newTemplate, description: e.target.value })
               }
-              placeholder="Optional description"
+              placeholder={t('templates.descPlaceholder')}
               rows={3}
             />
 
-            <Label htmlFor="columnCount">Number of Columns</Label>
+            <Label htmlFor="columnCount">{t('templates.columnCount')}</Label>
             <Input
               id="columnCount"
               type="number"
@@ -138,7 +140,7 @@ const Templates: React.FC<TemplatesProps> = () => {
               }
             />
 
-            <Label htmlFor="slotDuration">Default Slot Duration (minutes)</Label>
+            <Label htmlFor="slotDuration">{t('templates.slotDuration')}</Label>
             <Input
               id="slotDuration"
               type="number"
@@ -154,7 +156,7 @@ const Templates: React.FC<TemplatesProps> = () => {
           </div>
           <CardFooter className="gap-4">
             <Button variant="outline" onClick={addTemplate}>
-              Save
+              {t('common.save')}
             </Button>
             <Button
               variant="outline"
@@ -169,7 +171,7 @@ const Templates: React.FC<TemplatesProps> = () => {
                 })
               }
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </CardFooter>
         </Card>
@@ -185,7 +187,7 @@ const Templates: React.FC<TemplatesProps> = () => {
           ))}
           {(!database.templates || database.templates.length === 0) && (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No templates added yet
+              {t('templates.noTemplatesYet')}
             </div>
           )}
         </Card>
@@ -194,16 +196,16 @@ const Templates: React.FC<TemplatesProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit Template</SheetTitle>
+            <SheetTitle>{t('templates.editTitle')}</SheetTitle>
             <SheetDescription>
-              Make changes to the template details below.
+              {t('templates.editDesc')}
             </SheetDescription>
           </SheetHeader>
 
           {editingTemplate && (
             <div className="flex flex-col gap-4 py-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-templateName">Template Name</Label>
+                <Label htmlFor="edit-templateName">{t('templates.templateName')}</Label>
                 <Input
                   id="edit-templateName"
                   value={editingTemplate.name}
@@ -213,12 +215,12 @@ const Templates: React.FC<TemplatesProps> = () => {
                       name: e.target.value,
                     })
                   }
-                  placeholder="e.g., Weekly Schedule"
+                  placeholder={t('templates.namePlaceholder')}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-description">Description</Label>
+                <Label htmlFor="edit-description">{t('common.description')}</Label>
                 <Textarea
                   id="edit-description"
                   value={editingTemplate.description || ""}
@@ -228,13 +230,13 @@ const Templates: React.FC<TemplatesProps> = () => {
                       description: e.target.value,
                     })
                   }
-                  placeholder="Optional description"
+                  placeholder={t('templates.descPlaceholder')}
                   rows={3}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-columnCount">Number of Columns</Label>
+                <Label htmlFor="edit-columnCount">{t('templates.columnCount')}</Label>
                 <Input
                   id="edit-columnCount"
                   type="number"
@@ -251,7 +253,7 @@ const Templates: React.FC<TemplatesProps> = () => {
 
               <div className="flex flex-col gap-2">
                 <Label htmlFor="edit-slotDuration">
-                  Default Slot Duration (minutes)
+                  {t('templates.slotDuration')}
                 </Label>
                 <Input
                   id="edit-slotDuration"
@@ -270,7 +272,7 @@ const Templates: React.FC<TemplatesProps> = () => {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CalendarIcon className="size-4" />
                 <span>
-                  Created:{" "}
+                  {t('templates.created')}{" "}
                   {editingTemplate.createdAt
                     ? new Date(editingTemplate.createdAt).toLocaleDateString()
                     : "N/A"}
@@ -281,7 +283,7 @@ const Templates: React.FC<TemplatesProps> = () => {
 
           <SheetFooter>
             <Button variant="outline" onClick={updateTemplate}>
-              Save Changes
+              {t('common.saveChanges')}
             </Button>
           </SheetFooter>
         </SheetContent>
