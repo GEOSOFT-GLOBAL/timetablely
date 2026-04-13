@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
   onLoadSampleData,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { database: storeDatabase } = useDatabaseStore();
 
   // Use prop database if provided, otherwise use store database
@@ -60,11 +62,11 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <DatabaseIcon className="size-5" />
-          <h2 className="text-lg font-semibold">Database Overview</h2>
+          <h2 className="text-lg font-semibold">{t('databaseManager.title')}</h2>
         </div>
         {onLoadSampleData && (
           <Button variant="outline" size="sm" onClick={onLoadSampleData} className="w-full sm:w-auto">
-            Load Sample Data
+            {t('databaseManager.loadSampleData')}
           </Button>
         )}
       </div>
@@ -92,7 +94,7 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
                   className="gap-1 w-full sm:w-auto"
                 >
                   <PlusIcon className="size-4" />
-                  Add
+                  {t('common.add')}
                 </Button>
               </div>
             </CardContent>
@@ -105,21 +107,21 @@ const DatabaseManager: React.FC<DatabaseManagerProps> = ({
           <CardContent className="pt-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h3 className="font-semibold text-base sm:text-lg">Generate Timetable</h3>
+                <h3 className="font-semibold text-base sm:text-lg">{t('databaseManager.generateTimetable')}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Create timetables based on your database
+                  {t('databaseManager.generateDesc')}
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 {onGenerateTimetable && (
                   <Button variant="outline" onClick={onGenerateTimetable} className="w-full sm:w-auto">
-                    Generate
+                    {t('databaseManager.generate')}
                   </Button>
                 )}
                 {onGenerateAITimetable && (
                   <Button onClick={onGenerateAITimetable} className="gap-2 w-full sm:w-auto">
                     <IconSparkles className="h-4 w-4" />
-                    AI Generate
+                    {t('databaseManager.aiGenerate')}
                   </Button>
                 )}
               </div>
