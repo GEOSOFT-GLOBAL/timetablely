@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   IconCalendar,
   IconChartBar,
@@ -29,48 +30,9 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-const data = {
-  navMain: [
-    {
-      title: "Overview",
-      url: "/app/dashboard",
-      icon: IconDashboard,
-    },
-  ],
-  navManagement: [
-    {
-      title: "Templates",
-      url: "/app/templates",
-      icon: IconTemplate,
-    },
-    {
-      title: "Analytics",
-      url: "/app/analytics",
-      icon: IconChartBar,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "How to Use",
-      url: "/app/how-to-use",
-      icon: IconBook,
-    },
-    {
-      title: "Settings",
-      url: "/app/settings",
-      icon: IconSettings,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-};
-
-const getNavCore = (labels: any, icons: any) => [
+const getNavCore = (labels: any, icons: any, t: any) => [
   {
-    title: "Timetables",
+    title: t('nav.timetables'),
     url: "/app/timetables",
     icon: IconCalendar,
   },
@@ -94,6 +56,18 @@ const getNavCore = (labels: any, icons: any) => [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
   const { labels, icons } = useAppMode();
+  const { t } = useTranslation();
+
+  const navMain = [{ title: t('nav.overview'), url: "/app/dashboard", icon: IconDashboard }];
+  const navManagement = [
+    { title: t('nav.templates'), url: "/app/templates", icon: IconTemplate },
+    { title: t('nav.analytics'), url: "/app/analytics", icon: IconChartBar },
+  ];
+  const navSecondary = [
+    { title: t('nav.howToUse'), url: "/app/how-to-use", icon: IconBook },
+    { title: t('nav.settings'), url: "/app/settings", icon: IconSettings },
+    { title: t('nav.search'), url: "#", icon: IconSearch },
+  ];
 
   const userData = user
     ? {
@@ -144,7 +118,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="gap-1 px-3">
         {/* Overview Section */}
         <SidebarGroup className="mt-2">
-          <NavMain items={data.navMain} />
+          <NavMain items={navMain} />
         </SidebarGroup>
 
         <SidebarSeparator className="my-3" />
@@ -152,10 +126,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Core Features Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">
-            Core
+            {t('nav.core')}
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1">
-            {getNavCore(labels, icons).map((item) => (
+            {getNavCore(labels, icons, t).map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
@@ -185,10 +159,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Management Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">
-            Management
+            {t('nav.management')}
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1">
-            {data.navManagement.map((item) => (
+            {navManagement.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
@@ -218,7 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         {/* Secondary Navigation */}
         <SidebarGroup className="mt-auto pb-2">
-          <NavSecondary items={data.navSecondary} className="gap-1" />
+          <NavSecondary items={navSecondary} className="gap-1" />
         </SidebarGroup>
       </SidebarContent>
 
