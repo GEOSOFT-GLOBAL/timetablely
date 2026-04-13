@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import SectionHeader from "@/components/section-header";
 import CourseItem from "@/components/course-item";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ interface CoursesProps {
 }
 
 const Courses: React.FC<CoursesProps> = () => {
+  const { t } = useTranslation();
   const { labels } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newCourse, setNewCourse] = React.useState<Partial<ICourse>>({
@@ -105,17 +107,17 @@ const Courses: React.FC<CoursesProps> = () => {
       <div className="grid grid-cols-1 w-full gap-4 md:grid-cols-2 md:gap-6">
         <Card className="">
           <div className="p-4 flex flex-col gap-4">
-            <Label htmlFor="courseName">{labels.course} Name</Label>
+            <Label htmlFor="courseName">{t('courses.courseName', { course: labels.course })}</Label>
             <Input
               id="courseName"
               value={newCourse.name || ""}
               onChange={(e) =>
                 setNewCourse({ ...newCourse, name: e.target.value })
               }
-              placeholder={`e.g., ${labels.course === "Activity" ? "Morning Yoga" : "Mathematics"}`}
+              placeholder={labels.course === "Activity" ? t('courses.individualPlaceholder') : t('courses.educationPlaceholder')}
             />
 
-            <Label htmlFor="tutor">Assign {labels.tutor}</Label>
+            <Label htmlFor="tutor">{t('courses.assignTutor', { tutor: labels.tutor })}</Label>
             <Select
               value={newCourse.teacherId}
               onValueChange={(value) =>
@@ -123,12 +125,12 @@ const Courses: React.FC<CoursesProps> = () => {
               }
             >
               <SelectTrigger id="tutor" className="w-full">
-                <SelectValue placeholder={`Select a ${labels.tutor.toLowerCase()}`} />
+                <SelectValue placeholder={t('select.selectA', { item: labels.tutor.toLowerCase() })} />
               </SelectTrigger>
               <SelectContent>
                 {database.tutors.length === 0 ? (
                   <SelectItem value="no-tutors" disabled>
-                    No {labels.tutors.toLowerCase()} available
+                    {t('select.noAvailable', { items: labels.tutors.toLowerCase() })}
                   </SelectItem>
                 ) : (
                   database.tutors.map((tutor) => (
@@ -140,7 +142,7 @@ const Courses: React.FC<CoursesProps> = () => {
               </SelectContent>
             </Select>
 
-            <Label htmlFor="periodsPerWeek">Periods Per Week</Label>
+            <Label htmlFor="periodsPerWeek">{t('courses.periodsPerWeek')}</Label>
             <Input
               id="periodsPerWeek"
               type="number"
@@ -154,7 +156,7 @@ const Courses: React.FC<CoursesProps> = () => {
               }
             />
 
-            <Label htmlFor="priority">Priority</Label>
+            <Label htmlFor="priority">{t('common.priority')}</Label>
             <Select
               value={newCourse.priority}
               onValueChange={(value) =>
@@ -162,12 +164,12 @@ const Courses: React.FC<CoursesProps> = () => {
               }
             >
               <SelectTrigger id="priority" className="w-full">
-                <SelectValue placeholder="Select priority" />
+                <SelectValue placeholder={t('courses.selectPriority')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={PRIORITY.LOW}>Low</SelectItem>
-                <SelectItem value={PRIORITY.MEDIUM}>Medium</SelectItem>
-                <SelectItem value={PRIORITY.HIGH}>High</SelectItem>
+                <SelectItem value={PRIORITY.LOW}>{t('common.low')}</SelectItem>
+                <SelectItem value={PRIORITY.MEDIUM}>{t('common.medium')}</SelectItem>
+                <SelectItem value={PRIORITY.HIGH}>{t('common.high')}</SelectItem>
               </SelectContent>
             </Select>
             <div className="flex items-center gap-2">
@@ -182,13 +184,13 @@ const Courses: React.FC<CoursesProps> = () => {
                 }
               />
               <Label htmlFor="avoidConsecutive">
-                Avoid consecutive periods
+                {t('courses.avoidConsecutive')}
               </Label>
             </div>
           </div>
           <CardFooter className="gap-4">
             <Button variant="outline" onClick={addCourse}>
-              Save
+              {t('common.save')}
             </Button>
             <Button
               variant="outline"
@@ -201,7 +203,7 @@ const Courses: React.FC<CoursesProps> = () => {
                 })
               }
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </CardFooter>
         </Card>
@@ -223,7 +225,7 @@ const Courses: React.FC<CoursesProps> = () => {
           })}
           {database.courses.length === 0 && (
             <div className="flex items-center justify-center h-full text-muted-foreground">
-              No {labels.courses.toLowerCase()} added yet
+              {t('courses.noCoursesYet', { courses: labels.courses.toLowerCase() })}
             </div>
           )}
         </Card>
@@ -232,28 +234,28 @@ const Courses: React.FC<CoursesProps> = () => {
       <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Edit {labels.course}</SheetTitle>
+            <SheetTitle>{t('courses.editTitle', { course: labels.course })}</SheetTitle>
             <SheetDescription>
-              Make changes to the {labels.course.toLowerCase()} details below.
+              {t('courses.editDesc', { course: labels.course.toLowerCase() })}
             </SheetDescription>
           </SheetHeader>
 
           {editingCourse && (
             <div className="flex flex-col gap-4 py-4 px-3">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-courseName">Course Name</Label>
+                <Label htmlFor="edit-courseName">{t('courses.courseName', { course: labels.course })}</Label>
                 <Input
                   id="edit-courseName"
                   value={editingCourse.name}
                   onChange={(e) =>
                     setEditingCourse({ ...editingCourse, name: e.target.value })
                   }
-                  placeholder="e.g., Mathematics"
+                  placeholder={labels.course === "Activity" ? t('courses.individualPlaceholder') : t('courses.educationPlaceholder')}
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-tutor">Assign Tutor</Label>
+                <Label htmlFor="edit-tutor">{t('courses.assignTutor', { tutor: labels.tutor })}</Label>
                 <Select
                   value={editingCourse.teacherId}
                   onValueChange={(value) =>
@@ -261,12 +263,12 @@ const Courses: React.FC<CoursesProps> = () => {
                   }
                 >
                   <SelectTrigger id="edit-tutor" className="w-full">
-                    <SelectValue placeholder="Select a tutor" />
+                    <SelectValue placeholder={t('select.selectA', { item: labels.tutor.toLowerCase() })} />
                   </SelectTrigger>
                   <SelectContent>
                     {database.tutors.length === 0 ? (
                       <SelectItem value="no-tutors" disabled>
-                        No tutors available
+                        {t('select.noAvailable', { items: labels.tutors.toLowerCase() })}
                       </SelectItem>
                     ) : (
                       database.tutors.map((tutor) => (
@@ -280,7 +282,7 @@ const Courses: React.FC<CoursesProps> = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-periodsPerWeek">Periods Per Week</Label>
+                <Label htmlFor="edit-periodsPerWeek">{t('courses.periodsPerWeek')}</Label>
                 <Input
                   id="edit-periodsPerWeek"
                   type="number"
@@ -296,7 +298,7 @@ const Courses: React.FC<CoursesProps> = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-priority">Priority</Label>
+                <Label htmlFor="edit-priority">{t('common.priority')}</Label>
                 <Select
                   value={editingCourse.priority}
                   onValueChange={(value) =>
@@ -307,12 +309,12 @@ const Courses: React.FC<CoursesProps> = () => {
                   }
                 >
                   <SelectTrigger id="edit-priority" className="w-full">
-                    <SelectValue placeholder="Select priority" />
+                    <SelectValue placeholder={t('courses.selectPriority')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={PRIORITY.LOW}>Low</SelectItem>
-                    <SelectItem value={PRIORITY.MEDIUM}>Medium</SelectItem>
-                    <SelectItem value={PRIORITY.HIGH}>High</SelectItem>
+                    <SelectItem value={PRIORITY.LOW}>{t('common.low')}</SelectItem>
+                    <SelectItem value={PRIORITY.MEDIUM}>{t('common.medium')}</SelectItem>
+                    <SelectItem value={PRIORITY.HIGH}>{t('common.high')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -329,7 +331,7 @@ const Courses: React.FC<CoursesProps> = () => {
                   }
                 />
                 <Label htmlFor="edit-avoidConsecutive">
-                  Avoid consecutive periods
+                  {t('courses.avoidConsecutive')}
                 </Label>
               </div>
             </div>
@@ -337,7 +339,7 @@ const Courses: React.FC<CoursesProps> = () => {
 
           <SheetFooter>
             <Button variant="outline" onClick={updateCourse}>
-              Save Changes
+              {t('common.saveChanges')}
             </Button>
           </SheetFooter>
         </SheetContent>
