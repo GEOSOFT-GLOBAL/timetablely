@@ -1,4 +1,5 @@
 import DatabaseManager from "@/components/database-manager";
+import { useTranslation } from "react-i18next";
 import GridCell from "@/components/grid-cell";
 import GridControlls from "@/components/grid-controlls";
 import GridHeader from "@/components/grid-header";
@@ -45,6 +46,7 @@ interface TimetablesProps {
 }
 
 const Timetables: React.FC<TimetablesProps> = () => {
+  const { t } = useTranslation();
   const gridState = useGridState();
   const { database, setDatabase } = useDatabaseStore();
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -132,7 +134,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
   // Function to clear the timetable
   const handleClearTimetable = () => {
     gridState.setAllCellContents(new Map());
-    showDialog("Success", "Timetable cleared successfully!", "success");
+    showDialog(t('common.success'), t('timetables.cleared'), "success");
   };
 
   // Load API key from localStorage on mount
@@ -155,8 +157,8 @@ const Timetables: React.FC<TimetablesProps> = () => {
   const generateWithAI = async () => {
     if (database.courses.length === 0) {
       showDialog(
-        "Error",
-        "Please add subjects to the database first.",
+        t('common.error'),
+        t('timetables.noSubjectsError'),
         "error"
       );
       return;
@@ -184,17 +186,17 @@ const Timetables: React.FC<TimetablesProps> = () => {
       );
 
       showDialog(
-        "AI Timetable Generated",
+        t('timetables.aiGenerated'),
         `Successfully generated timetable with ${periodsCount} periods across ${database.courses.length} subjects using AI.`,
         "success"
       );
     } catch (error) {
       console.error("AI Generation Error:", error);
       showDialog(
-        "AI Generation Failed",
+        t('timetables.aiGenerationFailed'),
         error instanceof Error
           ? error.message
-          : "Failed to generate timetable with AI. Please check your API key and try again.",
+          : t('timetables.aiFailedDesc'),
         "error"
       );
     } finally {
@@ -204,7 +206,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
 
   const saveApiKey = () => {
     if (!apiKey.trim()) {
-      showDialog("Error", "Please enter a valid API key.", "error");
+      showDialog(t('common.error'), t('timetables.invalidApiKey'), "error");
       return;
     }
     localStorage.setItem("gemini_api_key", apiKey);
@@ -228,15 +230,15 @@ const Timetables: React.FC<TimetablesProps> = () => {
       .writeText(JSON.stringify(timetableData, null, 2))
       .then(() => {
         showDialog(
-          "Success",
-          "Timetable data copied to clipboard and logged to console!",
+          t('common.success'),
+          t('timetables.copied'),
           "success"
         );
       })
       .catch(() => {
         showDialog(
-          "Info",
-          "Timetable data logged to console (clipboard copy failed)",
+          t('common.information'),
+          t('timetables.copiedConsole'),
           "info"
         );
       });
@@ -254,13 +256,13 @@ const Timetables: React.FC<TimetablesProps> = () => {
         subtitle: "Master Schedule",
       });
       showDialog(
-        "Success",
-        "Timetable exported as PDF successfully!",
+        t('common.success'),
+        t('timetables.exportedPdf'),
         "success"
       );
     } catch (error) {
       console.error("PDF Export Error:", error);
-      showDialog("Error", "Failed to export PDF. Please try again.", "error");
+      showDialog(t('common.error'), t('timetables.exportFailed'), "error");
     }
   };
 
@@ -292,7 +294,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
             <tbody>
               ${Array.from({ length: 5 }, (_, row) => `
                 <tr>
-                  <td class="time-column">${["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][row]}</td>
+                  <td class="time-column">${[t('timetables.monday'), t('timetables.tuesday'), t('timetables.wednesday'), t('timetables.thursday'), t('timetables.friday')][row]}</td>
                   ${Array.from({ length: columnCount }, (_, col) => {
                     const key = `${row}-${col}`;
                     const content = cellContents.get(key);
@@ -325,21 +327,21 @@ const Timetables: React.FC<TimetablesProps> = () => {
       window.URL.revokeObjectURL(url);
 
       showDialog(
-        "Success",
-        "Timetable exported as Pro PDF successfully!",
+        t('common.success'),
+        t('timetables.exportedProPdf'),
         "success"
       );
     } catch (error) {
       console.error("Pro PDF Export Error:", error);
-      showDialog("Error", "Failed to export Pro PDF. Please try again.", "error");
+      showDialog(t('common.error'), t('timetables.exportProFailed'), "error");
     }
   };
 
   const handleGenerateAutomatedTimetable = (classId?: string) => {
     if (database.courses.length === 0) {
       showDialog(
-        "Error",
-        "Please add subjects to the database first.",
+        t('common.error'),
+        t('timetables.noSubjectsError'),
         "error"
       );
       return;
@@ -374,8 +376,8 @@ const Timetables: React.FC<TimetablesProps> = () => {
     // Note: This would require additional hooks in useGridState to update these values
     // For now, we'll show a dialog that some settings might need manual adjustment
     showDialog(
-      "Template Applied",
-      "Template applied successfully! Note that column count and durations may need manual adjustment.",
+      t('timetables.templateApplied'),
+      t('timetables.templateAppliedDesc'),
       "success"
     );
   };
@@ -383,8 +385,8 @@ const Timetables: React.FC<TimetablesProps> = () => {
   const handleGenerateAutomatedTimetableWithAlert = (classId?: string) => {
     if (database.courses.length === 0) {
       showDialog(
-        "Error",
-        "Please add subjects to the database first.",
+        t('common.error'),
+        t('timetables.noSubjectsError'),
         "error"
       );
       return;
@@ -414,7 +416,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
     }
 
     showDialog(
-      "Timetable Generated",
+      t('timetables.generated'),
       `Successfully added ${periodsCount} periods across ${subjectsCount} subjects.`,
       "success"
     );
@@ -537,13 +539,13 @@ const Timetables: React.FC<TimetablesProps> = () => {
               <Input
                 id="apiKey"
                 type="password"
-                placeholder="Enter your Gemini API key"
+                placeholder={t('timetables.enterApiKey')}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && saveApiKey()}
               />
               <p className="text-xs text-muted-foreground">
-                Get your API key from{" "}
+                {t('timetables.getApiKey')}{" "}
                 <a
                   href="https://makersuite.google.com/app/apikey"
                   target="_blank"
