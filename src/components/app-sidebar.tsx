@@ -30,10 +30,10 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-const getNavCore = (labels: any, icons: any, t: any) => {
+const getNavCore = (labels: any, icons: any, t: any, isCompany: boolean) => {
   return [
     {
-      title: t('nav.timetables'),
+      title: isCompany ? "Schedules" : t('nav.timetables'),
       url: "/app/schedule",
       icon: IconCalendar,
     },
@@ -65,7 +65,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ? [{ title: t('nav.overview'), url: "/app/dashboard", icon: IconDashboard, label: "Workspace" }]
     : [{ title: t('nav.overview'), url: "/app/dashboard", icon: IconDashboard }];
 
-  const navCore = getNavCore(labels, icons, t);
+  const navCore = getNavCore(labels, icons, t, isCompany);
   const navManagement = [
     { title: t('nav.templates'), url: "/app/templates", icon: IconTemplate },
     { title: t('nav.analytics'), url: "/app/analytics", icon: IconChartBar },
