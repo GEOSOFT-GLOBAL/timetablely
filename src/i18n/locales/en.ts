@@ -244,6 +244,29 @@ const en = {
     },
   },
 
+  // ── Workspace (company mode) ──────────────────────────────────────────────
+  workspace: {
+    title: "Workspace",
+    inviteMembers: "Invite Members",
+    pendingInvitations: "Pending Invitations",
+    emailPlaceholder: "colleague@example.com",
+    selectRole: "Select role",
+    roles: { admin: "Admin", member: "Member", viewer: "Viewer" },
+    inviteSent: "Invitation sent to {{email}}",
+    inviteRevoked: "Invitation revoked",
+    copyLink: "Copy invite link",
+    linkCopied: "Link copied!",
+    memberSince: "Member since {{date}}",
+    removeFromWorkspace: "Remove from workspace",
+  },
+
+  // ── Tasks (company mode) ──────────────────────────────────────────────────
+  tasks: {
+    newTask: "New Task",
+    effort: "Effort (periods/week)",
+    unassigned: "Unassigned",
+  },
+
   // ── Select helpers ────────────────────────────────────────────────────────
   select: {
     selectA: "Select a {{item}}",
