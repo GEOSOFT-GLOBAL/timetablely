@@ -1,14 +1,14 @@
 import Dashboard from "@/views";
 import Blocks from "@/views/blocks";
-import Tutors from "@/views/tutors";
+import Tutors from "@/views/members-view";
 import Billing from "@/views/billing";
-import Courses from "@/views/courses";
+import Courses from "@/views/items-view";
 import Account from "@/views/account";
 import Settings from "@/views/settings";
-import Sessions from "@/views/sessions";
+import Sessions from "@/views/groups-view";
 import HowToUse from "@/views/how-to-use";
 import Templates from "@/views/templates";
-import Timetables from "@/views/timetables";
+import Timetables from "@/views/schedule-view";
 import Notifications from "@/views/notifications";
 
 export const appRoutes = [
