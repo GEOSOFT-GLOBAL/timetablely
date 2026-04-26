@@ -33,7 +33,7 @@ interface CoursesProps {
 
 const Courses: React.FC<CoursesProps> = () => {
   const { t } = useTranslation();
-  const { labels } = useAppMode();
+  const { labels, isCompany } = useAppMode();
   const { database, setDatabase } = useDatabaseStore();
   const [newCourse, setNewCourse] = React.useState<Partial<ICourse>>({
     name: "",
@@ -45,6 +45,7 @@ const Courses: React.FC<CoursesProps> = () => {
     null
   );
   const [isEditSheetOpen, setIsEditSheetOpen] = React.useState(false);
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = React.useState(false);
 
   const addCourse = () => {
     if (!newCourse.name?.trim() || !newCourse.teacherId) return;
@@ -99,6 +100,282 @@ const Courses: React.FC<CoursesProps> = () => {
     setEditingCourse(null);
   };
 
+  // Company mode layout
+  if (isCompany) {
+    return (
+      <div className="flex flex-col w-full md:py-6 py-4 gap-4 px-4 lg:px-6">
+        <div className="gap-4 h-full w-full">
+          <SectionHeader />
+        </div>
+
+        <div className="flex gap-4 items-center mb-4">
+          <Button onClick={() => setIsAddDrawerOpen(true)}>
+            {t('common.add')} {labels.course}
+          </Button>
+        </div>
+
+        {database.courses.length === 0 ? (
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            {t('courses.noCoursesYet', { courses: labels.courses.toLowerCase() })}
+          </div>
+        ) : (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {database.courses.map((course) => {
+              const tutor = database.tutors.find(
+                (t) => t.id === course.teacherId
+              );
+              return (
+                <CourseItem
+                  key={course.id}
+                  course={course}
+                  tutorName={tutor?.name}
+                  onRemove={removeCourse}
+                  onEdit={handleEditCourse}
+                  isCompany
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* Add drawer for company mode */}
+        <Sheet open={isAddDrawerOpen} onOpenChange={setIsAddDrawerOpen}>
+          <SheetContent side="right" className="w-full sm:w-96">
+            <SheetHeader>
+              <SheetTitle>{t('common.add')} {labels.course}</SheetTitle>
+              <SheetDescription>
+                Create a new {labels.course.toLowerCase()}
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="flex flex-col gap-4 py-4 px-3">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="drawer-courseName">{t('courses.courseName', { course: labels.course })}</Label>
+                <Input
+                  id="drawer-courseName"
+                  value={newCourse.name || ""}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, name: e.target.value })
+                  }
+                  placeholder={labels.course === "Activity" ? t('courses.individualPlaceholder') : t('courses.educationPlaceholder')}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="drawer-tutor">{t('courses.assignTutor', { tutor: labels.tutor })}</Label>
+                <Select
+                  value={newCourse.teacherId}
+                  onValueChange={(value) =>
+                    setNewCourse({ ...newCourse, teacherId: value })
+                  }
+                >
+                  <SelectTrigger id="drawer-tutor" className="w-full">
+                    <SelectValue placeholder={t('select.selectA', { item: labels.tutor.toLowerCase() })} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {database.tutors.length === 0 ? (
+                      <SelectItem value="no-tutors" disabled>
+                        {t('select.noAvailable', { items: labels.tutors.toLowerCase() })}
+                      </SelectItem>
+                    ) : (
+                      database.tutors.map((tutor) => (
+                        <SelectItem key={tutor.id} value={tutor.id}>
+                          {tutor.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="drawer-periodsPerWeek">{t('courses.periodsPerWeek')}</Label>
+                <Input
+                  id="drawer-periodsPerWeek"
+                  type="number"
+                  min="1"
+                  value={newCourse.periodsPerWeek || 1}
+                  onChange={(e) =>
+                    setNewCourse({
+                      ...newCourse,
+                      periodsPerWeek: parseInt(e.target.value) || 1,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="drawer-priority">{t('common.priority')}</Label>
+                <Select
+                  value={newCourse.priority}
+                  onValueChange={(value) =>
+                    setNewCourse({ ...newCourse, priority: value as PRIORITY })
+                  }
+                >
+                  <SelectTrigger id="drawer-priority" className="w-full">
+                    <SelectValue placeholder={t('courses.selectPriority')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={PRIORITY.LOW}>{t('common.low')}</SelectItem>
+                    <SelectItem value={PRIORITY.MEDIUM}>{t('common.medium')}</SelectItem>
+                    <SelectItem value={PRIORITY.HIGH}>{t('common.high')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="drawer-avoidConsecutive"
+                  checked={newCourse.avoidConsecutive || false}
+                  onCheckedChange={(checked) =>
+                    setNewCourse({
+                      ...newCourse,
+                      avoidConsecutive: checked as boolean,
+                    })
+                  }
+                />
+                <Label htmlFor="drawer-avoidConsecutive">
+                  {t('courses.avoidConsecutive')}
+                </Label>
+              </div>
+            </div>
+
+            <SheetFooter>
+              <Button variant="outline" onClick={() => setIsAddDrawerOpen(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button onClick={() => {
+                addCourse();
+                setIsAddDrawerOpen(false);
+              }}>
+                {t('common.save')}
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+
+        {/* Edit sheet (same for all modes) */}
+        <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>{t('courses.editTitle', { course: labels.course })}</SheetTitle>
+              <SheetDescription>
+                {t('courses.editDesc', { course: labels.course.toLowerCase() })}
+              </SheetDescription>
+            </SheetHeader>
+
+            {editingCourse && (
+              <div className="flex flex-col gap-4 py-4 px-3">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="edit-courseName">{t('courses.courseName', { course: labels.course })}</Label>
+                  <Input
+                    id="edit-courseName"
+                    value={editingCourse.name}
+                    onChange={(e) =>
+                      setEditingCourse({ ...editingCourse, name: e.target.value })
+                    }
+                    placeholder={labels.course === "Activity" ? t('courses.individualPlaceholder') : t('courses.educationPlaceholder')}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="edit-tutor">{t('courses.assignTutor', { tutor: labels.tutor })}</Label>
+                  <Select
+                    value={editingCourse.teacherId}
+                    onValueChange={(value) =>
+                      setEditingCourse({ ...editingCourse, teacherId: value })
+                    }
+                  >
+                    <SelectTrigger id="edit-tutor" className="w-full">
+                      <SelectValue placeholder={t('select.selectA', { item: labels.tutor.toLowerCase() })} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {database.tutors.length === 0 ? (
+                        <SelectItem value="no-tutors" disabled>
+                          {t('select.noAvailable', { items: labels.tutors.toLowerCase() })}
+                        </SelectItem>
+                      ) : (
+                        database.tutors.map((tutor) => (
+                          <SelectItem key={tutor.id} value={tutor.id}>
+                            {tutor.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="edit-periodsPerWeek">{t('courses.periodsPerWeek')}</Label>
+                  <Input
+                    id="edit-periodsPerWeek"
+                    type="number"
+                    min="1"
+                    value={editingCourse.periodsPerWeek}
+                    onChange={(e) =>
+                      setEditingCourse({
+                        ...editingCourse,
+                        periodsPerWeek: parseInt(e.target.value) || 1,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="edit-priority">{t('common.priority')}</Label>
+                  <Select
+                    value={editingCourse.priority}
+                    onValueChange={(value) =>
+                      setEditingCourse({
+                        ...editingCourse,
+                        priority: value as PRIORITY,
+                      })
+                    }
+                  >
+                    <SelectTrigger id="edit-priority" className="w-full">
+                      <SelectValue placeholder={t('courses.selectPriority')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={PRIORITY.LOW}>{t('common.low')}</SelectItem>
+                      <SelectItem value={PRIORITY.MEDIUM}>{t('common.medium')}</SelectItem>
+                      <SelectItem value={PRIORITY.HIGH}>{t('common.high')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="edit-avoidConsecutive"
+                    checked={editingCourse.avoidConsecutive || false}
+                    onCheckedChange={(checked) =>
+                      setEditingCourse({
+                        ...editingCourse,
+                        avoidConsecutive: checked as boolean,
+                      })
+                    }
+                  />
+                  <Label htmlFor="edit-avoidConsecutive">
+                    {t('courses.avoidConsecutive')}
+                  </Label>
+                </div>
+              </div>
+            )}
+
+            <SheetFooter>
+              <Button variant="outline" onClick={() => setIsEditSheetOpen(false)}>
+                {t('common.cancel')}
+              </Button>
+              <Button onClick={updateCourse}>
+                {t('common.saveChanges')}
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
+    );
+  }
+
+  // Default mode layout (education & individual)
   return (
     <div className="flex flex-col w-full md:py-6 py-4 gap-4 px-4 lg:px-6">
       <div className="gap-4 h-full w-full">
@@ -338,7 +615,10 @@ const Courses: React.FC<CoursesProps> = () => {
           )}
 
           <SheetFooter>
-            <Button variant="outline" onClick={updateCourse}>
+            <Button variant="outline" onClick={() => setIsEditSheetOpen(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={updateCourse}>
               {t('common.saveChanges')}
             </Button>
           </SheetFooter>
