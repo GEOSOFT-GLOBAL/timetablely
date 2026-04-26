@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import SectionHeader from "@/components/section-header";
-import SessionItem from "@/components/session-item";
+import SessionItem from "@/components/group-item";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
