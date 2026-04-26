@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { dayLabels, gridSize } from "@/constants";
 import { useGridState } from "@/hooks/use-grid";
+import { useAppMode } from "@/hooks/use-app-mode";
 import type { applyTemplate } from "@/lib/template";
 import { canMergeCells, generateTimeLabels } from "@/lib/temputils";
 import {
@@ -36,7 +37,7 @@ import {
 import { generateAITimetable } from "@/lib/ai-timetable";
 import { exportTimetableToPDF } from "@/lib/pdf-export";
 import { createExportApiClient } from "@/config/axios";
-import { sampleDatabase } from "@/mock/load-data";
+import { getSampleDatabaseForMode } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { IconCheck, IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
 import * as React from "react";
@@ -47,6 +48,7 @@ interface TimetablesProps {
 
 const Timetables: React.FC<TimetablesProps> = () => {
   const { t } = useTranslation();
+  const { mode } = useAppMode();
   const gridState = useGridState();
   const { database, setDatabase } = useDatabaseStore();
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -591,7 +593,7 @@ const Timetables: React.FC<TimetablesProps> = () => {
         database={database}
         onGenerateTimetable={handleGenerateAutomatedTimetableWithAlert}
         onGenerateAITimetable={handleAIGeneration}
-        onLoadSampleData={() => setDatabase(sampleDatabase)}
+        onLoadSampleData={() => setDatabase(getSampleDatabaseForMode(mode))}
       />
       <TemplateManager
         columnCount={columnCount}
