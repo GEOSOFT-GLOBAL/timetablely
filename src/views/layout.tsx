@@ -6,10 +6,10 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 const pageTitles: Record<string, string> = {
   "/app/dashboard": "Dashboard",
-  "/app/timetables": "Timetables",
-  "/app/courses": "Courses",
-  "/app/tutors": "Tutors",
-  "/app/sessions": "Sessions",
+  "/app/schedule": "Schedule",
+  "/app/items": "Items",
+  "/app/members": "Members",
+  "/app/groups": "Groups",
   "/app/templates": "Templates",
   "/app/analytics": "Analytics",
   "/app/how-to-use": "How to Use",
