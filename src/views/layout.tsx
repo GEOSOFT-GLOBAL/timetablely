@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useModeDatabase } from "@/hooks/use-mode-database";
 
 const pageTitles: Record<string, string> = {
   "/app/dashboard": "Dashboard",
@@ -22,6 +23,9 @@ const pageTitles: Record<string, string> = {
 const Layout = () => {
   const location = useLocation();
   const currentTitle = pageTitles[location.pathname] || "Overview";
+  
+  // Initialize mode-specific database switching
+  useModeDatabase();
 
   return (
     <SidebarProvider
