@@ -249,6 +249,29 @@ const es = {
     selectA: "Seleccionar un {{item}}",
     noAvailable: "No hay {{items}} disponibles",
   },
+
+  // ── Workspace (company mode) ──────────────────────────────────────────────
+  workspace: {
+    title: "Espacio de Trabajo",
+    inviteMembers: "Invitar Miembros",
+    pendingInvitations: "Invitaciones Pendientes",
+    emailPlaceholder: "colega@ejemplo.com",
+    selectRole: "Seleccionar rol",
+    roles: { admin: "Administrador", member: "Miembro", viewer: "Visualizador" },
+    inviteSent: "Invitación enviada a {{email}}",
+    inviteRevoked: "Invitación revocada",
+    copyLink: "Copiar enlace de invitación",
+    linkCopied: "¡Enlace copiado!",
+    memberSince: "Miembro desde {{date}}",
+    removeFromWorkspace: "Remover del espacio de trabajo",
+  },
+
+  // ── Tasks (company mode) ──────────────────────────────────────────────────
+  tasks: {
+    newTask: "Nueva Tarea",
+    effort: "Esfuerzo (períodos/semana)",
+    unassigned: "Sin Asignar",
+  },
 } as const;
 
 export default es;
