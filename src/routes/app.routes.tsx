@@ -17,15 +17,15 @@ export const appRoutes = [
     element: <Dashboard />,
   },
   {
-    path: "courses",
+    path: "items",
     element: <Courses />,
   },
   {
-    path: "tutors",
+    path: "members",
     element: <Tutors />,
   },
   {
-    path: "sessions",
+    path: "groups",
     element: <Sessions />,
   },
   {
@@ -37,7 +37,7 @@ export const appRoutes = [
     element: <Blocks />,
   },
   {
-    path: "timetables",
+    path: "schedule",
     element: <Timetables />,
   },
   {
