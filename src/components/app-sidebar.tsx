@@ -57,10 +57,15 @@ const getNavCore = (labels: any, icons: any, t: any) => {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
-  const { labels, icons } = useAppMode();
+  const { labels, icons, isCompany } = useAppMode();
   const { t } = useTranslation();
 
-  const navMain = [{ title: t('nav.overview'), url: "/app/dashboard", icon: IconDashboard }];
+  // Company mode uses "Workspace" label instead of "Overview"
+  const navMain = isCompany
+    ? [{ title: t('nav.overview'), url: "/app/dashboard", icon: IconDashboard, label: "Workspace" }]
+    : [{ title: t('nav.overview'), url: "/app/dashboard", icon: IconDashboard }];
+
+  const navCore = getNavCore(labels, icons, t);
   const navManagement = [
     { title: t('nav.templates'), url: "/app/templates", icon: IconTemplate },
     { title: t('nav.analytics'), url: "/app/analytics", icon: IconChartBar },
@@ -118,9 +123,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent className="gap-1 px-3">
-        {/* Overview Section */}
+        {/* Overview / Workspace Section */}
         <SidebarGroup className="mt-2">
-          <NavMain items={navMain} />
+          {isCompany ? (
+            <>
+              <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">
+                Workspace
+              </SidebarGroupLabel>
+              <NavMain items={navMain} />
+            </>
+          ) : (
+            <NavMain items={navMain} />
+          )}
         </SidebarGroup>
 
         <SidebarSeparator className="my-3" />
@@ -131,7 +145,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {t('nav.core')}
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1">
-            {getNavCore(labels, icons, t).map((item) => (
+            {navCore.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   asChild
@@ -192,8 +206,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Spacer to push secondary nav to bottom */}
         <div className="flex-1" />
 
-        {/* Secondary Navigation */}
+        {/* Settings & Help Section (renamed for company mode) */}
         <SidebarGroup className="mt-auto pb-2">
+          {isCompany && (
+            <SidebarGroupLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">
+              Settings & Help
+            </SidebarGroupLabel>
+          )}
           <NavSecondary items={navSecondary} className="gap-1" />
         </SidebarGroup>
       </SidebarContent>
