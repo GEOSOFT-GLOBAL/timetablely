@@ -243,7 +243,28 @@ const zh = {
       zh: "中文",
     },
   },
+  // ── Workspace (company mode) ──────────────────────────────────────────────
+  workspace: {
+    title: "工作空间",
+    inviteMembers: "邀请成员",
+    pendingInvitations: "待处理邀请",
+    emailPlaceholder: "colleague@example.com",
+    selectRole: "选择角色",
+    roles: { admin: "管理员", member: "成员", viewer: "查看者" },
+    inviteSent: "邀请已发送至 {{email}}",
+    inviteRevoked: "邀请已撤销",
+    copyLink: "复制邀请链接",
+    linkCopied: "链接已复制!",
+    memberSince: "成员于 {{date}} 加入",
+    removeFromWorkspace: "从工作空间移除",
+  },
 
+  // ── Tasks (company mode) ──────────────────────────────────────────────────
+  tasks: {
+    newTask: "新任务",
+    effort: "工作量 (周期/周)",
+    unassigned: "未分配",
+  },
   // ── Select helpers ────────────────────────────────────────────────────────
   select: {
     selectA: "选择{{item}}",
