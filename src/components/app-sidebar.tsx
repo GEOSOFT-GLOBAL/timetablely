@@ -30,28 +30,30 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-const getNavCore = (labels: any, icons: any, t: any) => [
-  {
-    title: t('nav.timetables'),
-    url: "/app/timetables",
-    icon: IconCalendar,
-  },
-  {
-    title: labels.courses,
-    url: "/app/courses",
-    icon: icons.courses,
-  },
-  {
-    title: labels.tutors,
-    url: "/app/tutors",
-    icon: icons.tutors,
-  },
-  {
-    title: labels.sessions,
-    url: "/app/sessions",
-    icon: icons.sessions,
-  },
-];
+const getNavCore = (labels: any, icons: any, t: any) => {
+  return [
+    {
+      title: t('nav.timetables'),
+      url: "/app/schedule",
+      icon: IconCalendar,
+    },
+    {
+      title: labels.courses,
+      url: "/app/items",
+      icon: icons.courses,
+    },
+    {
+      title: labels.tutors,
+      url: "/app/members",
+      icon: icons.tutors,
+    },
+    {
+      title: labels.sessions,
+      url: "/app/groups",
+      icon: icons.sessions,
+    },
+  ];
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
