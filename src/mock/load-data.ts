@@ -2,6 +2,7 @@ import type { ITimetableDatabase } from "@/interface/database";
 import { PRIORITY } from "@/interface/enums";
 import { defaultBlockedTexts } from "@/lib/timetable";
 
+// ───── Education Mode Sample Data ─────
 export const sampleDatabase: ITimetableDatabase = {
   tutors: [
     {
@@ -9,7 +10,7 @@ export const sampleDatabase: ITimetableDatabase = {
       name: "Ms. Johnson",
       subjects: ["Mathematics", "Statistics"],
       maxPeriodsPerDay: 4,
-      unavailableSlots: ["0-0"], // Not available Monday first period
+      unavailableSlots: ["0-0"],
     },
     {
       id: "teacher-english",
@@ -126,4 +127,172 @@ export const sampleDatabase: ITimetableDatabase = {
   blockedSlots: [],
   blockedTexts: defaultBlockedTexts,
   templates: [],
+};
+
+// ───── Individual Mode Sample Data ─────
+export const sampleDatabaseIndividual: ITimetableDatabase = {
+  tutors: [
+    {
+      id: "person-alex",
+      name: "Alex",
+      subjects: ["Yoga", "Meditation"],
+      maxPeriodsPerDay: 2,
+      unavailableSlots: [],
+    },
+    {
+      id: "person-casey",
+      name: "Casey",
+      subjects: ["Running", "Strength Training"],
+      maxPeriodsPerDay: 3,
+      unavailableSlots: [],
+    },
+  ],
+  courses: [
+    {
+      id: "yoga",
+      name: "Morning Yoga",
+      teacherId: "person-alex",
+      periodsPerWeek: 3,
+      priority: PRIORITY.HIGH,
+      avoidConsecutive: false,
+    },
+    {
+      id: "meditation",
+      name: "Meditation",
+      teacherId: "person-alex",
+      periodsPerWeek: 4,
+      priority: PRIORITY.HIGH,
+      avoidConsecutive: false,
+    },
+    {
+      id: "running",
+      name: "Evening Run",
+      teacherId: "person-casey",
+      periodsPerWeek: 3,
+      priority: PRIORITY.MEDIUM,
+      avoidConsecutive: true,
+    },
+    {
+      id: "strength",
+      name: "Strength Training",
+      teacherId: "person-casey",
+      periodsPerWeek: 2,
+      priority: PRIORITY.MEDIUM,
+      avoidConsecutive: false,
+    },
+  ],
+  sessions: [
+    {
+      id: "group-wellness",
+      name: "Wellness Routine",
+      subjects: ["yoga", "meditation", "running"],
+    },
+    {
+      id: "group-fitness",
+      name: "Fitness Plan",
+      subjects: ["running", "strength"],
+    },
+  ],
+  blockedSlots: [],
+  blockedTexts: defaultBlockedTexts,
+  templates: [],
+};
+
+// ───── Company Mode Sample Data ─────
+export const sampleDatabaseCompany: ITimetableDatabase = {
+  tutors: [
+    {
+      id: "member-alice",
+      name: "Alice Johnson",
+      subjects: ["Frontend Development", "UI/UX Design"],
+      maxPeriodsPerDay: 4,
+      unavailableSlots: [],
+    },
+    {
+      id: "member-bob",
+      name: "Bob Smith",
+      subjects: ["Backend Development", "DevOps"],
+      maxPeriodsPerDay: 4,
+      unavailableSlots: [],
+    },
+    {
+      id: "member-carol",
+      name: "Carol Davis",
+      subjects: ["Project Management", "QA Testing"],
+      maxPeriodsPerDay: 3,
+      unavailableSlots: [],
+    },
+  ],
+  courses: [
+    {
+      id: "task-api",
+      name: "Build REST API",
+      teacherId: "member-bob",
+      periodsPerWeek: 5,
+      priority: PRIORITY.HIGH,
+      avoidConsecutive: false,
+    },
+    {
+      id: "task-ui",
+      name: "Design Dashboard",
+      teacherId: "member-alice",
+      periodsPerWeek: 4,
+      priority: PRIORITY.HIGH,
+      avoidConsecutive: false,
+    },
+    {
+      id: "task-testing",
+      name: "QA Testing Sprint",
+      teacherId: "member-carol",
+      periodsPerWeek: 3,
+      priority: PRIORITY.MEDIUM,
+      avoidConsecutive: true,
+    },
+    {
+      id: "task-devops",
+      name: "Setup CI/CD Pipeline",
+      teacherId: "member-bob",
+      periodsPerWeek: 2,
+      priority: PRIORITY.MEDIUM,
+      avoidConsecutive: false,
+    },
+    {
+      id: "task-review",
+      name: "Code Review Session",
+      teacherId: "member-alice",
+      periodsPerWeek: 2,
+      priority: PRIORITY.LOW,
+      avoidConsecutive: true,
+    },
+  ],
+  sessions: [
+    {
+      id: "project-webapp",
+      name: "Web App Project",
+      subjects: ["task-api", "task-ui", "task-testing"],
+    },
+    {
+      id: "project-infra",
+      name: "Infrastructure Project",
+      subjects: ["task-devops", "task-testing"],
+    },
+  ],
+  blockedSlots: [],
+  blockedTexts: defaultBlockedTexts,
+  templates: [],
+};
+
+// ───── Helper function to get sample data by mode ─────
+export const getSampleDatabaseForMode = (
+  mode: "education" | "individual" | "company"
+): ITimetableDatabase => {
+  switch (mode) {
+    case "individual":
+      return sampleDatabaseIndividual;
+    case "company":
+      return sampleDatabaseCompany;
+    case "education":
+    default:
+      return sampleDatabase;
+  }
 };
