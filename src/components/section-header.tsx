@@ -2,8 +2,9 @@ import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
+import { useAppMode } from "@/hooks/use-app-mode";
 import { useDatabaseStore } from "@/store/databaseStore";
-import { sampleDatabase } from "@/mock/load-data";
+import { getSampleDatabaseForMode } from "@/mock/load-data";
 
 interface SectionHeaderProps {
   propName?: string;
@@ -11,6 +12,7 @@ interface SectionHeaderProps {
 
 const SectionHeader: React.FC<SectionHeaderProps> = () => {
   const { t } = useTranslation();
+  const { mode } = useAppMode();
   const { setDatabase } = useDatabaseStore();
 
   return (
@@ -25,7 +27,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = () => {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-5 w-full sm:w-auto">
           <Button className="w-full sm:w-auto">{t('sectionHeader.autoGenerate')}</Button>
           <Button
-            onClick={() => setDatabase(sampleDatabase)}
+            onClick={() => setDatabase(getSampleDatabaseForMode(mode))}
             className="w-full sm:w-auto"
           >
             {t('sectionHeader.loadSampleData')}
