@@ -1,240 +1,215 @@
 import {
-  CalendarIcon,
   CheckCircleIcon,
-  ClockIcon,
-  DatabaseIcon,
-  DownloadIcon,
   HeartIcon,
   TargetIcon,
   UsersIcon,
+  ZapIcon,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  Container,
+  Section,
+  SectionHeading,
+} from "@/components/marketing/section";
+import { CtaSection } from "@/components/marketing/cta-section";
+import { solutions } from "@/config/solutions";
+import { cn } from "@/lib/utils";
+
+const values = [
+  {
+    title: "Efficiency",
+    description:
+      "Scheduling is overhead. Every feature is judged on how much of it we remove.",
+    icon: TargetIcon,
+  },
+  {
+    title: "Honesty",
+    description:
+      "A plan that does not fit should say so on day one, not fail quietly in week three.",
+    icon: CheckCircleIcon,
+  },
+  {
+    title: "Accessibility",
+    description:
+      "Works offline, works on a phone, works on the machine your school actually has.",
+    icon: UsersIcon,
+  },
+  {
+    title: "Craft",
+    description:
+      "Scheduling software is used daily for years. It should be pleasant to open.",
+    icon: HeartIcon,
+  },
+];
+
+const milestones = [
+  {
+    year: "2023",
+    title: "Project inception",
+    description:
+      "Timetablely started as an answer to one problem: building a school timetable by hand takes weeks and still ends up with conflicts.",
+  },
+  {
+    year: "2024",
+    title: "First release",
+    description:
+      "The initial version shipped with automated generation, the visual grid and PDF export.",
+  },
+  {
+    year: "2025",
+    title: "Beyond the classroom",
+    description:
+      "Teams and individuals started using it for projects and personal planning, so the engine was generalised into three modes.",
+  },
+  {
+    year: "2026",
+    title: "One platform, three modes",
+    description:
+      "Personal, Teams and Institutions now share the same scheduler, with vocabulary and defaults that match each one.",
+  },
+];
 
 const About = () => {
-  const values = [
-    {
-      title: "Efficiency",
-      description: "Save time and effort with automated timetable generation",
-      icon: TargetIcon,
-    },
-    {
-      title: "Innovation",
-      description: "Leverage advanced algorithms for optimal scheduling",
-      icon: DatabaseIcon,
-    },
-    {
-      title: "Accessibility",
-      description: "Use anywhere with offline support and responsive design",
-      icon: UsersIcon,
-    },
-    {
-      title: "Reliability",
-      description: "Robust system designed for schools of all sizes",
-      icon: CheckCircleIcon,
-    },
-  ];
-
-  const milestones = [
-    {
-      year: "2023",
-      title: "Project Inception",
-      description: "Timetablely was born out of a need for efficient timetable management in schools.",
-    },
-    {
-      year: "2024",
-      title: "First Release",
-      description: "Launch of the initial version with core timetable generation features.",
-    },
-    {
-      year: "2025",
-      title: "Major Update",
-      description: "Introduction of AI-powered scheduling and advanced analytics.",
-    },
-    {
-      year: "2026",
-      title: "Global Expansion",
-      description: "Timetablely now serves schools in over 50 countries worldwide.",
-    },
-  ];
-
   return (
-    <div className="flex w-full flex-col gap-6 py-24">
-      {/* Hero Section */}
-      <div className="px-4 lg:px-6 py-8 bg-linear-to-r from-primary/5 to-secondary/5 rounded-lg">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="flex justify-center mb-4">
-            <CalendarIcon className="size-12 text-primary" />
+    <>
+      <Section size="lg">
+        <Container className="flex flex-col gap-8">
+          <SectionHeading
+            as="h1"
+            eyebrow="About"
+            title="We build the part nobody wants to do by hand"
+            description="Timetablely began as timetable software for schools. It turned out the hard part — fitting real commitments into real available time — is the same problem whether you are running a university, a team, or your own week."
+          />
+        </Container>
+      </Section>
+
+      <Section muted bordered size="sm">
+        <Container className="grid gap-6 md:grid-cols-2">
+          <div className="bg-background flex flex-col gap-3 border p-8">
+            <TargetIcon className="text-primary size-5" />
+            <h2 className="text-xl font-semibold">Our mission</h2>
+            <p className="text-muted-foreground text-pretty">
+              To give people back the hours they lose to scheduling. Efficient
+              planning is not the goal in itself — it is what lets you get on
+              with teaching, building or living.
+            </p>
           </div>
-          <h1 className="text-4xl font-bold mb-4">About Timetablely</h1>
-          <p className="text-xl text-muted-foreground mb-6">
-            Revolutionizing school timetable management with intelligent automation
-          </p>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Timetablely is a comprehensive timetable management system designed to
-            simplify the complex process of creating and maintaining school timetables.
-            Our mission is to save educators time and effort by providing an intuitive
-            platform with powerful automation capabilities.
-          </p>
-        </div>
-      </div>
+          <div className="bg-background flex flex-col gap-3 border p-8">
+            <HeartIcon className="text-primary size-5" />
+            <h2 className="text-xl font-semibold">Our vision</h2>
+            <p className="text-muted-foreground text-pretty">
+              One scheduling engine that speaks your language — whether the
+              things you are placing are called courses, tasks or activities —
+              and is honest with you when the week is already full.
+            </p>
+          </div>
+        </Container>
+      </Section>
 
-      {/* Mission & Vision */}
-      <div className="px-4 lg:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TargetIcon className="size-5" />
-                Our Mission
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                To empower educational institutions with intelligent timetable
-                management solutions that save time, reduce stress, and improve
-                efficiency. We believe that efficient scheduling allows educators to
-                focus on what truly matters - teaching and learning.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HeartIcon className="size-5" />
-                Our Vision
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                To become the leading timetable management solution for educational
-                institutions worldwide, recognized for our innovative approach,
-                reliability, and commitment to customer success. We envision a future
-                where timetable creation is effortless and optimized.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Values */}
-      <div className="px-4 lg:px-6">
-        <h2 className="text-2xl font-bold mb-6">Our Values</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {values.map((value, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="mb-3">
-                  <value.icon className="size-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">{value.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
+      <Section>
+        <Container className="flex flex-col gap-10">
+          <SectionHeading
+            eyebrow="Values"
+            title="What we optimise for"
+          />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {values.map((value) => (
+              <div
+                key={value.title}
+                className="flex flex-col gap-3 border p-6"
+              >
+                <value.icon className="text-primary size-5" />
+                <h3 className="font-semibold">{value.title}</h3>
                 <p className="text-muted-foreground text-sm">
                   {value.description}
                 </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
 
-      {/* Milestones */}
-      <div className="px-4 lg:px-6">
-        <h2 className="text-2xl font-bold mb-6">Our Journey</h2>
-        <div className="space-y-4">
-          {milestones.map((milestone, index) => (
-            <Card key={index}>
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center font-bold text-primary">
-                    {milestone.year}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold mb-2">{milestone.title}</h3>
-                    <p className="text-muted-foreground">{milestone.description}</p>
-                  </div>
+      <Section muted bordered>
+        <Container className="flex flex-col gap-10">
+          <SectionHeading eyebrow="Journey" title="How we got here" />
+          <ol className="flex flex-col">
+            {milestones.map((milestone) => (
+              <li
+                key={milestone.year}
+                className="flex flex-col gap-2 border-l pb-8 pl-6 last:pb-0 sm:flex-row sm:gap-8"
+              >
+                <span className="text-primary michroma shrink-0 text-sm sm:w-20">
+                  {milestone.year}
+                </span>
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-semibold">{milestone.title}</h3>
+                  <p className="text-muted-foreground text-sm">
+                    {milestone.description}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+              </li>
+            ))}
+          </ol>
+        </Container>
+      </Section>
 
-      {/* Key Features */}
-      <div className="px-4 lg:px-6">
-        <h2 className="text-2xl font-bold mb-6">What Makes Timetablely Special</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ClockIcon className="size-5" />
-                Automated Generation
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">
-                Generate complete timetables in seconds with intelligent algorithms
-                that respect all constraints and preferences.
-              </p>
-            </CardContent>
-          </Card>
+      <Section>
+        <Container className="flex flex-col gap-10">
+          <SectionHeading
+            eyebrow="Who uses it"
+            title="Three audiences, one product"
+            description="Each mode exists because someone was already using Timetablely that way."
+          />
+          <div className="grid gap-6 lg:grid-cols-3">
+            {solutions.map((solution) => (
+              <div
+                key={solution.slug}
+                className="flex flex-col gap-3 border p-6"
+              >
+                <span
+                  className={cn(
+                    "flex size-10 items-center justify-center border",
+                    solution.accent.bg,
+                    solution.accent.border
+                  )}
+                >
+                  <solution.icon
+                    className={cn("size-4", solution.accent.text)}
+                  />
+                </span>
+                <h3 className="font-semibold">{solution.name}</h3>
+                <p className="text-muted-foreground text-sm">
+                  {solution.audience}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DatabaseIcon className="size-5" />
-                Comprehensive Database
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">
-                Manage all your school data in one place with an intuitive interface
-                for tutors, courses, sessions, and blocks.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DownloadIcon className="size-5" />
-                PDF Export
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-sm">
-                Export professional-quality PDF documents ready for printing or digital
-                distribution.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Footer Section */}
-      <div className="px-4 lg:px-6 py-8 bg-muted/50 rounded-lg">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-4">Join Us on Our Mission</h2>
-          <p className="text-muted-foreground mb-6">
-            We're constantly working to improve Timetablely and expand our features.
-            If you have feedback, suggestions, or would like to get involved, we'd
-            love to hear from you!
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="mailto:support@timetablely.com" className="text-primary hover:underline">
+      <Section muted bordered size="sm">
+        <Container>
+          <div className="bg-background flex flex-col gap-4 border p-8">
+            <ZapIcon className="text-primary size-5" />
+            <h2 className="text-xl font-semibold">Get involved</h2>
+            <p className="text-muted-foreground max-w-2xl text-pretty">
+              We are still shaping this. If something is missing, awkward, or
+              nearly right — tell us. Feature requests from people who schedule
+              for a living are how most of this got built.
+            </p>
+            <a
+              href="mailto:support@timetablely.com"
+              className="text-primary w-fit hover:underline"
+            >
               support@timetablely.com
             </a>
-            <span className="text-muted-foreground">•</span>
-            <span className="text-muted-foreground">+1 (555) 123-4567</span>
           </div>
-          <p className="text-sm text-muted-foreground mt-6">
-            © 2026 Timetablely. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </div>
+        </Container>
+      </Section>
+
+      <CtaSection />
+    </>
   );
 };
 
-export default About
+export default About;

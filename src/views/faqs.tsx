@@ -1,141 +1,183 @@
+import { Link } from "react-router-dom";
+import { MessageCircleQuestion } from "lucide-react";
+
 import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  HelpCircleIcon,
-} from "lucide-react";
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+  Container,
+  Section,
+  SectionHeading,
+} from "@/components/marketing/section";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 
+/** Grouped so a visitor can scan to their category instead of reading 15 rows. */
+const faqGroups = [
+  {
+    id: "basics",
+    title: "Getting started",
+    faqs: [
+      {
+        question: "What is Timetablely?",
+        answer:
+          "Timetablely is a scheduling platform. It started as timetable software for schools, and the same engine now runs three ways: as a personal task tracker, as project management for teams, and as full timetable scheduling for institutions.",
+      },
+      {
+        question: "Which mode should I choose?",
+        answer:
+          "Pick the one that matches who you are scheduling for. Personal is for your own week, Teams is for projects and members, Institutions is for classes, tutors and courses. You choose at sign-up and can switch later in settings without losing data.",
+      },
+      {
+        question: "Can I try it without signing up?",
+        answer:
+          "Yes. Quick Start gives you a working timetable in the browser with no account — limited to a handful of people and courses and a couple of generations per session, but everything else works.",
+      },
+      {
+        question: "How does automated generation work?",
+        answer:
+          "You give it constraints — availability, priority, how often something repeats, and the periods that are blocked — and the scheduler places everything against those rules, resolving conflicts as it goes. It produces a full grid in seconds.",
+      },
+    ],
+  },
+  {
+    id: "using",
+    title: "Using the app",
+    faqs: [
+      {
+        question: "Can I edit a generated schedule by hand?",
+        answer:
+          "Yes. Every cell is editable — double-click to change it, drag to move it, merge cells, and adjust time slots. You can regenerate around what you have already placed.",
+      },
+      {
+        question: "What are blocked periods?",
+        answer:
+          "Time that can never be scheduled into: breaks, assemblies, lunch, standing meetings. Define them once and every generation excludes them.",
+      },
+      {
+        question: "What are templates?",
+        answer:
+          "A saved schedule structure you can apply again — to the next term, the next project, or a parallel class — so you are not rebuilding the same shape twice.",
+      },
+      {
+        question: "How do I set availability?",
+        answer:
+          "Each person carries their own availability, a maximum load per day, and any unavailable slots. The scheduler treats all of it as a hard constraint.",
+      },
+      {
+        question: "Can I import existing data?",
+        answer:
+          "Yes. Import people, work items and groups from CSV to get set up quickly instead of typing everything in.",
+      },
+      {
+        question: "Can I export what I have made?",
+        answer:
+          "Yes — high-quality PDF export with customisable headers and footers, per group or as a batch.",
+      },
+    ],
+  },
+  {
+    id: "accounts",
+    title: "Plans, data and devices",
+    faqs: [
+      {
+        question: "Does it work offline?",
+        answer:
+          "Yes. Timetablely keeps working with no connection, storing changes locally and syncing them when you are back online.",
+      },
+      {
+        question: "Can I use it on multiple devices?",
+        answer:
+          "Yes. It is a progressive web app, so it runs on desktop, tablet and phone with the same account and the same data.",
+      },
+      {
+        question: "Is it suitable for a large institution?",
+        answer:
+          "Yes. It handles everything from a single freelancer's week to a university managing thousands of courses across departments.",
+      },
+      {
+        question: "How secure is my data?",
+        answer:
+          "Data is encrypted in transit and at rest, passwords are hashed, and access to production systems is restricted. The privacy policy sets out exactly what we collect and why.",
+      },
+      {
+        question: "What happens if I hit a plan limit?",
+        answer:
+          "Nothing is deleted. You keep everything you have created and are prompted to upgrade before adding more.",
+      },
+      {
+        question: "How often is Timetablely updated?",
+        answer:
+          "Regularly, and updates apply in the background — you are always on the current version without doing anything.",
+      },
+    ],
+  },
+];
+
 const Faqs = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const faqs = [
-    {
-      question: "What is Timetablely?",
-      answer: "Timetablely is an intelligent timetable management system designed for schools and educational institutions. It helps you create, manage, and optimize timetables with ease using automated scheduling algorithms.",
-    },
-    {
-      question: "How does the automated timetable generation work?",
-      answer: "Our system uses advanced scheduling algorithms that take into account various constraints including teacher availability, course priorities, classroom capacities, and institutional rules. It generates optimized timetables in seconds while minimizing conflicts.",
-    },
-    {
-      question: "Can I manually edit the generated timetables?",
-      answer: "Yes! You can manually edit any timetable cell by double-clicking on it. You can also merge cells, adjust time slots, and make other modifications to the automatically generated timetables.",
-    },
-    {
-      question: "Is Timetablely available offline?",
-      answer: "Yes, Timetablely includes comprehensive offline support. You can continue working without an internet connection, and your data will automatically sync when you're back online.",
-    },
-    {
-      question: "Can I export my timetables?",
-      answer: "Absolutely! You can export your timetables as high-quality PDF documents. The export feature includes customizable headers, footers, and other formatting options.",
-    },
-    {
-      question: "How do I manage tutor availability?",
-      answer: "You can set tutor availability in the Tutors section. Each tutor can have specific time slots marked as unavailable, and the system will respect these constraints when generating timetables.",
-    },
-    {
-      question: "What are timetable templates?",
-      answer: "Timetable templates allow you to save your timetable configurations for future use. You can create templates from existing timetables and apply them to new classes or terms, saving you time and effort.",
-    },
-    {
-      question: "How do I set course priorities?",
-      answer: "You can set course priorities (High, Medium, Low) in the Courses section. High-priority courses are scheduled first to ensure they get the most favorable time slots.",
-    },
-    {
-      question: "What are blocked time slots?",
-      answer: "Blocked time slots are non-teaching periods such as breaks, assemblies, or lunch that should be excluded from scheduling. You can define custom blocked time slots in the Blocks section.",
-    },
-    {
-      question: "Can I import data from other systems?",
-      answer: "Yes, Timetablely supports importing data from CSV files. You can import tutors, courses, sessions, and other data to quickly set up your database.",
-    },
-    {
-      question: "Is Timetablely suitable for large schools?",
-      answer: "Timetablely is designed to handle schools of all sizes, from small primary schools to large secondary schools and universities. The system can manage thousands of courses and teachers efficiently.",
-    },
-    {
-      question: "How secure is my data?",
-      answer: "We take data security very seriously. All your data is encrypted and stored securely. We follow industry best practices to ensure your information remains safe and protected.",
-    },
-    {
-      question: "Can I use Timetablely on multiple devices?",
-      answer: "Yes, Timetablely is a progressive web application (PWA) that works on all modern devices. You can use it on your computer, tablet, or smartphone with the same account.",
-    },
-    {
-      question: "What support options are available?",
-      answer: "We offer comprehensive support including documentation, video tutorials, and email support. If you encounter any issues, our support team is ready to help you.",
-    },
-    {
-      question: "How often is Timetablely updated?",
-      answer: "We regularly update Timetablely with new features and improvements. Updates are automatic and happen in the background, so you always have access to the latest version.",
-    },
-  ];
-
-  const toggleFaq = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
   return (
-    <div className="flex w-full flex-col gap-6 py-24">
-      <div className="px-4 lg:px-6">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Frequently Asked Questions</h1>
-          <p className="text-muted-foreground">
-            Find answers to common questions about Timetablely
-          </p>
-        </div>
+    <>
+      <Section size="lg">
+        <Container className="flex flex-col gap-12">
+          <SectionHeading
+            as="h1"
+            eyebrow="FAQs"
+            title="Frequently asked questions"
+            description="What people ask before and just after they start. If yours is not here, ask us directly."
+          />
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div key={index} className="border-b last:border-b-0 border-border">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between p-4 text-left"
-                    onClick={() => toggleFaq(index)}
-                  >
-                    <span className="font-medium">{faq.question}</span>
-                    {openIndex === index ? (
-                      <ChevronUpIcon className="size-5" />
-                    ) : (
-                      <ChevronDownIcon className="size-5" />
-                    )}
-                  </Button>
-                  {openIndex === index && (
-                    <div className="px-4 pb-4 text-sm text-muted-foreground">
-                      {faq.answer}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+          <div className="flex flex-col gap-12">
+            {faqGroups.map((group) => (
+              <div key={group.id} className="flex flex-col gap-4">
+                <h2 className="text-xl font-semibold">{group.title}</h2>
+                <Accordion type="single" collapsible className="border">
+                  {group.faqs.map((faq) => (
+                    <AccordionItem
+                      key={faq.question}
+                      value={faq.question}
+                      className="px-6"
+                    >
+                      <AccordionTrigger className="text-left">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground text-pretty">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
 
-        <Card className="mt-8 bg-muted/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <HelpCircleIcon className="size-5" />
-              Still Have Questions?
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              If you can't find the answer to your question, please don't hesitate to
-              contact us. Our support team is here to help!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button>Contact Support</Button>
-              <Button variant="outline">View Documentation</Button>
+      <Section muted bordered size="sm">
+        <Container>
+          <div className="bg-background flex flex-col items-start gap-4 border p-8 sm:flex-row sm:items-center">
+            <MessageCircleQuestion className="text-primary size-6 shrink-0" />
+            <div className="flex-1">
+              <h2 className="font-semibold">Still have a question?</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Send it over — we answer every message, usually within a
+                business day.
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button asChild>
+                <Link to="/contact">Contact support</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/quick-start">Try Quick Start</Link>
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </Section>
+    </>
   );
 };
 
-export default Faqs
+export default Faqs;

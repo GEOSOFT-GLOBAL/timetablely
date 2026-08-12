@@ -15,14 +15,24 @@ type MenuItem = {
 };
 
 export type BubbleMenuProps = {
-  logo: ReactNode | string;
+  /** Optional. When omitted, no logo bubble is rendered — use this when the
+   * page already has a header carrying the brand. */
+  logo?: ReactNode | string;
   onMenuClick?: (open: boolean) => void;
   className?: string;
   style?: CSSProperties;
   menuAriaLabel?: string;
+  /** Overrides the themed surface colour. Leave unset to follow light/dark. */
   menuBg?: string;
+  /** Overrides the themed text colour. Leave unset to follow light/dark. */
   menuContentColor?: string;
   useFixedPosition?: boolean;
+  /**
+   * "top" spans the viewport top (original full-nav behaviour).
+   * "bottom-right" docks the toggle as a floating action, so it can sit
+   * alongside a conventional header without competing with it.
+   */
+  placement?: "top" | "bottom-right";
   items?: MenuItem[];
   animationEase?: string;
   animationDuration?: number;
@@ -73,9 +83,10 @@ export default function BubbleMenu({
   className,
   style,
   menuAriaLabel = "Toggle menu",
-  menuBg = "#fff",
-  menuContentColor = "#111",
+  menuBg,
+  menuContentColor,
   useFixedPosition = false,
+  placement = "top",
   items,
   animationEase = "back.out(1.5)",
   animationDuration = 0.5,
@@ -93,15 +104,22 @@ export default function BubbleMenu({
   const containerClassName = [
     "bubble-menu",
     useFixedPosition ? "fixed" : "absolute",
-    "left-0 right-0 top-8",
-    "flex items-center justify-between",
-    "gap-4 px-8",
+    placement === "bottom-right"
+      ? "bottom-6 right-6 flex items-center justify-end gap-4"
+      : "left-0 right-0 top-8 flex items-center justify-between gap-4 px-8",
     "pointer-events-none",
     "z-[1001]",
     className,
   ]
     .filter(Boolean)
     .join(" ");
+
+  /** Themed surface, overridable per-instance. */
+  const surfaceStyle: CSSProperties = {
+    background: menuBg ?? "var(--background)",
+    color: menuContentColor ?? "var(--foreground)",
+  };
+  const lineColor = menuContentColor ?? "currentColor";
 
   const handleToggle = () => {
     const nextState = !isMenuOpen;
@@ -167,6 +185,19 @@ export default function BubbleMenu({
       });
     }
   }, [isMenuOpen, showOverlay, animationEase, animationDuration, staggerDelay]);
+
+  // Escape closes the overlay — without this the only way out is the toggle.
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        onMenuClick?.(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isMenuOpen, onMenuClick]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -245,54 +276,55 @@ export default function BubbleMenu({
       <nav
         className={containerClassName}
         style={style}
-        aria-label="Main navigation"
+        aria-label="Quick navigation"
       >
-        <Link
-          to="/"
-          className={[
-            "bubble logo-bubble",
-            "inline-flex items-center justify-center",
-            "rounded-full",
-            "bg-white",
-            "shadow-[0_4px_16px_rgba(0,0,0,0.12)]",
-            "pointer-events-auto",
-            "h-12 md:h-14",
-            "px-4 md:px-8",
-            "gap-2",
-            "will-change-transform",
-            "no-underline",
-          ].join(" ")}
-          aria-label="Logo - Go to home"
-          style={{
-            background: menuBg,
-            minHeight: "48px",
-            borderRadius: "9999px",
-          }}
-        >
-          <span
+        {logo ? (
+          <Link
+            to="/"
             className={[
-              "logo-content",
+              "bubble logo-bubble",
               "inline-flex items-center justify-center",
-              "w-[120px] h-full",
+              "rounded-full border",
+              "shadow-[0_4px_16px_rgba(0,0,0,0.12)]",
+              "pointer-events-auto",
+              "h-12 md:h-14",
+              "px-4 md:px-8",
+              "gap-2",
+              "will-change-transform",
+              "no-underline",
             ].join(" ")}
-            style={
-              {
-                ["--logo-max-height"]: "60%",
-                ["--logo-max-width"]: "100%",
-              } as CSSProperties
-            }
+            aria-label="Logo - Go to home"
+            style={{
+              ...surfaceStyle,
+              minHeight: "48px",
+              borderRadius: "9999px",
+            }}
           >
-            {typeof logo === "string" ? (
-              <img
-                src={logo}
-                alt="Logo"
-                className="bubble-logo max-h-[60%] max-w-full object-contain block"
-              />
-            ) : (
-              logo
-            )}
-          </span>
-        </Link>
+            <span
+              className={[
+                "logo-content",
+                "inline-flex items-center justify-center",
+                "w-[120px] h-full",
+              ].join(" ")}
+              style={
+                {
+                  ["--logo-max-height"]: "60%",
+                  ["--logo-max-width"]: "100%",
+                } as CSSProperties
+              }
+            >
+              {typeof logo === "string" ? (
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="bubble-logo max-h-[60%] max-w-full object-contain block"
+                />
+              ) : (
+                logo
+              )}
+            </span>
+          </Link>
+        ) : null}
 
         <button
           type="button"
@@ -300,25 +332,24 @@ export default function BubbleMenu({
             "bubble toggle-bubble menu-btn",
             isMenuOpen ? "open" : "",
             "inline-flex flex-col items-center justify-center",
-            "rounded-full",
-            "bg-white",
+            "rounded-full border",
             "shadow-[0_4px_16px_rgba(0,0,0,0.12)]",
             "pointer-events-auto",
             "w-12 h-12 md:w-14 md:h-14",
-            "border-0 cursor-pointer p-0",
+            "cursor-pointer p-0",
             "will-change-transform",
           ].join(" ")}
           onClick={handleToggle}
           aria-label={menuAriaLabel}
-          aria-pressed={isMenuOpen}
-          style={{ background: menuBg }}
+          aria-expanded={isMenuOpen}
+          style={surfaceStyle}
         >
           <span
             className="menu-line block mx-auto rounded-[2px]"
             style={{
               width: 26,
               height: 2,
-              background: menuContentColor,
+              background: lineColor,
               transform: isMenuOpen ? "translateY(4px) rotate(45deg)" : "none",
             }}
           />
@@ -328,7 +359,7 @@ export default function BubbleMenu({
               marginTop: "6px",
               width: 26,
               height: 2,
-              background: menuContentColor,
+              background: lineColor,
               transform: isMenuOpen
                 ? "translateY(-4px) rotate(-45deg)"
                 : "none",
@@ -345,6 +376,7 @@ export default function BubbleMenu({
             useFixedPosition ? "fixed" : "absolute",
             "inset-0",
             "flex items-center justify-center",
+            "bg-background/85 backdrop-blur-sm",
             "pointer-events-none",
             "z-[1000]",
           ].join(" ")}
@@ -381,9 +413,8 @@ export default function BubbleMenu({
                   className={[
                     "pill-link",
                     "w-full",
-                    "rounded-[999px]",
+                    "rounded-[999px] border",
                     "no-underline",
-                    "bg-white",
                     "text-inherit",
                     "shadow-[0_4px_14px_rgba(0,0,0,0.10)]",
                     "flex items-center justify-center",
@@ -395,11 +426,14 @@ export default function BubbleMenu({
                   style={
                     {
                       ["--item-rot"]: `${item.rotation ?? 0}deg`,
-                      ["--pill-bg"]: menuBg,
-                      ["--pill-color"]: menuContentColor,
-                      ["--hover-bg"]: item.hoverStyles?.bgColor || "#f3f4f6",
+                      ["--pill-bg"]: menuBg ?? "var(--card)",
+                      ["--pill-color"]: menuContentColor ?? "var(--foreground)",
+                      ["--hover-bg"]:
+                        item.hoverStyles?.bgColor || "var(--accent)",
                       ["--hover-color"]:
-                        item.hoverStyles?.textColor || menuContentColor,
+                        item.hoverStyles?.textColor ??
+                        menuContentColor ??
+                        "var(--foreground)",
                       background: "var(--pill-bg)",
                       color: "var(--pill-color)",
                       minHeight: "var(--pill-min-h, 160px)",

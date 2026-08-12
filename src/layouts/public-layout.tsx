@@ -1,64 +1,86 @@
 import * as React from "react";
-import { Outlet } from "react-router-dom";
-import BubbleMenu from "@/components/BubbleMenu";
+import { Outlet, useLocation } from "react-router-dom";
 
+import BubbleMenu from "@/components/BubbleMenu";
+import { SiteNav } from "@/components/marketing/site-nav";
+import { SiteFooter } from "@/components/marketing/site-footer";
+
+/**
+ * Shell for every public (unauthenticated) page.
+ *
+ * The primary navigation is the conventional sticky header. The BubbleMenu is
+ * kept as a brand flourish on the landing page only, where it has room to
+ * breathe and does not compete with in-page navigation.
+ */
 const PublicLayout: React.FC = () => {
-  const menuItems = [
+  const { pathname } = useLocation();
+  const isLanding = pathname === "/";
+
+  const bubbleItems = [
     {
-      label: "pricing",
-      href: "/pricing",
-      ariaLabel: "Pricing",
+      label: "personal",
+      href: "/solutions/personal",
+      ariaLabel: "Timetablely for personal use",
+      rotation: -8,
+      hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
+    },
+    {
+      label: "teams",
+      href: "/solutions/teams",
+      ariaLabel: "Timetablely for teams",
+      rotation: 8,
+      hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
+    },
+    {
+      label: "institutions",
+      href: "/solutions/institutions",
+      ariaLabel: "Timetablely for institutions",
       rotation: -8,
       hoverStyles: { bgColor: "#3b82f6", textColor: "#ffffff" },
     },
     {
-      label: "features",
-      href: "/features",
-      ariaLabel: "Features",
+      label: "pricing",
+      href: "/pricing",
+      ariaLabel: "Pricing",
       rotation: 8,
-      hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
+      hoverStyles: { bgColor: "#f59e0b", textColor: "#ffffff" },
     },
     {
       label: "quick start",
       href: "/quick-start",
       ariaLabel: "Quick Start",
       rotation: -8,
-      hoverStyles: { bgColor: "#f59e0b", textColor: "#ffffff" },
-    },
-    {
-      label: "about",
-      href: "/about",
-      ariaLabel: "About",
-      rotation: 8,
       hoverStyles: { bgColor: "#ef4444", textColor: "#ffffff" },
-    },
-    {
-      label: "faqs",
-      href: "/faqs",
-      ariaLabel: "FAQs",
-      rotation: -8,
-      hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
     },
   ];
 
+  // Reset scroll on navigation — without this, moving between long marketing
+  // pages lands the visitor mid-page.
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
+
   return (
-    <div className="min-h-screen relative">
-      <BubbleMenu
-        logo={
-          <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Timetablely
-          </span>
-        }
-        items={menuItems}
-        menuAriaLabel="Toggle navigation"
-        menuBg="#ffffff"
-        menuContentColor="#111111"
-        useFixedPosition={true}
-        animationEase="back.out(1.5)"
-        animationDuration={0.5}
-        staggerDelay={0.12}
-      />
-      <Outlet />
+    <div className="bg-background text-foreground flex min-h-screen flex-col">
+      <SiteNav />
+
+      {isLanding ? (
+        <BubbleMenu
+          items={bubbleItems}
+          menuAriaLabel="Toggle quick navigation"
+          placement="bottom-right"
+          useFixedPosition
+          animationEase="back.out(1.5)"
+          animationDuration={0.5}
+          staggerDelay={0.12}
+        />
+      ) : null}
+
+      <main className="flex-1 pt-16">
+        <Outlet />
+      </main>
+
+      <SiteFooter />
     </div>
   );
 };

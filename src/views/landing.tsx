@@ -1,6 +1,12 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
+
 import Hero from "@/components/hero";
+import { SolutionsSection } from "@/components/marketing/solutions-section";
+import { HowItWorks } from "@/components/marketing/how-it-works";
+import { FeatureHighlights } from "@/components/marketing/feature-highlights";
+import { PricingTeaser } from "@/components/marketing/pricing-teaser";
+import { CtaSection } from "@/components/marketing/cta-section";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 const VISIT_KEY = "timetablely_landing_visited";
@@ -42,7 +48,16 @@ const Landing: React.FC = () => {
       });
   }, []);
 
-  return <Hero />;
+  return (
+    <>
+      <Hero />
+      <SolutionsSection />
+      <HowItWorks />
+      <FeatureHighlights />
+      <PricingTeaser />
+      <CtaSection />
+    </>
+  );
 };
 
 export default Landing;
