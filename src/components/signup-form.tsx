@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
+import { Check } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -17,20 +11,32 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Stepper,
-  StepperContent,
   StepperIndicator,
   StepperItem,
   StepperNav,
-  StepperPanel,
   StepperSeparator,
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { Check } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthAlert } from "@/components/auth/auth-alert";
+import { GoogleButton } from "@/components/auth/google-button";
+import { PasswordStrength } from "@/components/auth/password-strength";
+import { MIN_PASSWORD_LENGTH, isPasswordAcceptable } from "@/lib/password";
+import { useAuthStore } from "@/store/authStore";
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+const STEPS = [
+  { step: 1, title: "Details" },
+  { step: 2, title: "Email" },
+  { step: 3, title: "Password" },
+] as const;
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function SignupForm({ className }: { className?: string }) {
   const navigate = useNavigate();
   const {
     signup,
@@ -50,385 +56,388 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationError, setValidationError] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
+  const [pending, setPending] = useState<"credentials" | "google" | null>(null);
 
-  const handleNext = () => {
+  const displayError = validationError || error;
+
+  const dismissError = () => {
     setValidationError("");
-    
-    // Validate current step
-    if (currentStep === 1) {
+    clearError();
+  };
+
+  /** Returns true when the current step's fields are usable. */
+  const validateStep = (step: number) => {
+    if (step === 1) {
       if (!firstname.trim() || !lastname.trim() || !username.trim()) {
-        setValidationError("Please fill in all fields");
-        return;
-      }
-    } else if (currentStep === 2) {
-      if (!email.trim()) {
-        setValidationError("Please enter your email");
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setValidationError("Please enter a valid email");
-        return;
+        setValidationError("Please fill in your name and a username.");
+        return false;
       }
     }
-    
-    setCurrentStep(currentStep + 1);
+    if (step === 2) {
+      if (!email.trim()) {
+        setValidationError("Please enter your email address.");
+        return false;
+      }
+      if (!EMAIL_PATTERN.test(email)) {
+        setValidationError("That email address does not look right.");
+        return false;
+      }
+    }
+    return true;
   };
 
-  const handleBack = () => {
+  const goNext = () => {
     setValidationError("");
-    setCurrentStep(currentStep - 1);
+    if (!validateStep(currentStep)) return;
+    setCurrentStep((step) => Math.min(step + 1, STEPS.length));
   };
 
+  const goBack = () => {
+    setValidationError("");
+    setCurrentStep((step) => Math.max(step - 1, 1));
+  };
+
+  const createAccount = async (linkAccount?: boolean) => {
+    setPending("credentials");
+    try {
+      await signup({
+        email,
+        password,
+        username,
+        firstname,
+        lastname,
+        ...(linkAccount ? { linkAccount: true } : {}),
+      });
+      navigate("/app/dashboard");
+    } catch {
+      // Error is handled by the store
+    } finally {
+      setPending(null);
+    }
+  };
+
+  /**
+   * One submit handler for all three steps: pressing Enter on an early step
+   * advances instead of submitting a half-filled account.
+   */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setValidationError("");
 
-    if (password.length < 8) {
-      setValidationError("Password must be at least 8 characters long");
+    if (currentStep < STEPS.length) {
+      goNext();
       return;
     }
 
+    if (!isPasswordAcceptable(password)) {
+      setValidationError(
+        `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`
+      );
+      return;
+    }
     if (password !== confirmPassword) {
-      setValidationError("Passwords do not match");
+      setValidationError("The two passwords do not match.");
       return;
     }
 
-    try {
-      await signup({
-        email,
-        password,
-        username,
-        firstname,
-        lastname,
-      });
-      navigate("/app/dashboard");
-    } catch {
-      // Error is handled by the store
-    }
-  };
-
-  const handleLinkAccount = async () => {
-    try {
-      await signup({
-        email,
-        password,
-        username,
-        firstname,
-        lastname,
-        linkAccount: true,
-      });
-      navigate("/app/dashboard");
-    } catch {
-      // Error is handled by the store
-    }
+    await createAccount();
   };
 
   const handleGoogleSignup = async () => {
+    setPending("google");
     try {
       await initiateGoogleAuth();
     } catch {
       // Error is handled by the store
+    } finally {
+      setPending(null);
     }
   };
 
-  const displayError = validationError || error;
+  const signInFooter = (
+    <>
+      Already have an account?{" "}
+      <Link
+        to="/auth/login"
+        className="text-foreground font-medium underline underline-offset-4"
+      >
+        Log in
+      </Link>
+    </>
+  );
 
-  // Account linking dialog
+  // The API reports that this email already has an account on another app in
+  // the suite, and offers to link them.
   if (accountLinkPrompt) {
     return (
-      <Card {...props}>
-        <CardHeader>
-          <CardTitle>Account Found</CardTitle>
-          <CardDescription>
-            An account with this email already exists
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {accountLinkPrompt.prompt}
-            </p>
-            <div className="p-3 bg-muted rounded-md">
-              <p className="text-sm font-medium mb-1">Existing apps:</p>
-              <div className="flex gap-2 flex-wrap">
-                {accountLinkPrompt.existingApps.map((app) => (
-                  <span
-                    key={app}
-                    className="px-2 py-1 bg-primary/10 text-primary text-xs rounded capitalize"
-                  >
-                    {app}
-                  </span>
-                ))}
-              </div>
+      <AuthShell
+        className={className}
+        title="You already have an account"
+        description={accountLinkPrompt.prompt}
+        footer={signInFooter}
+      >
+        <div className="flex flex-col gap-5">
+          <div className="bg-muted/50 flex flex-col gap-2 border p-4">
+            <p className="text-sm font-medium">Already used on</p>
+            <div className="flex flex-wrap gap-2">
+              {accountLinkPrompt.existingApps.map((app) => (
+                <span
+                  key={app}
+                  className="bg-primary/10 text-primary px-2 py-1 text-xs capitalize"
+                >
+                  {app}
+                </span>
+              ))}
             </div>
-            {displayError && (
-              <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                {displayError}
-              </div>
-            )}
-            <div className="space-y-2">
-              <Button
-                onClick={handleLinkAccount}
-                disabled={isLoading}
-                className="w-full"
-              >
-                {isLoading ? "Linking..." : "Link Accounts (Use Same Password)"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  clearAccountLinkPrompt();
-                  clearError();
-                }}
-                disabled={isLoading}
-                className="w-full"
-              >
-                Use Different Email
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Linking accounts means you&apos;ll use the same password across
-              all apps.
-            </p>
           </div>
-        </CardContent>
-      </Card>
+
+          {displayError ? (
+            <AuthAlert onDismiss={dismissError}>{displayError}</AuthAlert>
+          ) : null}
+
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => createAccount(true)}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {pending === "credentials" ? <Spinner /> : null}
+              Link my accounts
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                clearAccountLinkPrompt();
+                clearError();
+              }}
+              disabled={isLoading}
+              className="w-full"
+            >
+              Use a different email
+            </Button>
+          </div>
+
+          <p className="text-muted-foreground text-xs">
+            Linking means the same password signs you in to every app in the
+            suite.
+          </p>
+        </div>
+      </AuthShell>
     );
   }
 
   return (
-    <Card {...props}>
-      <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="text-xl sm:text-2xl">
-          Create an account
-        </CardTitle>
-        <CardDescription className="text-sm">
-          Complete the steps below to create your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-4 sm:px-6">
+    <AuthShell
+      className={className}
+      title="Create your account"
+      description="Free to start. No credit card required."
+      footer={signInFooter}
+    >
+      <div className="flex flex-col gap-6">
+        {/* Offered before the form, so someone using Google never fills in
+            three steps of details first. */}
+        <GoogleButton
+          onClick={handleGoogleSignup}
+          disabled={isLoading}
+          loading={pending === "google"}
+          label="Sign up with Google"
+        />
+
+        <div className="flex items-center gap-3">
+          <span className="bg-border h-px flex-1" />
+          <span className="text-muted-foreground text-xs uppercase tracking-wider">
+            or sign up with email
+          </span>
+          <span className="bg-border h-px flex-1" />
+        </div>
+
         <Stepper value={currentStep} onValueChange={setCurrentStep}>
           <StepperNav className="mb-6">
-            <StepperItem step={1} completed={currentStep > 1}>
-              <StepperTrigger>
-                <StepperIndicator>
-                  {currentStep > 1 ? <Check className="size-4" /> : "1"}
-                </StepperIndicator>
-                <div className="hidden sm:block">
-                  <StepperTitle>Personal Info</StepperTitle>
-                </div>
-              </StepperTrigger>
-              <StepperSeparator />
-            </StepperItem>
-
-            <StepperItem step={2} completed={currentStep > 2}>
-              <StepperTrigger>
-                <StepperIndicator>
-                  {currentStep > 2 ? <Check className="size-4" /> : "2"}
-                </StepperIndicator>
-                <div className="hidden sm:block">
-                  <StepperTitle>Account</StepperTitle>
-                </div>
-              </StepperTrigger>
-              <StepperSeparator />
-            </StepperItem>
-
-            <StepperItem step={3}>
-              <StepperTrigger>
-                <StepperIndicator>3</StepperIndicator>
-                <div className="hidden sm:block">
-                  <StepperTitle>Password</StepperTitle>
-                </div>
-              </StepperTrigger>
-            </StepperItem>
+            {STEPS.map((item, index) => (
+              <StepperItem
+                key={item.step}
+                step={item.step}
+                completed={currentStep > item.step}
+                // Steps ahead are unreachable by click — otherwise the
+                // indicator would skip each step's validation.
+                disabled={item.step > currentStep}
+              >
+                <StepperTrigger>
+                  <StepperIndicator>
+                    {currentStep > item.step ? (
+                      <Check className="size-4" />
+                    ) : (
+                      item.step
+                    )}
+                  </StepperIndicator>
+                  <div className="hidden sm:block">
+                    <StepperTitle>{item.title}</StepperTitle>
+                  </div>
+                </StepperTrigger>
+                {index < STEPS.length - 1 ? <StepperSeparator /> : null}
+              </StepperItem>
+            ))}
           </StepperNav>
-
-          <StepperPanel>
-            <form onSubmit={handleSubmit}>
-              {displayError && (
-                <div className="mb-4 p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                  {displayError}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValidationError("");
-                      clearError();
-                    }}
-                    className="ml-2 underline"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              )}
-
-              <StepperContent value={1}>
-                <FieldGroup>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Field>
-                      <FieldLabel htmlFor="firstname">First Name</FieldLabel>
-                      <Input
-                        id="firstname"
-                        type="text"
-                        placeholder="John"
-                        value={firstname}
-                        onChange={(e) => setFirstname(e.target.value)}
-                        disabled={isLoading}
-                        autoFocus
-                      />
-                    </Field>
-                    <Field>
-                      <FieldLabel htmlFor="lastname">Last Name</FieldLabel>
-                      <Input
-                        id="lastname"
-                        type="text"
-                        placeholder="Doe"
-                        value={lastname}
-                        onChange={(e) => setLastname(e.target.value)}
-                        disabled={isLoading}
-                      />
-                    </Field>
-                  </div>
-                  <Field>
-                    <FieldLabel htmlFor="username">Username</FieldLabel>
-                    <Input
-                      id="username"
-                      type="text"
-                      placeholder="johndoe"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </Field>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      onClick={handleNext}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      Next
-                    </Button>
-                  </div>
-                  <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
-                    Already have an account?{" "}
-                    <Link to="/auth/login" className="underline">
-                      Sign in
-                    </Link>
-                  </FieldDescription>
-                </FieldGroup>
-              </StepperContent>
-
-              <StepperContent value={2}>
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={isLoading}
-                      autoFocus
-                    />
-                    <FieldDescription>
-                      We&apos;ll use this to contact you.
-                    </FieldDescription>
-                  </Field>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleBack}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNext}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      Next
-                    </Button>
-                  </div>
-                  <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
-                    Already have an account?{" "}
-                    <Link to="/auth/login" className="underline">
-                      Sign in
-                    </Link>
-                  </FieldDescription>
-                </FieldGroup>
-              </StepperContent>
-
-              <StepperContent value={3}>
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <PasswordInput
-                      id="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={isLoading}
-                      autoFocus
-                    />
-                    <FieldDescription>
-                      Must be at least 8 characters long.
-                    </FieldDescription>
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="confirm-password">
-                      Confirm Password
-                    </FieldLabel>
-                    <PasswordInput
-                      id="confirm-password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </Field>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleBack}
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full"
-                    >
-                      {isLoading ? "Creating account..." : "Create Account"}
-                    </Button>
-                  </div>
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={handleGoogleSignup}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    Sign up with Google
-                  </Button>
-                  <FieldDescription className="px-2 sm:px-6 text-center text-xs sm:text-sm">
-                    Already have an account?{" "}
-                    <Link to="/auth/login" className="underline">
-                      Sign in
-                    </Link>
-                  </FieldDescription>
-                </FieldGroup>
-              </StepperContent>
-            </form>
-          </StepperPanel>
         </Stepper>
-      </CardContent>
-    </Card>
+
+        <form onSubmit={handleSubmit} noValidate>
+          <FieldGroup>
+            {displayError ? (
+              <AuthAlert onDismiss={dismissError}>{displayError}</AuthAlert>
+            ) : null}
+
+            {currentStep === 1 ? (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field>
+                    <FieldLabel htmlFor="firstname">First name</FieldLabel>
+                    <Input
+                      id="firstname"
+                      name="firstname"
+                      autoComplete="given-name"
+                      placeholder="John"
+                      value={firstname}
+                      onChange={(e) => setFirstname(e.target.value)}
+                      disabled={isLoading}
+                      autoFocus
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="lastname">Last name</FieldLabel>
+                    <Input
+                      id="lastname"
+                      name="lastname"
+                      autoComplete="family-name"
+                      placeholder="Doe"
+                      value={lastname}
+                      onChange={(e) => setLastname(e.target.value)}
+                      disabled={isLoading}
+                    />
+                  </Field>
+                </div>
+                <Field>
+                  <FieldLabel htmlFor="username">Username</FieldLabel>
+                  <Input
+                    id="username"
+                    name="username"
+                    autoComplete="username"
+                    placeholder="johndoe"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  <FieldDescription>
+                    This is how you will appear to others in a shared workspace.
+                  </FieldDescription>
+                </Field>
+                <Button type="submit" disabled={isLoading} className="w-full">
+                  Continue
+                </Button>
+              </>
+            ) : null}
+
+            {currentStep === 2 ? (
+              <>
+                <Field>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                  <FieldDescription>
+                    Used to sign in and to recover your account.
+                  </FieldDescription>
+                </Field>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goBack}
+                    disabled={isLoading}
+                  >
+                    Back
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    Continue
+                  </Button>
+                </div>
+              </>
+            ) : null}
+
+            {currentStep === 3 ? (
+              <>
+                <Field>
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <PasswordInput
+                    id="password"
+                    name="password"
+                    autoComplete="new-password"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                  <PasswordStrength password={password} />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="confirm-password">
+                    Confirm password
+                  </FieldLabel>
+                  <PasswordInput
+                    id="confirm-password"
+                    name="confirm-password"
+                    autoComplete="new-password"
+                    placeholder="Repeat your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  {confirmPassword.length > 0 &&
+                  password !== confirmPassword ? (
+                    <FieldDescription className="text-destructive">
+                      Passwords do not match.
+                    </FieldDescription>
+                  ) : null}
+                </Field>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={goBack}
+                    disabled={isLoading}
+                  >
+                    Back
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {pending === "credentials" ? <Spinner /> : null}
+                    {pending === "credentials" ? "Creating…" : "Create account"}
+                  </Button>
+                </div>
+                <FieldDescription className="text-center">
+                  By creating an account you agree to our{" "}
+                  <Link to="/terms" className="underline underline-offset-4">
+                    terms
+                  </Link>{" "}
+                  and{" "}
+                  <Link to="/privacy" className="underline underline-offset-4">
+                    privacy policy
+                  </Link>
+                  .
+                </FieldDescription>
+              </>
+            ) : null}
+          </FieldGroup>
+        </form>
+      </div>
+    </AuthShell>
   );
 }

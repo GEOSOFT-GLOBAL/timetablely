@@ -1,11 +1,6 @@
 import { LoginForm } from "@/components/login-form";
 
-const Login = () => {
-  return (
-    <div className="flex items-center justify-center w-screen min-h-screen px-4 sm:px-6 py-8">
-      <LoginForm className="w-full max-w-[550px]" />
-    </div>
-  );
-};
+// Centering and page chrome live in AuthLayout.
+const Login = () => <LoginForm />;
 
 export default Login;

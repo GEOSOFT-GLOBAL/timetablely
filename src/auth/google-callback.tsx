@@ -1,116 +1,145 @@
-import { useEffect, useState, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthAlert } from "@/components/auth/auth-alert";
 import { useAuthStore } from "@/store/authStore";
+
+const SUCCESS_REDIRECT_MS = 2000;
+const ERROR_REDIRECT_MS = 5000;
+
+type Status = "loading" | "success" | "error";
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { handleGoogleCallback, isLoading, error, clearError } = useAuthStore();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { handleGoogleCallback, clearError } = useAuthStore();
+  const [status, setStatus] = useState<Status>("loading");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const processedRef = useRef(false);
 
   useEffect(() => {
     const processGoogleCallback = async () => {
+      // Guard first, so React Strict Mode's double effect cannot spend the
+      // single-use authorization code twice.
+      if (processedRef.current) return;
+      processedRef.current = true;
+
       try {
         const code = searchParams.get("code");
-        const error = searchParams.get("error");
+        const oauthError = searchParams.get("error");
         const state = searchParams.get("state");
 
-        if (error) {
-          throw new Error(`Google OAuth error: ${error}`);
+        if (oauthError) {
+          throw new Error(`Google returned an error: ${oauthError}`);
         }
-
         if (!code) {
-          throw new Error("No authorization code received from Google");
+          throw new Error("No authorization code was received from Google.");
         }
 
-        // Prevent double execution in React Strict Mode
-        if (processedRef.current) return;
-        processedRef.current = true;
-
-        // Use the auth store to handle the callback with state validation
         await handleGoogleCallback(code, state || undefined);
-
         setStatus("success");
-
-        // Redirect to dashboard after 2 seconds
-        setTimeout(() => {
-          navigate("/app/dashboard");
-        }, 2000);
-      } catch (error: any) {
-        console.error("Google callback error:", error);
+      } catch (err: unknown) {
         setStatus("error");
-        setErrorMessage(error.message || "An unexpected error occurred during authentication");
-
-        // Redirect to login after 5 seconds on error
-        setTimeout(() => {
-          navigate("/auth/login");
-        }, 5000);
+        setErrorMessage(
+          err instanceof Error
+            ? err.message
+            : "An unexpected error occurred during authentication."
+        );
       }
     };
 
     processGoogleCallback();
-  }, [searchParams, navigate, handleGoogleCallback]);
+  }, [searchParams, handleGoogleCallback]);
 
-  // Clear any previous errors when component mounts
+  // Clear any previous errors when the screen mounts.
   useEffect(() => {
     clearError();
   }, [clearError]);
 
+  // Redirect once settled, with the timer cleaned up on unmount so a manual
+  // click cannot race the automatic navigation.
+  useEffect(() => {
+    if (status === "loading") return;
+
+    const timer = setTimeout(
+      () => navigate(status === "success" ? "/app/dashboard" : "/auth/login"),
+      status === "success" ? SUCCESS_REDIRECT_MS : ERROR_REDIRECT_MS
+    );
+    return () => clearTimeout(timer);
+  }, [status, navigate]);
+
+  if (status === "loading") {
+    return (
+      <AuthShell
+        title="Signing you in"
+        description="Finishing your Google authentication — this only takes a moment."
+      >
+        <div className="flex flex-col items-center gap-4 py-6">
+          <Loader2 className="text-primary size-10 animate-spin" />
+          <p className="text-muted-foreground text-sm">
+            Verifying with Google…
+          </p>
+        </div>
+      </AuthShell>
+    );
+  }
+
+  if (status === "success") {
+    return (
+      <AuthShell
+        title="You are signed in"
+        description="Taking you to your dashboard."
+      >
+        <div className="flex flex-col items-center gap-5 py-2">
+          <CheckCircle2 className="size-10 text-emerald-500" />
+          <Button onClick={() => navigate("/app/dashboard")} className="w-full">
+            Go to dashboard
+          </Button>
+        </div>
+      </AuthShell>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center w-screen min-h-screen px-4 sm:px-6 py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Google Authentication</CardTitle>
-          <CardDescription className="text-center">
-            Processing your Google authentication...
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {status === "loading" && (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="text-muted-foreground">Authenticating with Google...</p>
-            </div>
-          )}
+    <AuthShell
+      title="We could not sign you in"
+      description="Google authentication did not complete."
+      footer={
+        <>
+          Need a hand?{" "}
+          <Link
+            to="/contact"
+            className="text-foreground font-medium underline underline-offset-4"
+          >
+            Contact support
+          </Link>
+        </>
+      }
+    >
+      <div className="flex flex-col gap-5">
+        <div className="flex justify-center">
+          <XCircle className="text-destructive size-10" />
+        </div>
 
-          {status === "success" && (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <CheckCircle className="h-12 w-12 text-green-500" />
-              <p className="text-lg font-medium">Authentication Successful!</p>
-              <p className="text-muted-foreground text-center">
-                You have been successfully authenticated with Google. Redirecting to dashboard...
-              </p>
-              <Button onClick={() => navigate("/app/dashboard")} className="w-full">
-                Go to Dashboard
-              </Button>
-            </div>
-          )}
+        <AuthAlert>{errorMessage}</AuthAlert>
 
-          {status === "error" && (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <XCircle className="h-12 w-12 text-red-500" />
-              <p className="text-lg font-medium text-red-600">Authentication Failed</p>
-              <Alert variant="destructive">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-              <p className="text-muted-foreground text-center">
-                You will be redirected to the login page shortly.
-              </p>
-              <Button onClick={() => navigate("/auth/login")} variant="outline" className="w-full">
-                Go to Login
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+        <p className="text-muted-foreground text-center text-sm">
+          Returning you to the login page shortly.
+        </p>
+
+        <Button
+          variant="outline"
+          onClick={() => navigate("/auth/login")}
+          className="w-full"
+        >
+          Back to log in
+        </Button>
+      </div>
+    </AuthShell>
   );
 };
 

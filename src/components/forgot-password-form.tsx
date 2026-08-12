@@ -1,14 +1,9 @@
-import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
+import { MailCheck } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -16,38 +11,32 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthAlert } from "@/components/auth/auth-alert";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 const APP_SOURCE = "timetablely";
 
-export function ForgotPasswordForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function ForgotPasswordForm({ className }: { className?: string }) {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [resent, setResent] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const requestReset = async () => {
     setError("");
     setIsLoading(true);
 
     try {
       const { data: res } = await axios.post(
         `${API_BASE}/auth/forgot-password`,
+        { email, appSource: APP_SOURCE },
         {
-          email,
-          appSource: APP_SOURCE,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           timeout: 10000, // 10 second timeout
-        },
+        }
       );
 
       if (!res.success) {
@@ -55,12 +44,14 @@ export function ForgotPasswordForm({
       }
 
       setIsSubmitted(true);
+      return true;
     } catch (err: unknown) {
       let message = "Failed to send reset email. Please try again.";
 
       if (axios.isAxiosError(err)) {
         if (err.code === "ECONNABORTED" || err.code === "ERR_NETWORK") {
-          message = "Network error. Please check your connection and try again.";
+          message =
+            "Network error. Please check your connection and try again.";
         } else if (err.response?.data?.message) {
           message = err.response.data.message;
         } else if (err.message) {
@@ -69,93 +60,137 @@ export function ForgotPasswordForm({
       }
 
       setError(message);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await requestReset();
+  };
+
+  const handleResend = async () => {
+    setResent(false);
+    const ok = await requestReset();
+    if (ok) setResent(true);
+  };
+
+  const loginFooter = (
+    <>
+      Remembered it?{" "}
+      <Link
+        to="/auth/login"
+        className="text-foreground font-medium underline underline-offset-4"
+      >
+        Back to log in
+      </Link>
+    </>
+  );
+
   if (isSubmitted) {
     return (
-      <div className={cn("flex flex-col w-full max-w-[550px] gap-6", className)} {...props}>
-        <Card>
-          <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl">Check your email</CardTitle>
-            <CardDescription className="text-sm">
-              We've sent a password reset link to {email}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6">
-            <FieldGroup>
-              <Field>
-                <Button
-                  type="button"
-                  onClick={() => setIsSubmitted(false)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Try another email
-                </Button>
-                <FieldDescription className="text-center text-xs sm:text-sm">
-                  Remember your password?{" "}
-                  <a href="/#/auth/login" className="underline">Login</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </CardContent>
-        </Card>
-      </div>
+      <AuthShell
+        className={className}
+        title="Check your email"
+        description={
+          <>
+            If an account exists for <strong>{email}</strong>, we have sent it a
+            link to reset the password. The link expires in one hour.
+          </>
+        }
+        footer={loginFooter}
+      >
+        <div className="flex flex-col gap-5">
+          <div className="bg-muted/50 flex items-start gap-3 border p-4">
+            <MailCheck className="text-primary mt-0.5 size-5 shrink-0" />
+            <p className="text-muted-foreground text-sm">
+              Nothing after a minute or two? Check your spam folder before
+              trying again — repeated requests invalidate the earlier link.
+            </p>
+          </div>
+
+          {error ? (
+            <AuthAlert onDismiss={() => setError("")}>{error}</AuthAlert>
+          ) : null}
+
+          {resent ? (
+            <AuthAlert variant="success">
+              Sent again. Use the most recent email.
+            </AuthAlert>
+          ) : null}
+
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleResend}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? <Spinner /> : null}
+              Resend the email
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setIsSubmitted(false);
+                setResent(false);
+                setError("");
+              }}
+              className="w-full"
+            >
+              Use a different email
+            </Button>
+          </div>
+        </div>
+      </AuthShell>
     );
   }
 
   return (
-    <div className={cn("flex flex-col w-full max-w-[550px] gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-xl sm:text-2xl">Reset your password</CardTitle>
-          <CardDescription className="text-sm">
-            Enter your email address and we'll send you a link to reset your password
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6">
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                  {error}
-                  <button
-                    type="button"
-                    onClick={() => setError("")}
-                    className="ml-2 underline"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              )}
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </Field>
-              <Field>
-                <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? "Sending..." : "Send reset link"}
-                </Button>
-                <FieldDescription className="text-center text-xs sm:text-sm">
-                  Remember your password?{" "}
-                  <a href="/#/auth/login" className="underline">Login</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <AuthShell
+      className={className}
+      title="Reset your password"
+      description="Enter the email you signed up with and we will send you a reset link."
+      footer={loginFooter}
+    >
+      <form onSubmit={handleSubmit} noValidate>
+        <FieldGroup>
+          {error ? (
+            <AuthAlert onDismiss={() => setError("")}>{error}</AuthAlert>
+          ) : null}
+
+          <Field>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoFocus
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+            <FieldDescription>
+              We will only send a link if this address has an account.
+            </FieldDescription>
+          </Field>
+
+          <Field>
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? <Spinner /> : null}
+              {isLoading ? "Sending…" : "Send reset link"}
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
+    </AuthShell>
   );
 }

@@ -1,85 +1,57 @@
+import { Link, useSearchParams } from "react-router-dom";
+import { LinkIcon } from "lucide-react";
+
 import { ResetPasswordForm } from "@/components/reset-password-form";
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 
 const ResetPassword = () => {
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // The app runs on a browser router, so the token arrives as a normal query
+  // parameter. Reading it from `location.hash` (as this page used to) always
+  // produced null and sent every visitor to the invalid-link state.
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
-  useEffect(() => {
-    // Extract token from URL query parameters
-    const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
-    const tokenParam = urlParams.get('token');
-    
-    setToken(tokenParam);
-    setIsLoading(false);
-  }, []);
-
-  // Show loading state while extracting token
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center w-screen min-h-screen px-4 sm:px-6 py-8">
-        <div className="w-full max-w-[550px]">
-          <Card>
-            <CardContent className="px-4 sm:px-6 py-8">
-              <div className="text-center text-gray-600">Loading...</div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  // Handle missing token scenario
   if (!token) {
     return (
-      <div className="flex items-center justify-center w-screen min-h-screen px-4 sm:px-6 py-8">
-        <div className="w-full max-w-[550px]">
-          <Card>
-            <CardHeader className="px-4 sm:px-6">
-              <CardTitle className="text-xl sm:text-2xl">Invalid reset link</CardTitle>
-              <CardDescription className="text-sm">
-                This password reset link is invalid or incomplete
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="px-4 sm:px-6">
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  The password reset link you followed is missing required information.
-                  Please check your email and click the reset link again, or request a new password reset.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    type="button"
-                    onClick={() => window.location.href = "/#/auth/forgot-password"}
-                    className="flex-1"
-                  >
-                    Request new reset link
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => window.location.href = "/#/auth/login"}
-                    className="flex-1"
-                  >
-                    Back to login
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <AuthShell
+        title="This link is not valid"
+        description="The reset link is missing its token, which usually means it was truncated by an email client."
+        footer={
+          <>
+            Need help?{" "}
+            <Link
+              to="/contact"
+              className="text-foreground font-medium underline underline-offset-4"
+            >
+              Contact support
+            </Link>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-5">
+          <div className="bg-muted/50 flex items-start gap-3 border p-4">
+            <LinkIcon className="text-muted-foreground mt-0.5 size-5 shrink-0" />
+            <p className="text-muted-foreground text-sm">
+              Try opening the link from your email again, and copy the whole URL
+              if you are pasting it. Reset links also expire after one hour.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button asChild className="w-full">
+              <Link to="/auth/forgot-password">Request a new link</Link>
+            </Button>
+            <Button variant="outline" asChild className="w-full">
+              <Link to="/auth/login">Back to log in</Link>
+            </Button>
+          </div>
         </div>
-      </div>
+      </AuthShell>
     );
   }
 
-  // Render ResetPasswordForm with token
-  return (
-    <div className="flex items-center justify-center w-screen min-h-screen px-4 sm:px-6 py-8">
-      <ResetPasswordForm token={token} className="w-full max-w-[550px]" />
-    </div>
-  );
+  return <ResetPasswordForm token={token} />;
 };
 
 export default ResetPassword;

@@ -1,109 +1,63 @@
-import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Spinner } from "@/components/ui/spinner";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthAlert } from "@/components/auth/auth-alert";
+import { PasswordStrength } from "@/components/auth/password-strength";
+import { MIN_PASSWORD_LENGTH, isPasswordAcceptable } from "@/lib/password";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
+const REDIRECT_DELAY_MS = 3000;
 
-interface ResetPasswordFormProps extends React.ComponentProps<"div"> {
+interface ResetPasswordFormProps {
   token: string;
   className?: string;
 }
 
-interface PasswordStrength {
-  score: number; // 0-4
-  label: string;
-  color: string;
-}
-
-function calculatePasswordStrength(password: string): PasswordStrength {
-  let score = 0;
-  
-  if (password.length === 0) {
-    return { score: 0, label: "", color: "" };
-  }
-  
-  // Length check
-  if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
-  
-  // Character variety checks
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
-  if (/\d/.test(password)) score++;
-  if (/[^a-zA-Z0-9]/.test(password)) score++;
-  
-  // Map score to strength
-  if (score <= 1) {
-    return { score: 1, label: "Weak", color: "bg-red-500" };
-  } else if (score === 2) {
-    return { score: 2, label: "Fair", color: "bg-orange-500" };
-  } else if (score === 3) {
-    return { score: 3, label: "Good", color: "bg-yellow-500" };
-  } else {
-    return { score: 4, label: "Strong", color: "bg-green-500" };
-  }
-}
-
-export function ResetPasswordForm({
-  token,
-  className,
-  ...props
-}: ResetPasswordFormProps) {
+export function ResetPasswordForm({ token, className }: ResetPasswordFormProps) {
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
-    score: 0,
-    label: "",
-    color: "",
-  });
-  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-  // Calculate password strength on password change
+  /**
+   * On success, hand off to the login page with a flag so it can confirm the
+   * reset. Uses the router rather than a full page load, and the timer is
+   * cleaned up so an unmount cannot navigate afterwards.
+   */
   useEffect(() => {
-    setPasswordStrength(calculatePasswordStrength(password));
-  }, [password]);
-
-  // Client-side validation
-  const validatePassword = (): boolean => {
-    const errors: string[] = [];
-
-    if (password.length < 8) {
-      errors.push("Password must be at least 8 characters long");
-    }
-
-    if (password !== confirmPassword) {
-      errors.push("Passwords do not match");
-    }
-
-    setValidationErrors(errors);
-    return errors.length === 0;
-  };
+    if (!success) return;
+    const timer = setTimeout(
+      () => navigate("/auth/login?reset=success"),
+      REDIRECT_DELAY_MS
+    );
+    return () => clearTimeout(timer);
+  }, [success, navigate]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setError("");
-    setValidationErrors([]);
 
-    // Client-side validation
-    if (!validatePassword()) {
+    if (!isPasswordAcceptable(password)) {
+      setError(
+        `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`
+      );
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("The two passwords do not match.");
       return;
     }
 
@@ -112,16 +66,11 @@ export function ResetPasswordForm({
     try {
       const { data: res } = await axios.post(
         `${API_BASE}/auth/reset-password`,
+        { token, password },
         {
-          token,
-          password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           timeout: 10000, // 10 second timeout
-        },
+        }
       );
 
       if (!res.success) {
@@ -129,19 +78,15 @@ export function ResetPasswordForm({
       }
 
       setSuccess(true);
-      
-      // Redirect to login after 3 seconds
-      setTimeout(() => {
-        window.location.href = "/#/auth/login";
-      }, 3000);
     } catch (err: unknown) {
       let message = "Failed to reset password. Please try again.";
 
       if (axios.isAxiosError(err)) {
         if (err.code === "ECONNABORTED" || err.code === "ERR_NETWORK") {
-          message = "Network error. Please check your connection and try again.";
+          message =
+            "Network error. Please check your connection and try again.";
         } else if (err.response?.status === 400) {
-          // Handle invalid/expired token
+          // Invalid or expired token
           const errorMsg = err.response.data?.message || "";
           if (errorMsg.toLowerCase().includes("expired")) {
             message = "This reset link has expired. Please request a new one.";
@@ -165,134 +110,92 @@ export function ResetPasswordForm({
 
   if (success) {
     return (
-      <div className={cn("flex flex-col w-full max-w-[550px] gap-6", className)} {...props}>
-        <Card>
-          <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl">Password reset successful</CardTitle>
-            <CardDescription className="text-sm">
-              Your password has been successfully reset
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 sm:px-6">
-            <FieldGroup>
-              <div className="p-3 text-sm text-green-700 bg-green-50 rounded-md">
-                Redirecting to login page...
-              </div>
-              <Field>
-                <Button
-                  type="button"
-                  onClick={() => window.location.href = "/#/auth/login"}
-                  className="w-full"
-                >
-                  Go to login
-                </Button>
-              </Field>
-            </FieldGroup>
-          </CardContent>
-        </Card>
-      </div>
+      <AuthShell
+        className={className}
+        title="Password updated"
+        description="You can now log in with your new password."
+      >
+        <div className="flex flex-col gap-5">
+          <AuthAlert variant="success">
+            Taking you to the login page…
+          </AuthAlert>
+          <Button asChild className="w-full">
+            <Link to="/auth/login?reset=success">Go to login</Link>
+          </Button>
+        </div>
+      </AuthShell>
     );
   }
 
+  const mismatch =
+    confirmPassword.length > 0 && password !== confirmPassword;
+
   return (
-    <div className={cn("flex flex-col w-full max-w-[550px] gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="text-xl sm:text-2xl">Set new password</CardTitle>
-          <CardDescription className="text-sm">
-            Enter your new password below
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6">
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                  {error}
-                  <button
-                    type="button"
-                    onClick={() => setError("")}
-                    className="ml-2 underline"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              )}
-              
-              {validationErrors.length > 0 && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                  <ul className="list-disc list-inside">
-                    {validationErrors.map((err, idx) => (
-                      <li key={idx}>{err}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+    <AuthShell
+      className={className}
+      title="Set a new password"
+      description="Choose something you have not used on this account before."
+      footer={
+        <>
+          Remembered it?{" "}
+          <Link
+            to="/auth/login"
+            className="text-foreground font-medium underline underline-offset-4"
+          >
+            Back to log in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} noValidate>
+        <FieldGroup>
+          {error ? (
+            <AuthAlert onDismiss={() => setError("")}>{error}</AuthAlert>
+          ) : null}
 
-              <Field>
-                <FieldLabel htmlFor="password">New Password</FieldLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter new password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  minLength={8}
-                />
-                
-                {/* Password strength indicator */}
-                {password.length > 0 && (
-                  <div className="mt-2">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className={cn(
-                            "h-full transition-all duration-300",
-                            passwordStrength.color
-                          )}
-                          style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-gray-600">
-                        {passwordStrength.label}
-                      </span>
-                    </div>
-                    <FieldDescription className="text-xs">
-                      Use at least 8 characters with a mix of letters, numbers, and symbols
-                    </FieldDescription>
-                  </div>
-                )}
-              </Field>
+          <Field>
+            <FieldLabel htmlFor="password">New password</FieldLabel>
+            <PasswordInput
+              id="password"
+              name="password"
+              autoComplete="new-password"
+              placeholder="Enter a new password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+              autoFocus
+            />
+            <PasswordStrength password={password} />
+          </Field>
 
-              <Field>
-                <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                  minLength={8}
-                />
-              </Field>
+          <Field>
+            <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+            <PasswordInput
+              id="confirmPassword"
+              name="confirmPassword"
+              autoComplete="new-password"
+              placeholder="Repeat the new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+            {mismatch ? (
+              <FieldDescription className="text-destructive">
+                Passwords do not match.
+              </FieldDescription>
+            ) : null}
+          </Field>
 
-              <Field>
-                <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading ? "Resetting password..." : "Reset password"}
-                </Button>
-                <FieldDescription className="text-center text-xs sm:text-sm">
-                  Remember your password?{" "}
-                  <a href="/#/auth/login" className="underline">Login</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          <Field>
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? <Spinner /> : null}
+              {isLoading ? "Updating…" : "Update password"}
+            </Button>
+          </Field>
+        </FieldGroup>
+      </form>
+    </AuthShell>
   );
 }
