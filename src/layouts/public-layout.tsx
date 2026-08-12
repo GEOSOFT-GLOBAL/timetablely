@@ -12,9 +12,16 @@ import { SiteFooter } from "@/components/marketing/site-footer";
  * kept as a brand flourish on the landing page only, where it has room to
  * breathe and does not compete with in-page navigation.
  */
+/**
+ * Routes that are tools rather than pages. They carry their own toolbar and
+ * need the full viewport, so the marketing shell steps out of the way.
+ */
+const TOOL_ROUTES = ["/quick-start"];
+
 const PublicLayout: React.FC = () => {
   const { pathname } = useLocation();
   const isLanding = pathname === "/";
+  const isTool = TOOL_ROUTES.includes(pathname);
 
   const bubbleItems = [
     {
@@ -59,6 +66,14 @@ const PublicLayout: React.FC = () => {
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [pathname]);
+
+  if (isTool) {
+    return (
+      <div className="bg-background text-foreground min-h-screen">
+        <Outlet />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background text-foreground flex min-h-screen flex-col">

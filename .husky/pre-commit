@@ -3,7 +3,7 @@
 echo "🚀 Pre-commit hook: Switching Git user account..."
 
 # Run the Git user switching script
-yarn run config
+# yarn run config
 
 # Check if the user switch was successful
 if [ $? -eq 0 ]; then

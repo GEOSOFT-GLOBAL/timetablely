@@ -21,7 +21,10 @@ export function AppModeProvider({ children }: { children: React.ReactNode }) {
 
     const setMode = React.useCallback((newMode: AppMode) => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newMode));
+            // Stored raw, because readMode() compares against the raw value —
+            // JSON.stringify would persist `"education"` (with quotes) and
+            // never match on the next read.
+            localStorage.setItem(STORAGE_KEY, newMode);
         } catch {
             // ignore
         }
