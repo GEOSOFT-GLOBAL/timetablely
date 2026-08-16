@@ -10,6 +10,7 @@ import HowToUse from "@/views/how-to-use";
 import Templates from "@/views/templates";
 import Timetables from "@/views/schedule-view";
 import Notifications from "@/views/notifications";
+import Workspace from "@/views/workspace";
 
 export const appRoutes = [
   {
@@ -31,6 +32,10 @@ export const appRoutes = [
   {
     path: "templates",
     element: <Templates />,
+  },
+  {
+    path: "workspace",
+    element: <Workspace />,
   },
   {
     path: "special-blocks",

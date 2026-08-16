@@ -13,6 +13,7 @@ const pageTitles: Record<string, string> = {
   "/app/groups": "Groups",
   "/app/templates": "Templates",
   "/app/analytics": "Analytics",
+  "/app/workspace": "Workspace",
   "/app/how-to-use": "How to Use",
   "/app/settings": "Settings",
   "/app/account": "Account",
@@ -29,7 +30,10 @@ const Layout = () => {
 
   return (
     <SidebarProvider
-      defaultOpen
+      // Starts as an icon rail: the destination list is short and stable, so
+      // the width is better spent on the schedule. The header trigger expands
+      // it, and that choice is remembered.
+      defaultOpen={false}
       style={
         {
           "--sidebar-width": "240px",

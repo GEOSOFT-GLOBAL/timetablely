@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { Check } from "lucide-react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { Check, TicketIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +38,9 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function SignupForm({ className }: { className?: string }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  /** Set when this signup came from a workspace invite link. */
+  const inviteCode = searchParams.get("invite")?.trim().toUpperCase() ?? "";
   const {
     signup,
     initiateGoogleAuth,
@@ -109,8 +112,9 @@ export function SignupForm({ className }: { className?: string }) {
         ...(linkAccount ? { linkAccount: true } : {}),
       });
       // New accounts go through setup; Protected sends them on if it is
-      // already complete (e.g. a linked account from another app).
-      navigate("/onboarding");
+      // already complete (e.g. a linked account from another app). An invite
+      // code rides along so setup can skip straight to joining that team.
+      navigate(inviteCode ? `/onboarding?invite=${inviteCode}` : "/onboarding");
     } catch {
       // Error is handled by the store
     } finally {
@@ -231,11 +235,27 @@ export function SignupForm({ className }: { className?: string }) {
   return (
     <AuthShell
       className={className}
-      title="Create your account"
-      description="Free to start. No credit card required."
+      title={inviteCode ? "Join your team" : "Create your account"}
+      description={
+        inviteCode
+          ? "Create your account and we will take you straight into the workspace."
+          : "Free to start. No credit card required."
+      }
       footer={signInFooter}
     >
       <div className="flex flex-col gap-6">
+        {inviteCode ? (
+          <div className="bg-primary/5 border-primary/30 flex items-center gap-3 border p-4">
+            <TicketIcon className="text-primary size-5 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium">You have been invited</p>
+              <p className="text-muted-foreground font-mono text-xs tracking-[0.2em]">
+                {inviteCode}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
         {/* Offered before the form, so someone using Google never fills in
             three steps of details first. */}
         <GoogleButton

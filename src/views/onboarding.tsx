@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,9 +8,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { OnboardingLayout } from "@/components/onboarding/onboarding-layout";
 import { StepSolution } from "@/components/onboarding/step-solution";
 import { StepWorkspace } from "@/components/onboarding/step-workspace";
+import {
+  emptyWorkspaceChoice,
+  isUsableInviteCode,
+  type WorkspaceChoice,
+} from "@/lib/workspace-api";
 import { StepSchedule } from "@/components/onboarding/step-schedule";
 import { StepData } from "@/components/onboarding/step-data";
 import { StepReady } from "@/components/onboarding/step-ready";
+import { useWorkspaceStore } from "@/store/workspaceStore";
 import { buildSampleDatabase } from "@/config/onboarding";
 import { getSolutionByMode } from "@/config/solutions";
 import type { AppMode } from "@/context/app-mode-context";
@@ -43,9 +49,22 @@ const Onboarding = () => {
   const setStoreMode = useModeSpecificDatabaseStore((state) => state.setMode);
   const { complete, dismiss } = useOnboardingStore();
 
+  const [searchParams] = useSearchParams();
+  const createWorkspace = useWorkspaceStore((state) => state.createWorkspace);
+  const joinWorkspace = useWorkspaceStore((state) => state.joinWorkspace);
+
   const [stepIndex, setStepIndex] = React.useState(0);
-  const [mode, setSelectedMode] = React.useState<AppMode | null>(null);
-  const [workspaceName, setWorkspaceName] = React.useState("");
+  // An invite link lands here with the code in the URL: the sender already
+  // decided the mode and the intent, so both are pre-answered.
+  const invitedCode = searchParams.get("invite")?.trim().toUpperCase() ?? "";
+  const [mode, setSelectedMode] = React.useState<AppMode | null>(
+    invitedCode ? "company" : null
+  );
+  const [workspace, setWorkspace] = React.useState<WorkspaceChoice>(
+    invitedCode
+      ? { ...emptyWorkspaceChoice, intent: "join", inviteCode: invitedCode }
+      : emptyWorkspaceChoice
+  );
   const [schedule, setSchedule] = React.useState<SchedulePreferences>(
     defaultSchedulePreferences
   );
@@ -53,10 +72,16 @@ const Onboarding = () => {
   const [isFinishing, setIsFinishing] = React.useState(false);
 
   const solution = getSolutionByMode(mode);
+  const isJoining = mode === "company" && workspace.intent === "join";
 
   /** Each step decides for itself whether Continue is available. */
   const canContinue = (() => {
     if (stepIndex === 0) return mode !== null;
+    if (stepIndex === 1 && mode === "company") {
+      return isJoining
+        ? isUsableInviteCode(workspace.inviteCode)
+        : workspace.name.trim().length > 0;
+    }
     return true;
   })();
 
@@ -73,24 +98,50 @@ const Onboarding = () => {
     setIsFinishing(true);
 
     try {
-      // 1. Workspace vocabulary and behaviour.
+      // 1. The shared container, for teams. Joining can fail — a bad code
+      //    should stop the flow here rather than drop the user into a
+      //    workspace that does not exist.
+      let workspaceName = workspace.name.trim();
+
+      if (mode === "company") {
+        const joined = isJoining
+          ? await joinWorkspace(workspace.inviteCode)
+          : await createWorkspace(workspaceName);
+
+        if (!joined) {
+          setIsFinishing(false);
+          toast.error(
+            isJoining ? "Could not join that workspace" : "Could not create the workspace",
+            {
+              description:
+                useWorkspaceStore.getState().error ?? "Please try again.",
+            }
+          );
+          return;
+        }
+
+        workspaceName = joined.name;
+      }
+
+      // 2. Workspace vocabulary and behaviour.
       setMode(mode);
       setStoreMode(mode);
 
-      // 2. Starting data, written to both the active database and the
-      //    per-mode slot so switching modes later does not lose it.
-      if (seedSample) {
+      // 3. Starting data, written to both the active database and the
+      //    per-mode slot so switching modes later does not lose it. Someone
+      //    joining an existing team inherits its records instead.
+      if (seedSample && !isJoining) {
         const sample = buildSampleDatabase(mode);
         setDatabaseForMode(mode, sample);
         await setDatabase(sample);
       }
 
-      // 3. Preferences, and the flag that stops the flow reappearing.
+      // 4. Preferences, and the flag that stops the flow reappearing.
       complete({
         mode,
-        workspaceName: workspaceName.trim(),
+        workspaceName,
         schedule,
-        seededSample: seedSample,
+        seededSample: seedSample && !isJoining,
       });
 
       toast.success("Your workspace is ready", {
@@ -125,14 +176,13 @@ const Onboarding = () => {
       body: <StepSolution value={mode} onChange={setSelectedMode} />,
     },
     {
-      title: "Name your workspace",
-      description: "Something you will recognise on exports and shared views.",
+      title:
+        mode === "company" ? "Your team workspace" : "Name your workspace",
+      description: isJoining
+        ? "Enter the code from your invite and you will land in your team's workspace."
+        : "Something you will recognise on exports and shared views.",
       body: mode ? (
-        <StepWorkspace
-          mode={mode}
-          value={workspaceName}
-          onChange={setWorkspaceName}
-        />
+        <StepWorkspace mode={mode} value={workspace} onChange={setWorkspace} />
       ) : null,
     },
     {
@@ -144,9 +194,21 @@ const Onboarding = () => {
       ) : null,
     },
     {
-      title: "How would you like to start?",
-      description: "Either way, nothing here is permanent.",
-      body: mode ? (
+      title: isJoining ? "You are joining a team" : "How would you like to start?",
+      description: isJoining
+        ? "Nothing to set up here — you inherit what the workspace already has."
+        : "Either way, nothing here is permanent.",
+      body: isJoining ? (
+        <div className="bg-muted/40 flex flex-col gap-2 border p-5">
+          <p className="text-muted-foreground michroma text-xs uppercase tracking-[0.18em]">
+            Starting point
+          </p>
+          <p className="text-sm">
+            Your workspace's members, tasks and projects are already there. You
+            can add your own from the moment you land.
+          </p>
+        </div>
+      ) : mode ? (
         <StepData mode={mode} value={seedSample} onChange={setSeedSample} />
       ) : null,
     },
@@ -158,9 +220,11 @@ const Onboarding = () => {
       body: mode ? (
         <StepReady
           mode={mode}
-          workspaceName={workspaceName}
+          workspaceName={
+            isJoining ? `Invite ${workspace.inviteCode}` : workspace.name
+          }
           schedule={schedule}
-          seedSample={seedSample}
+          seedSample={seedSample && !isJoining}
         />
       ) : null,
     },
