@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { dayLabels, gridSize } from "@/constants";
 import { useGridState } from "@/hooks/use-grid";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { useAppMode } from "@/hooks/use-app-mode";
 import type { applyTemplate } from "@/lib/template";
 import { canMergeCells, generateTimeLabels } from "@/lib/temputils";
@@ -49,7 +50,12 @@ interface TimetablesProps {
 const Timetables: React.FC<TimetablesProps> = () => {
   const { t } = useTranslation();
   const { mode } = useAppMode();
-  const gridState = useGridState();
+  // Seed the grid from the preferences captured during onboarding.
+  const schedulePrefs = useOnboardingStore((state) => state.schedule);
+  const gridState = useGridState({
+    columnCount: schedulePrefs.columnCount,
+    defaultSlotDuration: schedulePrefs.slotDuration,
+  });
   const { database, setDatabase } = useDatabaseStore();
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogContent, setDialogContent] = React.useState<{
@@ -102,7 +108,8 @@ const Timetables: React.FC<TimetablesProps> = () => {
   const timeLabels = generateTimeLabels(
     columnCount,
     columnDurations,
-    defaultSlotDuration
+    defaultSlotDuration,
+    schedulePrefs.startMinutes
   );
 
   const handleDefaultDurationKeyDown = (e: React.KeyboardEvent) => {

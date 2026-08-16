@@ -1,5 +1,6 @@
 import ErrorView from "@/views/error-view";
 import Layout from "@/views/layout";
+import Onboarding from "@/views/onboarding";
 import { createBrowserRouter } from "react-router-dom";
 import { appRoutes } from "./app.routes";
 import { publicRoutes } from "./public.routes";
@@ -24,6 +25,16 @@ export const routes = createBrowserRouter([
     ),
     errorElement: <ErrorView />,
     children: [...appRoutes],
+  },
+  {
+    // Sits outside /app so the sidebar shell never wraps the setup flow.
+    path: "/onboarding",
+    element: (
+      <Protected skipOnboardingGate>
+        <Onboarding />
+      </Protected>
+    ),
+    errorElement: <ErrorView />,
   },
   {
     path: "/auth",

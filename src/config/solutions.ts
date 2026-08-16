@@ -263,3 +263,6 @@ export const solutions: Solution[] = [
 
 export const getSolution = (slug?: string): Solution | undefined =>
   solutions.find((solution) => solution.slug === slug);
+
+export const getSolutionByMode = (mode?: AppMode | null): Solution | undefined =>
+  solutions.find((solution) => solution.mode === mode);

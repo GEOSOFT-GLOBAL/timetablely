@@ -108,7 +108,9 @@ export function SignupForm({ className }: { className?: string }) {
         lastname,
         ...(linkAccount ? { linkAccount: true } : {}),
       });
-      navigate("/app/dashboard");
+      // New accounts go through setup; Protected sends them on if it is
+      // already complete (e.g. a linked account from another app).
+      navigate("/onboarding");
     } catch {
       // Error is handled by the store
     } finally {

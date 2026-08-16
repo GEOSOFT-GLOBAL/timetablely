@@ -8,20 +8,38 @@ import type {
   IMergeInfo,
 } from "@/interface/types";
 
-export const useGridState = (): IGridState & IGridActions => {
+interface GridDefaults {
+  /** Slots per day. Falls back to the previous hardcoded 12. */
+  columnCount?: number;
+  /** Minutes per slot. Falls back to the previous hardcoded 45. */
+  defaultSlotDuration?: number;
+}
+
+/**
+ * @param defaults Initial grid shape, e.g. the preferences captured during
+ * onboarding. Only used on first render — later edits stay local to the grid.
+ */
+export const useGridState = (
+  defaults: GridDefaults = {}
+): IGridState & IGridActions => {
+  const { columnCount: initialColumnCount = 12, defaultSlotDuration: initialSlotDuration = 45 } =
+    defaults;
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
   const [mergedCells, setMergedCells] = useState<Map<string, IMergeInfo>>(
     new Map(),
   );
   const [hiddenCells, setHiddenCells] = useState<Set<string>>(new Set());
-  const [columnCount, setColumnCount] = useState(12);
+  const [columnCount, setColumnCount] = useState(initialColumnCount);
   const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
   const [openPopover, setOpenPopover] = useState<number | null>(null);
   const [editingDuration, setEditingDuration] = useState<number | null>(null);
   const [tempDuration, setTempDuration] = useState("");
-  const [defaultSlotDuration, setDefaultSlotDuration] = useState(45);
+  const [defaultSlotDuration, setDefaultSlotDuration] =
+    useState(initialSlotDuration);
   const [editingDefaultDuration, setEditingDefaultDuration] = useState(false);
-  const [tempDefaultDuration, setTempDefaultDuration] = useState("45");
+  const [tempDefaultDuration, setTempDefaultDuration] = useState(
+    String(initialSlotDuration)
+  );
   const [columnDurations, setColumnDurations] = useState<{
     [key: number]: number;
   }>({});
