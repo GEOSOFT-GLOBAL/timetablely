@@ -63,6 +63,139 @@ const zh = {
   dashboard: {
     title: "仪表板",
     subtitle: "欢迎回来！以下是您的日程概览。",
+    viewAll: "查看全部 {{count}} 项",
+    periods: "{{count}} 个课时",
+
+    modes: {
+      education: {
+        title: "本学期概览",
+        subtitle: "生成课表之前，先看看目前的情况。",
+        groupsTitle: "各班级课时",
+        groupsDesc: "本周每个班级所需的课时。",
+        capacityTitle: "教学周",
+        capacityDesc: "可用时段与待排课时的对比。",
+        priorityDesc: "排课时优先安排哪些课程。",
+        readinessDesc: "生成课表之前还需要完成的步骤。",
+        allClear: "一切就绪，可以生成课表了。",
+      },
+      company: {
+        title: "工作区概览",
+        subtitle: "团队本周承诺完成的工作。",
+        groupsTitle: "项目",
+        groupsDesc: "本周投入到每个项目的工作量。",
+        capacityTitle: "团队容量",
+        capacityDesc: "可用工作时段与已承诺工作量的对比。",
+        priorityDesc: "优先安排哪些任务。",
+        readinessDesc: "安排本周工作之前还需要完成的步骤。",
+        allClear: "计划排得下，可以安排本周工作了。",
+      },
+      individual: {
+        title: "你的一周",
+        subtitle: "把你答应过的事都放在一处。",
+        groupsTitle: "你的分组",
+        groupsDesc: "你的活动是怎么分组的。",
+        capacityTitle: "这一周有多满",
+        capacityDesc: "空闲时段与你已承担事项的对比。",
+        priorityDesc: "时间紧张时，先给什么留位置。",
+        readinessDesc: "安排这一周之前还需要完成的步骤。",
+        allClear: "这一周排得下，可以开始安排了。",
+      },
+    },
+
+    stats: {
+      weeklyPeriods: "每周课时",
+      committed: "已承诺工作量",
+      weekLoad: "本周负载",
+      openSlots: "共 {{count}} 个空闲时段",
+      slotsUsed: "已占用 {{total}} 个时段中的 {{used}} 个",
+      peopleOver: "{{count}} 人超出容量",
+      peopleIdle: "{{count}} 人没有分配任务",
+      peopleOk: "所有人都在每周容量之内",
+      peopleNone: "尚未添加任何人",
+      itemsUnowned: "{{count}} 项未指派{{person}}",
+      itemsOk: "每周 {{count}} 个课时",
+      itemsNone: "尚未添加任何内容",
+      groupsEmpty: "{{count}} 个为空",
+      groupsUngrouped: "{{count}} 个{{items}}不属于任何{{group}}",
+      groupsOk: "每个{{item}}都已分组",
+      groupsNone: "尚未创建",
+    },
+
+    workload: {
+      title: "{{people}}负载",
+      desc: "所需课时与每周容量的对比。",
+      capacity: "{{used}} / {{capacity}}",
+      items: "{{count}} 个{{items}}",
+      unavailable: "{{count}} 个时段不可用",
+      empty: "添加{{people}}后即可在此查看负载。",
+      state: {
+        idle: "没有分配",
+        light: "还有余量",
+        healthy: "进度正常",
+        full: "已满",
+        over: "超出容量",
+      },
+    },
+
+    groups: {
+      items: "{{count}} 个{{items}}",
+      unowned: "{{count}} 项未指派",
+      empty: "这里还没有内容。",
+    },
+
+    capacity: {
+      ofSlots: "{{total}} 个时段中的 {{used}} 个",
+      remaining: "还有 {{count}} 个时段空闲",
+      over: "比这一周能容纳的多出 {{count}} 个课时",
+      gridSlots: "每周时段",
+      blocked: "已屏蔽",
+      requested: "所需",
+      heaviest: "占用最多的{{items}}",
+    },
+
+    priority: {
+      title: "优先级分布",
+      row: "{{count}} 个{{items}}",
+      empty: "添加{{items}}后即可查看分布。",
+    },
+
+    attention: {
+      title: "需要处理",
+      desc: "生成之前有 {{count}} 处需要查看。",
+      allClear: "没有任何问题会阻碍生成。",
+      unownedItems: "{{count}} 个{{items}}未指派{{person}}，生成时会被跳过。",
+      overloadedPeople: "{{count}} 位{{people}}被安排的课时超出了其一周的容量。",
+      weekOversubscribed:
+        "计划需要 {{demand}} 个课时，但只有 {{capacity}} 个时段可用。",
+      zeroPeriodItems: "{{count}} 个{{items}}的每周课时为零。",
+      emptyGroups: "{{count}} 个{{groups}}中没有任何{{items}}。",
+      ungroupedItems: "{{count}} 个{{items}}不属于任何{{group}}。",
+      idlePeople: "{{count}} 位{{people}}没有分配任何内容。",
+    },
+
+    readiness: {
+      title: "设置",
+      progress: "已完成 {{total}} 个步骤中的 {{done}} 个",
+      steps: {
+        people: "添加{{people}}",
+        items: "添加{{items}}",
+        owners: "为每个{{item}}指派{{person}}",
+        groups: "创建{{groups}}",
+        schedule: "保存第一份日程",
+      },
+    },
+
+    actions: {
+      title: "快捷操作",
+      manage: "管理{{section}}",
+      templates: "模板",
+      fixedHours: "固定时间",
+      schedule: {
+        education: "打开课表",
+        company: "打开日程",
+        individual: "打开我的一周",
+      },
+    },
   },
 
   // ── Database Manager ──────────────────────────────────────────────────────

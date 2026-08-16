@@ -63,6 +63,161 @@ const en = {
   dashboard: {
     title: "Dashboard",
     subtitle: "Welcome back! Here's an overview of your schedule.",
+    viewAll: "View all {{count}}",
+    // Keys ending in _one carry the singular; i18next falls back to the base
+    // key for every other count, so only the singular has to be spelled out.
+    periods_one: "{{count}} period",
+    periods: "{{count}} periods",
+
+    // Per-mode framing. The three workspaces share one data model, so only
+    // the questions the overview answers differ.
+    modes: {
+      education: {
+        title: "Term overview",
+        subtitle: "Where your timetable stands before you generate it.",
+        groupsTitle: "Class coverage",
+        groupsDesc: "Periods each class is asking for this week.",
+        capacityTitle: "The teaching week",
+        capacityDesc: "Slots available against periods to place.",
+        priorityDesc: "Which courses the scheduler places first.",
+        readinessDesc: "What is left before a timetable can be generated.",
+        allClear: "Everything checks out — you can generate a timetable.",
+      },
+      company: {
+        title: "Workspace overview",
+        subtitle: "What the team has committed to this week.",
+        groupsTitle: "Projects",
+        groupsDesc: "Effort committed to each project this week.",
+        capacityTitle: "Team capacity",
+        capacityDesc: "Working slots available against effort committed.",
+        priorityDesc: "Which tasks get scheduled first.",
+        readinessDesc: "What is left before the week can be scheduled.",
+        allClear: "The plan fits — you can schedule the week.",
+      },
+      individual: {
+        title: "Your week",
+        subtitle: "Everything you have committed to, in one place.",
+        groupsTitle: "Your groups",
+        groupsDesc: "How your activities are split up.",
+        capacityTitle: "How full your week is",
+        capacityDesc: "Free slots against what you have taken on.",
+        priorityDesc: "What gets a place first when the week is tight.",
+        readinessDesc: "What is left before your week can be laid out.",
+        allClear: "Your week fits — you can lay it out.",
+      },
+    },
+
+    stats: {
+      weeklyPeriods: "Weekly periods",
+      committed: "Committed effort",
+      weekLoad: "Week load",
+      openSlots_one: "of {{count}} open slot",
+      openSlots: "of {{count}} open slots",
+      slotsUsed: "{{used}} of {{total}} slots claimed",
+      peopleOver: "{{count}} over capacity",
+      peopleIdle: "{{count}} with nothing assigned",
+      peopleOk: "All within weekly capacity",
+      peopleNone: "Nobody added yet",
+      itemsUnowned: "{{count}} with no {{person}} assigned",
+      itemsOk_one: "{{count}} period per week",
+      itemsOk: "{{count}} periods per week",
+      itemsNone: "Nothing added yet",
+      groupsEmpty_one: "{{count}} with nothing in it",
+      groupsEmpty: "{{count}} with nothing in them",
+      groupsUngrouped: "{{count}} {{items}} not in a {{group}}",
+      groupsOk: "Every {{item}} is grouped",
+      groupsNone: "None created yet",
+    },
+
+    workload: {
+      title: "{{people}} workload",
+      desc: "Periods requested against weekly capacity.",
+      capacity: "{{used}} / {{capacity}}",
+      items: "{{count}} {{items}}",
+      unavailable_one: "{{count}} slot unavailable",
+      unavailable: "{{count}} slots unavailable",
+      empty: "Add {{people}} to see workload here.",
+      state: {
+        idle: "Nothing assigned",
+        light: "Room to spare",
+        healthy: "On track",
+        full: "At capacity",
+        over: "Over capacity",
+      },
+    },
+
+    groups: {
+      items: "{{count}} {{items}}",
+      unowned: "{{count}} unassigned",
+      empty: "Nothing here yet.",
+    },
+
+    capacity: {
+      ofSlots: "{{used}} of {{total}} slots",
+      remaining_one: "{{count}} slot still free",
+      remaining: "{{count}} slots still free",
+      over_one: "{{count}} period more than the week can hold",
+      over: "{{count}} periods more than the week can hold",
+      gridSlots: "Slots in a week",
+      blocked: "Blocked",
+      requested: "Requested",
+      heaviest: "Heaviest {{items}}",
+    },
+
+    priority: {
+      title: "Priority mix",
+      row: "{{count}} {{items}}",
+      empty: "Add {{items}} to see the mix.",
+    },
+
+    attention: {
+      title: "Needs attention",
+      desc_one: "{{count}} thing to look at before generating.",
+      desc: "{{count}} things to look at before generating.",
+      allClear: "Nothing is blocking generation.",
+      unownedItems_one:
+        "{{count}} {{items}} has no {{person}} assigned and will be skipped when generating.",
+      unownedItems:
+        "{{count}} {{items}} have no {{person}} assigned and will be skipped when generating.",
+      overloadedPeople_one:
+        "{{count}} {{people}} is asked for more periods than their week can hold.",
+      overloadedPeople:
+        "{{count}} {{people}} are asked for more periods than their week can hold.",
+      weekOversubscribed:
+        "The plan asks for {{demand}} periods but only {{capacity}} slots are open.",
+      zeroPeriodItems_one: "{{count}} {{items}} is set to zero periods per week.",
+      zeroPeriodItems: "{{count}} {{items}} are set to zero periods per week.",
+      emptyGroups_one: "{{count}} {{groups}} has nothing in it.",
+      emptyGroups: "{{count}} {{groups}} have no {{items}} in them.",
+      ungroupedItems_one: "{{count}} {{items}} belongs to no {{group}}.",
+      ungroupedItems: "{{count}} {{items}} belong to no {{group}}.",
+      idlePeople_one: "{{count}} {{people}} has nothing assigned.",
+      idlePeople: "{{count}} {{people}} have nothing assigned.",
+    },
+
+    readiness: {
+      title: "Setup",
+      progress: "{{done}} of {{total}} steps done",
+      steps: {
+        people: "Add your {{people}}",
+        items: "Add your {{items}}",
+        owners: "Give every {{item}} a {{person}}",
+        groups: "Create your {{groups}}",
+        schedule: "Save your first schedule",
+      },
+    },
+
+    actions: {
+      title: "Quick actions",
+      manage: "Manage {{section}}",
+      templates: "Templates",
+      fixedHours: "Fixed hours",
+      schedule: {
+        education: "Open timetable",
+        company: "Open schedule",
+        individual: "Open my week",
+      },
+    },
   },
 
   // ── Database Manager ──────────────────────────────────────────────────────

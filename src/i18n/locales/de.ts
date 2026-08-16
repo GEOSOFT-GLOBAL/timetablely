@@ -63,6 +63,155 @@ const de = {
   dashboard: {
     title: "Dashboard",
     subtitle: "Willkommen zurück! Hier ist eine Übersicht Ihres Zeitplans.",
+    viewAll: "Alle {{count}} anzeigen",
+    periods_one: "{{count}} Einheit",
+    periods: "{{count}} Einheiten",
+
+    modes: {
+      education: {
+        title: "Überblick zum Halbjahr",
+        subtitle: "So steht Ihr Stundenplan, bevor Sie ihn erzeugen.",
+        groupsTitle: "Abdeckung je Klasse",
+        groupsDesc: "Einheiten, die jede Klasse diese Woche benötigt.",
+        capacityTitle: "Die Unterrichtswoche",
+        capacityDesc: "Verfügbare Zeitfenster gegenüber zu planenden Einheiten.",
+        priorityDesc: "Welche Kurse zuerst eingeplant werden.",
+        readinessDesc: "Was noch fehlt, bevor ein Stundenplan erzeugt werden kann.",
+        allClear: "Alles passt — Sie können einen Stundenplan erzeugen.",
+      },
+      company: {
+        title: "Überblick zum Arbeitsbereich",
+        subtitle: "Wozu sich das Team diese Woche verpflichtet hat.",
+        groupsTitle: "Projekte",
+        groupsDesc: "Zugesagter Aufwand je Projekt in dieser Woche.",
+        capacityTitle: "Team-Kapazität",
+        capacityDesc:
+          "Verfügbare Arbeitsfenster gegenüber zugesagtem Aufwand.",
+        priorityDesc: "Welche Aufgaben zuerst eingeplant werden.",
+        readinessDesc: "Was noch fehlt, bevor die Woche geplant werden kann.",
+        allClear: "Der Plan passt — Sie können die Woche einplanen.",
+      },
+      individual: {
+        title: "Ihre Woche",
+        subtitle: "Alles, was Sie sich vorgenommen haben, an einem Ort.",
+        groupsTitle: "Ihre Gruppen",
+        groupsDesc: "Wie sich Ihre Aktivitäten aufteilen.",
+        capacityTitle: "Wie voll Ihre Woche ist",
+        capacityDesc: "Freie Zeitfenster gegenüber dem, was Sie übernommen haben.",
+        priorityDesc: "Was zuerst einen Platz bekommt, wenn es eng wird.",
+        readinessDesc: "Was noch fehlt, bevor Ihre Woche geplant werden kann.",
+        allClear: "Ihre Woche passt — Sie können sie planen.",
+      },
+    },
+
+    stats: {
+      weeklyPeriods: "Einheiten pro Woche",
+      committed: "Zugesagter Aufwand",
+      weekLoad: "Wochenauslastung",
+      openSlots_one: "von {{count}} freien Zeitfenster",
+      openSlots: "von {{count}} freien Zeitfenstern",
+      slotsUsed: "{{used}} von {{total}} Zeitfenstern belegt",
+      peopleOver: "{{count}} über der Kapazität",
+      peopleIdle: "{{count}} ohne Zuordnung",
+      peopleOk: "Alle innerhalb der Wochenkapazität",
+      peopleNone: "Noch niemand hinzugefügt",
+      itemsUnowned: "{{count}} ohne zugeordnete {{person}}",
+      itemsOk_one: "{{count}} Einheit pro Woche",
+      itemsOk: "{{count}} Einheiten pro Woche",
+      itemsNone: "Noch nichts hinzugefügt",
+      groupsEmpty: "{{count}} ohne Inhalt",
+      groupsUngrouped: "{{count}} {{items}} ohne {{group}}",
+      groupsOk: "Jede {{item}} ist zugeordnet",
+      groupsNone: "Noch keine angelegt",
+    },
+
+    workload: {
+      title: "Auslastung der {{people}}",
+      desc: "Angefragte Einheiten gegenüber der Wochenkapazität.",
+      capacity: "{{used}} / {{capacity}}",
+      items: "{{count}} {{items}}",
+      unavailable: "{{count}} Zeitfenster nicht verfügbar",
+      empty: "Fügen Sie {{people}} hinzu, um die Auslastung zu sehen.",
+      state: {
+        idle: "Nichts zugeordnet",
+        light: "Noch Luft",
+        healthy: "Im Rahmen",
+        full: "An der Grenze",
+        over: "Über der Kapazität",
+      },
+    },
+
+    groups: {
+      items: "{{count}} {{items}}",
+      unowned: "{{count}} ohne Zuordnung",
+      empty: "Hier ist noch nichts.",
+    },
+
+    capacity: {
+      ofSlots: "{{used}} von {{total}} Zeitfenstern",
+      remaining: "{{count}} Zeitfenster noch frei",
+      over_one: "{{count}} Einheit mehr, als die Woche fasst",
+      over: "{{count}} Einheiten mehr, als die Woche fasst",
+      gridSlots: "Zeitfenster pro Woche",
+      blocked: "Blockiert",
+      requested: "Angefragt",
+      heaviest: "Umfangreichste {{items}}",
+    },
+
+    priority: {
+      title: "Prioritätsverteilung",
+      row: "{{count}} {{items}}",
+      empty: "Fügen Sie {{items}} hinzu, um die Verteilung zu sehen.",
+    },
+
+    attention: {
+      title: "Benötigt Aufmerksamkeit",
+      desc_one: "{{count}} Punkt zum Prüfen vor dem Erzeugen.",
+      desc: "{{count}} Punkte zum Prüfen vor dem Erzeugen.",
+      allClear: "Nichts steht dem Erzeugen im Weg.",
+      unownedItems_one:
+        "{{count}} {{items}} hat keine zugeordnete {{person}} und wird beim Erzeugen übersprungen.",
+      unownedItems:
+        "{{count}} {{items}} haben keine zugeordnete {{person}} und werden beim Erzeugen übersprungen.",
+      overloadedPeople_one:
+        "Von {{count}} {{people}} werden mehr Einheiten verlangt, als ihre Woche fasst.",
+      overloadedPeople:
+        "Von {{count}} {{people}} werden mehr Einheiten verlangt, als ihre Woche fasst.",
+      weekOversubscribed:
+        "Der Plan verlangt {{demand}} Einheiten, aber nur {{capacity}} Zeitfenster sind frei.",
+      zeroPeriodItems_one: "{{count}} {{items}} steht auf null Einheiten pro Woche.",
+      zeroPeriodItems: "{{count}} {{items}} stehen auf null Einheiten pro Woche.",
+      emptyGroups_one: "{{count}} {{groups}} enthält nichts.",
+      emptyGroups: "{{count}} {{groups}} enthalten keine {{items}}.",
+      ungroupedItems_one: "{{count}} {{items}} gehört zu keiner {{group}}.",
+      ungroupedItems: "{{count}} {{items}} gehören zu keiner {{group}}.",
+      idlePeople_one: "{{count}} {{people}} hat nichts zugeordnet.",
+      idlePeople: "{{count}} {{people}} haben nichts zugeordnet.",
+    },
+
+    readiness: {
+      title: "Einrichtung",
+      progress: "{{done}} von {{total}} Schritten erledigt",
+      steps: {
+        people: "{{people}} hinzufügen",
+        items: "{{items}} hinzufügen",
+        owners: "Jeder {{item}} eine {{person}} zuordnen",
+        groups: "{{groups}} anlegen",
+        schedule: "Ersten Zeitplan speichern",
+      },
+    },
+
+    actions: {
+      title: "Schnellaktionen",
+      manage: "{{section}} verwalten",
+      templates: "Vorlagen",
+      fixedHours: "Feste Zeiten",
+      schedule: {
+        education: "Stundenplan öffnen",
+        company: "Zeitplan öffnen",
+        individual: "Meine Woche öffnen",
+      },
+    },
   },
 
   // ── Database Manager ──────────────────────────────────────────────────────

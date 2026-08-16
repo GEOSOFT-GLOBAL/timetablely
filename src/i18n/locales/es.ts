@@ -63,6 +63,157 @@ const es = {
   dashboard: {
     title: "Panel",
     subtitle: "¡Bienvenido de nuevo! Aquí tienes un resumen de tu horario.",
+    viewAll: "Ver los {{count}}",
+    periods_one: "{{count}} periodo",
+    periods: "{{count}} periodos",
+
+    modes: {
+      education: {
+        title: "Resumen del trimestre",
+        subtitle: "Cómo está tu horario antes de generarlo.",
+        groupsTitle: "Cobertura por clase",
+        groupsDesc: "Periodos que pide cada clase esta semana.",
+        capacityTitle: "La semana lectiva",
+        capacityDesc: "Espacios disponibles frente a periodos por colocar.",
+        priorityDesc: "Qué cursos coloca primero el generador.",
+        readinessDesc: "Lo que falta para poder generar un horario.",
+        allClear: "Todo está en orden: ya puedes generar un horario.",
+      },
+      company: {
+        title: "Resumen del espacio de trabajo",
+        subtitle: "A qué se ha comprometido el equipo esta semana.",
+        groupsTitle: "Proyectos",
+        groupsDesc: "Esfuerzo comprometido en cada proyecto esta semana.",
+        capacityTitle: "Capacidad del equipo",
+        capacityDesc:
+          "Espacios de trabajo disponibles frente al esfuerzo comprometido.",
+        priorityDesc: "Qué tareas se programan primero.",
+        readinessDesc: "Lo que falta para poder programar la semana.",
+        allClear: "El plan cabe: ya puedes programar la semana.",
+      },
+      individual: {
+        title: "Tu semana",
+        subtitle: "Todo lo que te has comprometido a hacer, en un solo lugar.",
+        groupsTitle: "Tus grupos",
+        groupsDesc: "Cómo se reparten tus actividades.",
+        capacityTitle: "Qué tan llena está tu semana",
+        capacityDesc: "Espacios libres frente a lo que has asumido.",
+        priorityDesc: "Qué tiene sitio primero cuando la semana aprieta.",
+        readinessDesc: "Lo que falta para organizar tu semana.",
+        allClear: "Tu semana cabe: ya puedes organizarla.",
+      },
+    },
+
+    stats: {
+      weeklyPeriods: "Periodos semanales",
+      committed: "Esfuerzo comprometido",
+      weekLoad: "Carga semanal",
+      openSlots_one: "de {{count}} espacio libre",
+      openSlots: "de {{count}} espacios libres",
+      slotsUsed: "{{used}} de {{total}} espacios ocupados",
+      peopleOver: "{{count}} por encima de su capacidad",
+      peopleIdle: "{{count}} sin nada asignado",
+      peopleOk: "Todos dentro de su capacidad semanal",
+      peopleNone: "Aún no has añadido a nadie",
+      itemsUnowned: "{{count}} sin {{person}} asignado",
+      itemsOk_one: "{{count}} periodo por semana",
+      itemsOk: "{{count}} periodos por semana",
+      itemsNone: "Aún no has añadido nada",
+      groupsEmpty: "{{count}} sin contenido",
+      groupsUngrouped: "{{count}} {{items}} sin {{group}}",
+      groupsOk: "Cada {{item}} está agrupado",
+      groupsNone: "Aún no has creado ninguno",
+    },
+
+    workload: {
+      title: "Carga de {{people}}",
+      desc: "Periodos solicitados frente a la capacidad semanal.",
+      capacity: "{{used}} / {{capacity}}",
+      items: "{{count}} {{items}}",
+      unavailable_one: "{{count}} espacio no disponible",
+      unavailable: "{{count}} espacios no disponibles",
+      empty: "Añade {{people}} para ver la carga aquí.",
+      state: {
+        idle: "Sin nada asignado",
+        light: "Con margen",
+        healthy: "En buen ritmo",
+        full: "Al límite",
+        over: "Por encima de su capacidad",
+      },
+    },
+
+    groups: {
+      items: "{{count}} {{items}}",
+      unowned: "{{count}} sin asignar",
+      empty: "Aquí todavía no hay nada.",
+    },
+
+    capacity: {
+      ofSlots: "{{used}} de {{total}} espacios",
+      remaining_one: "{{count}} espacio aún libre",
+      remaining: "{{count}} espacios aún libres",
+      over_one: "{{count}} periodo más del que cabe en la semana",
+      over: "{{count}} periodos más de los que caben en la semana",
+      gridSlots: "Espacios por semana",
+      blocked: "Bloqueados",
+      requested: "Solicitados",
+      heaviest: "{{items}} con más carga",
+    },
+
+    priority: {
+      title: "Reparto por prioridad",
+      row: "{{count}} {{items}}",
+      empty: "Añade {{items}} para ver el reparto.",
+    },
+
+    attention: {
+      title: "Requiere atención",
+      desc_one: "{{count}} cosa que revisar antes de generar.",
+      desc: "{{count}} cosas que revisar antes de generar.",
+      allClear: "Nada impide generar el horario.",
+      unownedItems_one:
+        "{{count}} {{items}} no tiene {{person}} asignado y se omitirá al generar.",
+      unownedItems:
+        "{{count}} {{items}} no tienen {{person}} asignado y se omitirán al generar.",
+      overloadedPeople_one:
+        "A {{count}} {{people}} se le piden más periodos de los que caben en su semana.",
+      overloadedPeople:
+        "A {{count}} {{people}} se les piden más periodos de los que caben en su semana.",
+      weekOversubscribed:
+        "El plan pide {{demand}} periodos pero solo hay {{capacity}} espacios libres.",
+      zeroPeriodItems_one: "{{count}} {{items}} tiene cero periodos por semana.",
+      zeroPeriodItems: "{{count}} {{items}} tienen cero periodos por semana.",
+      emptyGroups_one: "{{count}} {{groups}} no tiene contenido.",
+      emptyGroups: "{{count}} {{groups}} no tienen {{items}}.",
+      ungroupedItems_one: "{{count}} {{items}} no pertenece a ningún {{group}}.",
+      ungroupedItems: "{{count}} {{items}} no pertenecen a ningún {{group}}.",
+      idlePeople_one: "{{count}} {{people}} no tiene nada asignado.",
+      idlePeople: "{{count}} {{people}} no tienen nada asignado.",
+    },
+
+    readiness: {
+      title: "Configuración",
+      progress: "{{done}} de {{total}} pasos completados",
+      steps: {
+        people: "Añade tus {{people}}",
+        items: "Añade tus {{items}}",
+        owners: "Asigna un {{person}} a cada {{item}}",
+        groups: "Crea tus {{groups}}",
+        schedule: "Guarda tu primer horario",
+      },
+    },
+
+    actions: {
+      title: "Acciones rápidas",
+      manage: "Gestionar {{section}}",
+      templates: "Plantillas",
+      fixedHours: "Horas fijas",
+      schedule: {
+        education: "Abrir horario",
+        company: "Abrir planificación",
+        individual: "Abrir mi semana",
+      },
+    },
   },
 
   // ── Database Manager ──────────────────────────────────────────────────────

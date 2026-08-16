@@ -63,6 +63,156 @@ const fr = {
   dashboard: {
     title: "Tableau de bord",
     subtitle: "Bon retour ! Voici un aperçu de votre emploi du temps.",
+    viewAll: "Voir les {{count}}",
+    periods_one: "{{count}} créneau",
+    periods: "{{count}} créneaux",
+
+    modes: {
+      education: {
+        title: "Vue du trimestre",
+        subtitle: "Où en est votre emploi du temps avant de le générer.",
+        groupsTitle: "Couverture par classe",
+        groupsDesc: "Créneaux demandés par chaque classe cette semaine.",
+        capacityTitle: "La semaine de cours",
+        capacityDesc: "Créneaux disponibles face aux heures à placer.",
+        priorityDesc: "Les cours que le générateur place en premier.",
+        readinessDesc: "Ce qu'il reste à faire avant de générer un emploi du temps.",
+        allClear: "Tout est en ordre : vous pouvez générer un emploi du temps.",
+      },
+      company: {
+        title: "Vue de l'espace de travail",
+        subtitle: "Ce que l'équipe s'est engagée à faire cette semaine.",
+        groupsTitle: "Projets",
+        groupsDesc: "Charge engagée sur chaque projet cette semaine.",
+        capacityTitle: "Capacité de l'équipe",
+        capacityDesc: "Créneaux de travail disponibles face à la charge engagée.",
+        priorityDesc: "Les tâches planifiées en premier.",
+        readinessDesc: "Ce qu'il reste à faire avant de planifier la semaine.",
+        allClear: "Le plan tient : vous pouvez planifier la semaine.",
+      },
+      individual: {
+        title: "Votre semaine",
+        subtitle: "Tous vos engagements, au même endroit.",
+        groupsTitle: "Vos groupes",
+        groupsDesc: "Comment vos activités sont réparties.",
+        capacityTitle: "Le remplissage de votre semaine",
+        capacityDesc: "Créneaux libres face à ce que vous avez pris en charge.",
+        priorityDesc: "Ce qui passe en premier quand la semaine est serrée.",
+        readinessDesc: "Ce qu'il reste à faire avant d'organiser votre semaine.",
+        allClear: "Votre semaine tient : vous pouvez l'organiser.",
+      },
+    },
+
+    stats: {
+      weeklyPeriods: "Créneaux hebdomadaires",
+      committed: "Charge engagée",
+      weekLoad: "Charge de la semaine",
+      openSlots_one: "sur {{count}} créneau libre",
+      openSlots: "sur {{count}} créneaux libres",
+      slotsUsed: "{{used}} créneaux sur {{total}} pris",
+      peopleOver: "{{count}} au-delà de leur capacité",
+      peopleIdle: "{{count}} sans rien d'assigné",
+      peopleOk: "Tout le monde dans sa capacité hebdomadaire",
+      peopleNone: "Personne d'ajouté pour l'instant",
+      itemsUnowned: "{{count}} sans {{person}} assigné",
+      itemsOk_one: "{{count}} créneau par semaine",
+      itemsOk: "{{count}} créneaux par semaine",
+      itemsNone: "Rien d'ajouté pour l'instant",
+      groupsEmpty: "{{count}} sans contenu",
+      groupsUngrouped: "{{count}} {{items}} sans {{group}}",
+      groupsOk: "Chaque {{item}} est regroupé",
+      groupsNone: "Aucun créé pour l'instant",
+    },
+
+    workload: {
+      title: "Charge des {{people}}",
+      desc: "Créneaux demandés face à la capacité hebdomadaire.",
+      capacity: "{{used}} / {{capacity}}",
+      items: "{{count}} {{items}}",
+      unavailable_one: "{{count}} créneau indisponible",
+      unavailable: "{{count}} créneaux indisponibles",
+      empty: "Ajoutez des {{people}} pour voir la charge ici.",
+      state: {
+        idle: "Rien d'assigné",
+        light: "De la marge",
+        healthy: "Bon rythme",
+        full: "À pleine capacité",
+        over: "Au-delà de la capacité",
+      },
+    },
+
+    groups: {
+      items: "{{count}} {{items}}",
+      unowned: "{{count}} non assignés",
+      empty: "Rien ici pour l'instant.",
+    },
+
+    capacity: {
+      ofSlots: "{{used}} créneaux sur {{total}}",
+      remaining_one: "{{count}} créneau encore libre",
+      remaining: "{{count}} créneaux encore libres",
+      over_one: "{{count}} créneau de plus que la semaine ne peut contenir",
+      over: "{{count}} créneaux de plus que la semaine ne peut contenir",
+      gridSlots: "Créneaux par semaine",
+      blocked: "Bloqués",
+      requested: "Demandés",
+      heaviest: "{{items}} les plus lourdes",
+    },
+
+    priority: {
+      title: "Répartition par priorité",
+      row: "{{count}} {{items}}",
+      empty: "Ajoutez des {{items}} pour voir la répartition.",
+    },
+
+    attention: {
+      title: "À vérifier",
+      desc_one: "{{count}} point à regarder avant de générer.",
+      desc: "{{count}} points à regarder avant de générer.",
+      allClear: "Rien ne bloque la génération.",
+      unownedItems_one:
+        "{{count}} {{items}} n'a pas de {{person}} assigné et sera ignorée à la génération.",
+      unownedItems:
+        "{{count}} {{items}} n'ont pas de {{person}} assigné et seront ignorées à la génération.",
+      overloadedPeople_one:
+        "{{count}} {{people}} se voit demander plus de créneaux que sa semaine ne peut contenir.",
+      overloadedPeople:
+        "{{count}} {{people}} se voient demander plus de créneaux que leur semaine ne peut contenir.",
+      weekOversubscribed:
+        "Le plan demande {{demand}} créneaux alors que seuls {{capacity}} sont libres.",
+      zeroPeriodItems_one: "{{count}} {{items}} est à zéro créneau par semaine.",
+      zeroPeriodItems: "{{count}} {{items}} sont à zéro créneau par semaine.",
+      emptyGroups_one: "{{count}} {{groups}} ne contient rien.",
+      emptyGroups: "{{count}} {{groups}} ne contiennent aucune {{items}}.",
+      ungroupedItems_one: "{{count}} {{items}} n'appartient à aucun {{group}}.",
+      ungroupedItems: "{{count}} {{items}} n'appartiennent à aucun {{group}}.",
+      idlePeople_one: "{{count}} {{people}} n'a rien d'assigné.",
+      idlePeople: "{{count}} {{people}} n'ont rien d'assigné.",
+    },
+
+    readiness: {
+      title: "Configuration",
+      progress: "{{done}} étapes sur {{total}} terminées",
+      steps: {
+        people: "Ajoutez vos {{people}}",
+        items: "Ajoutez vos {{items}}",
+        owners: "Attribuez un {{person}} à chaque {{item}}",
+        groups: "Créez vos {{groups}}",
+        schedule: "Enregistrez votre premier planning",
+      },
+    },
+
+    actions: {
+      title: "Actions rapides",
+      manage: "Gérer les {{section}}",
+      templates: "Modèles",
+      fixedHours: "Heures fixes",
+      schedule: {
+        education: "Ouvrir l'emploi du temps",
+        company: "Ouvrir le planning",
+        individual: "Ouvrir ma semaine",
+      },
+    },
   },
 
   // ── Database Manager ──────────────────────────────────────────────────────

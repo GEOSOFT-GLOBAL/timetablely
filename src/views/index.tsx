@@ -1,288 +1,258 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import * as React from "react";
+import { useTranslation } from "react-i18next";
+import { IconCalendarStats, IconLayoutGrid } from "@tabler/icons-react";
+
+import AttentionPanel from "@/components/dashboard/attention-panel";
+import CapacityPanel from "@/components/dashboard/capacity-panel";
+import GroupPanel from "@/components/dashboard/group-panel";
+import PriorityPanel from "@/components/dashboard/priority-panel";
+import QuickActions from "@/components/dashboard/quick-actions";
+import ReadinessPanel from "@/components/dashboard/readiness-panel";
+import StatTile from "@/components/dashboard/stat-tile";
+import WorkloadPanel from "@/components/dashboard/workload-panel";
+import { Badge } from "@/components/ui/badge";
+import { getSolutionByMode } from "@/config/solutions";
+import { useAppMode } from "@/hooks/use-app-mode";
+import { ROUTES, buildDashboardMetrics } from "@/lib/dashboard";
 import { useDatabaseStore } from "@/store/databaseStore";
-import {
-  IconUsers,
-  IconBook,
-  IconSchool,
-  IconClock,
-  IconTrendingUp,
-  IconCalendar,
-  IconChartBar,
-} from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useOnboardingStore } from "@/store/onboardingStore";
 
+/**
+ * The overview each workspace mode actually needs.
+ *
+ * All three read the same records, but they are asking different questions:
+ * an institution wants to know whether a term can be generated, a team wants
+ * to know whether the plan fits the people, and one person wants to know
+ * whether their week is already full. The metrics are shared; the emphasis,
+ * the ordering and the vocabulary are not.
+ */
 const Dashboard = () => {
+  const { t } = useTranslation();
+  const { mode, labels, icons } = useAppMode();
   const { database } = useDatabaseStore();
-  const navigate = useNavigate();
+  const schedule = useOnboardingStore((state) => state.schedule);
+  const workspaceName = useOnboardingStore((state) => state.workspaceName);
 
-  // Calculate statistics
-  const totalTutors = database.tutors.length;
-  const totalCourses = database.courses.length;
-  const totalSessions = database.sessions.length;
-  const totalPeriods = database.courses.reduce(
-    (sum, course) => sum + course.periodsPerWeek,
-    0
+  const metrics = React.useMemo(
+    () => buildDashboardMetrics(database, schedule),
+    [database, schedule]
   );
 
-  // Priority breakdown
-  const highPriority = database.courses.filter(
-    (c) => c.priority === "HIGH"
-  ).length;
-  const mediumPriority = database.courses.filter(
-    (c) => c.priority === "MEDIUM"
-  ).length;
-  const lowPriority = database.courses.filter(
-    (c) => c.priority === "LOW"
-  ).length;
+  const solution = getSolutionByMode(mode);
+  const copy = {
+    title: t(`dashboard.modes.${mode}.title`),
+    subtitle: t(`dashboard.modes.${mode}.subtitle`),
+    groupsTitle: t(`dashboard.modes.${mode}.groupsTitle`),
+    groupsDesc: t(`dashboard.modes.${mode}.groupsDesc`),
+    capacityTitle: t(`dashboard.modes.${mode}.capacityTitle`),
+    capacityDesc: t(`dashboard.modes.${mode}.capacityDesc`),
+    priorityDesc: t(`dashboard.modes.${mode}.priorityDesc`),
+    readinessDesc: t(`dashboard.modes.${mode}.readinessDesc`),
+    allClear: t(`dashboard.modes.${mode}.allClear`),
+  };
 
-  // Teacher workload
-  const avgPeriodsPerTeacher =
-    totalTutors > 0 ? (totalPeriods / totalTutors).toFixed(1) : 0;
+  const peopleHint = () => {
+    if (metrics.peopleCount === 0) return t("dashboard.stats.peopleNone");
+    if (metrics.overloadedPeople.length > 0)
+      return t("dashboard.stats.peopleOver", {
+        count: metrics.overloadedPeople.length,
+      });
+    if (metrics.idlePeople.length > 0)
+      return t("dashboard.stats.peopleIdle", {
+        count: metrics.idlePeople.length,
+      });
+    return t("dashboard.stats.peopleOk");
+  };
 
-  const stats = [
-    {
-      title: "Total Tutors",
-      value: totalTutors,
-      icon: IconUsers,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50 dark:bg-blue-950",
-      route: "/app/tutors",
-    },
-    {
-      title: "Total Courses",
-      value: totalCourses,
-      icon: IconBook,
-      color: "text-green-600",
-      bgColor: "bg-green-50 dark:bg-green-950",
-      route: "/app/courses",
-    },
-    {
-      title: "Total Sessions",
-      value: totalSessions,
-      icon: IconSchool,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50 dark:bg-purple-950",
-      route: "/app/sessions",
-    },
-    {
-      title: "Weekly Periods",
-      value: totalPeriods,
-      icon: IconClock,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50 dark:bg-orange-950",
-      route: "/app/timetables",
-    },
-  ];
+  const itemHint = () => {
+    if (metrics.itemCount === 0) return t("dashboard.stats.itemsNone");
+    if (metrics.unownedItems.length > 0)
+      return t("dashboard.stats.itemsUnowned", {
+        count: metrics.unownedItems.length,
+        person: labels.tutor.toLowerCase(),
+      });
+    return t("dashboard.stats.itemsOk", { count: metrics.demand });
+  };
+
+  const groupHint = () => {
+    if (metrics.groupCount === 0) return t("dashboard.stats.groupsNone");
+    if (metrics.emptyGroups.length > 0)
+      return t("dashboard.stats.groupsEmpty", {
+        count: metrics.emptyGroups.length,
+      });
+    if (metrics.ungroupedItems.length > 0)
+      return t("dashboard.stats.groupsUngrouped", {
+        count: metrics.ungroupedItems.length,
+        items: (metrics.ungroupedItems.length === 1
+          ? labels.course
+          : labels.courses
+        ).toLowerCase(),
+        group: labels.session.toLowerCase(),
+      });
+    return t("dashboard.stats.groupsOk", { item: labels.course.toLowerCase() });
+  };
+
+  const attention = (
+    <AttentionPanel issues={metrics.issues} allClearHint={copy.allClear} />
+  );
+  const readiness = (
+    <ReadinessPanel steps={metrics.readiness} description={copy.readinessDesc} />
+  );
+  const workload = <WorkloadPanel loads={metrics.peopleLoads} />;
+  const groups = (
+    <GroupPanel
+      groups={metrics.groupLoads}
+      openSlots={metrics.openSlots}
+      title={copy.groupsTitle}
+      description={copy.groupsDesc}
+    />
+  );
+  const priority = (
+    <PriorityPanel metrics={metrics} description={copy.priorityDesc} />
+  );
+  const capacity = (
+    <CapacityPanel
+      metrics={metrics}
+      title={copy.capacityTitle}
+      description={copy.capacityDesc}
+      showTopItems={mode === "individual"}
+    />
+  );
 
   return (
-    <div className="flex w-full flex-col gap-6 py-4 md:py-6 px-4 lg:px-6">
+    <div className="flex w-full flex-col gap-6 px-4 py-4 md:py-6 lg:px-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Overview of your timetable management system
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
-          <Card
-            key={stat.title}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigate(stat.route)}
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.title}</p>
-                  <p className="text-3xl font-bold mt-2">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Course Priority Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconChartBar className="h-5 w-5" />
-              Course Priority Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">High Priority</span>
-                  <span className="text-sm text-muted-foreground">
-                    {highPriority} courses
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-red-500 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        totalCourses > 0
-                          ? (highPriority / totalCourses) * 100
-                          : 0
-                      }%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Medium Priority</span>
-                  <span className="text-sm text-muted-foreground">
-                    {mediumPriority} courses
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-yellow-500 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        totalCourses > 0
-                          ? (mediumPriority / totalCourses) * 100
-                          : 0
-                      }%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Low Priority</span>
-                  <span className="text-sm text-muted-foreground">
-                    {lowPriority} courses
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        totalCourses > 0
-                          ? (lowPriority / totalCourses) * 100
-                          : 0
-                      }%`,
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Teacher Workload */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconTrendingUp className="h-5 w-5" />
-              Teacher Workload
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Average Periods per Teacher
-                  </p>
-                  <p className="text-2xl font-bold mt-1">
-                    {avgPeriodsPerTeacher}
-                  </p>
-                </div>
-                <IconClock className="h-8 w-8 text-muted-foreground" />
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Total Weekly Periods
-                  </p>
-                  <p className="text-2xl font-bold mt-1">{totalPeriods}</p>
-                </div>
-                <IconCalendar className="h-8 w-8 text-muted-foreground" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col gap-2"
-              onClick={() => navigate("/app/timetables")}
-            >
-              <IconCalendar className="h-6 w-6" />
-              <span>Generate Timetable</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col gap-2"
-              onClick={() => navigate("/app/tutors")}
-            >
-              <IconUsers className="h-6 w-6" />
-              <span>Manage Tutors</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              className="h-auto py-4 flex flex-col gap-2"
-              onClick={() => navigate("/app/courses")}
-            >
-              <IconBook className="h-6 w-6" />
-              <span>Manage Courses</span>
-            </Button>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">{copy.title}</h1>
+            {solution && (
+              <Badge
+                variant="outline"
+                className={`${solution.accent.text} ${solution.accent.border}`}
+              >
+                {solution.name}
+              </Badge>
+            )}
           </div>
-        </CardContent>
-      </Card>
+          <p className="text-muted-foreground mt-1">
+            {workspaceName ? `${workspaceName} — ${copy.subtitle}` : copy.subtitle}
+          </p>
+        </div>
+      </div>
 
-      {/* Getting Started */}
-      {totalCourses === 0 && (
-        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950">
-          <CardHeader>
-            <CardTitle className="text-blue-900 dark:text-blue-100">
-              Getting Started
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-blue-800 dark:text-blue-200">
-            <p className="mb-4">
-              Welcome! To get started with your timetable management:
-            </p>
-            <ol className="list-decimal list-inside space-y-2">
-              <li>Add tutors (teachers) to your database</li>
-              <li>Create courses (subjects) and assign teachers</li>
-              <li>Set up sessions (classes) if needed</li>
-              <li>Generate your timetable automatically</li>
-            </ol>
-            <Button className="mt-4" onClick={() => navigate("/app/tutors")}>
-              Add Your First Tutor
-            </Button>
-          </CardContent>
-        </Card>
+      {/* The three record sections, plus the number that matters most here */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatTile
+          label={labels.courses}
+          value={metrics.itemCount}
+          hint={itemHint()}
+          icon={icons.courses}
+          to={ROUTES.items}
+          accent={solution?.accent}
+        />
+        <StatTile
+          label={labels.tutors}
+          value={metrics.peopleCount}
+          hint={peopleHint()}
+          icon={icons.tutors}
+          to={ROUTES.people}
+          accent={solution?.accent}
+        />
+        <StatTile
+          label={labels.sessions}
+          value={metrics.groupCount}
+          hint={groupHint()}
+          icon={icons.sessions}
+          to={ROUTES.groups}
+          accent={solution?.accent}
+        />
+        {mode === "individual" ? (
+          <StatTile
+            label={t("dashboard.stats.weekLoad")}
+            value={`${Math.round(metrics.weekLoad * 100)}%`}
+            hint={t("dashboard.stats.slotsUsed", {
+              used: metrics.demand,
+              total: metrics.openSlots,
+            })}
+            icon={IconLayoutGrid}
+            to={ROUTES.schedule}
+            accent={solution?.accent}
+          />
+        ) : (
+          <StatTile
+            label={
+              mode === "company"
+                ? t("dashboard.stats.committed")
+                : t("dashboard.stats.weeklyPeriods")
+            }
+            value={metrics.demand}
+            hint={t("dashboard.stats.openSlots", { count: metrics.openSlots })}
+            icon={IconCalendarStats}
+            to={ROUTES.schedule}
+            accent={solution?.accent}
+          />
+        )}
+      </div>
+
+      {metrics.isEmpty ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {readiness}
+          {capacity}
+        </div>
+      ) : (
+        <>
+          {/* What needs fixing, and what is left to set up */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">{attention}</div>
+            {readiness}
+          </div>
+
+          {/* Mode-specific body */}
+          {mode === "education" && (
+            <>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {workload}
+                {groups}
+              </div>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {capacity}
+                {priority}
+              </div>
+            </>
+          )}
+
+          {mode === "company" && (
+            <>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {capacity}
+                {workload}
+              </div>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {groups}
+                {priority}
+              </div>
+            </>
+          )}
+
+          {mode === "individual" && (
+            <>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {capacity}
+                {priority}
+              </div>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                {groups}
+                {/* With a workspace of one, a workload breakdown is just the
+                    same number twice — only show it once there are others. */}
+                {metrics.peopleCount > 1 ? workload : null}
+              </div>
+            </>
+          )}
+        </>
       )}
+
+      <QuickActions />
     </div>
   );
 };
