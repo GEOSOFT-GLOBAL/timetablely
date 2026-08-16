@@ -71,6 +71,13 @@ export interface WorkspaceActor {
 /** Thrown for problems worth showing the user verbatim. */
 export class WorkspaceError extends Error {}
 
+/**
+ * Stands in for the user id when nothing is signed in — a workspace created
+ * offline still needs an owner, and that owner has to keep matching after a
+ * reload or its creator loses admin of their own workspace.
+ */
+export const LOCAL_ACTOR_ID = "local-user";
+
 /** How a company user arrives at a workspace: they make one or join one. */
 export type WorkspaceIntent = "create" | "join";
 

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import {
+  LOCAL_ACTOR_ID,
   WorkspaceError,
   workspaceApi,
   type Workspace,
@@ -40,10 +41,10 @@ interface WorkspaceState {
 }
 
 /** Who is acting, taken from the signed-in user. */
-const currentActor = (): WorkspaceActor => {
+export const currentActor = (): WorkspaceActor => {
   const user = useAuthStore.getState().user;
   return {
-    id: user?.id ?? "local-user",
+    id: user?.id ?? LOCAL_ACTOR_ID,
     name:
       user?.firstname && user?.lastname
         ? `${user.firstname} ${user.lastname}`

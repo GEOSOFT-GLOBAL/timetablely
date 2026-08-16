@@ -29,7 +29,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAppMode } from "@/hooks/use-app-mode";
-import { inviteLinkFor, type WorkspaceRole } from "@/lib/workspace-api";
+import {
+  LOCAL_ACTOR_ID,
+  inviteLinkFor,
+  type WorkspaceRole,
+} from "@/lib/workspace-api";
 import { useAuthStore } from "@/store/authStore";
 import { useActiveWorkspace, useWorkspaceStore } from "@/store/workspaceStore";
 
@@ -175,9 +179,12 @@ const WorkspaceView = () => {
     );
   }
 
-  const isAdmin = workspace.members.some(
-    (member) => member.id === user?.id && member.role === "admin"
-  );
+  const actorId = user?.id ?? LOCAL_ACTOR_ID;
+  const isAdmin =
+    workspace.ownerId === actorId ||
+    workspace.members.some(
+      (member) => member.id === actorId && member.role === "admin"
+    );
   const pending = workspace.invites.filter((invite) => !invite.acceptedAt);
 
   return (
@@ -189,7 +196,10 @@ const WorkspaceView = () => {
           <p className="text-muted-foreground mt-1">
             {t("workspace.memberCount", {
               count: workspace.members.length,
-              members: labels.tutors.toLowerCase(),
+              members: (workspace.members.length === 1
+                ? labels.tutor
+                : labels.tutors
+              ).toLowerCase(),
             })}
           </p>
         </div>
@@ -377,7 +387,7 @@ const WorkspaceView = () => {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">
                     {member.name}
-                    {member.id === user?.id && (
+                    {member.id === actorId && (
                       <span className="text-muted-foreground ml-2 text-xs">
                         {t("workspace.you")}
                       </span>
@@ -388,7 +398,7 @@ const WorkspaceView = () => {
                   </p>
                 </div>
 
-                {isAdmin && member.id !== user?.id && (
+                {isAdmin && member.id !== actorId && (
                   <Button
                     variant="ghost"
                     size="icon"
