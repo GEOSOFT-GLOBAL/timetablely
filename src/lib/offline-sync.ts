@@ -32,6 +32,100 @@ interface TimetableDataWithMeta {
 }
 
 /**
+ * What a sync run actually did.
+ *
+ * The distinction matters: a run that pushed nothing and pulled nothing is a
+ * no-op the user should never hear about, and the UI decides what to announce
+ * from these numbers rather than announcing that the run happened at all.
+ */
+export interface SyncOutcome {
+  /** Queued offline changes the server accepted. */
+  pushed: number;
+  /** Queued changes the server rejected; they stay in the queue for a retry. */
+  failed: number;
+  /** The server held data we did not already have, now applied locally. */
+  pulled: boolean;
+  /** False when the fetch failed, i.e. we are working from cache alone. */
+  reachedServer: boolean;
+  errors: string[];
+}
+
+/** Nothing moved in either direction. */
+export const isNoOpSync = (outcome: SyncOutcome) =>
+  outcome.pushed === 0 && outcome.failed === 0 && !outcome.pulled;
+
+/**
+ * Key order must not decide whether data counts as "changed" — Mongo and the
+ * local store serialise the same record with fields in different orders.
+ */
+const stableStringify = (value: unknown): string => {
+  if (value === null || typeof value !== "object") {
+    return JSON.stringify(value) ?? "null";
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(",")}]`;
+  }
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, entry]) => entry !== undefined)
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  return `{${entries
+    .map(([key, entry]) => `${JSON.stringify(key)}:${stableStringify(entry)}`)
+    .join(",")}}`;
+};
+
+const fingerprintDatabase = (data: ITimetableDatabase): string =>
+  stableStringify({
+    tutors: data.tutors ?? [],
+    courses: data.courses ?? [],
+    sessions: data.sessions ?? [],
+    templates: data.templates ?? [],
+    blockedSlots: data.blockedSlots ?? [],
+    blockedTexts: data.blockedTexts ?? [],
+  });
+
+/**
+ * The fingerprint of the last payload the server gave us.
+ *
+ * Compared against the server's *previous* response rather than the local
+ * cache on purpose: local edits change the cache constantly, so comparing
+ * against it would report a change on every poll and defeat the whole point.
+ */
+const SERVER_FINGERPRINT_KEY = "server-data-fingerprint";
+
+const readServerFingerprint = async (): Promise<string | null> => {
+  try {
+    const row = await offlineDB.get<{ key: string; value: string }>(
+      STORES.SETTINGS,
+      SERVER_FINGERPRINT_KEY
+    );
+    return row?.value ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const writeServerFingerprint = async (value: string): Promise<void> => {
+  try {
+    await offlineDB.put(STORES.SETTINGS, {
+      key: SERVER_FINGERPRINT_KEY,
+      value,
+    });
+  } catch {
+    // Losing the fingerprint costs one redundant apply, not correctness.
+  }
+};
+
+/** Server payloads carry no blocked-slot data yet; the shape still needs it. */
+const asDatabase = (serverData: Record<string, unknown>): ITimetableDatabase => ({
+  tutors: (serverData.tutors || []) as ITutor[],
+  courses: (serverData.courses || []) as ICourse[],
+  sessions: (serverData.sessions || []) as ISession[],
+  blockedSlots: [],
+  blockedTexts: [],
+  templates: (serverData.templates || []) as ITimetableTemplate[],
+});
+
+/**
  * Offline sync service
  * Handles syncing data between local storage and server
  */
@@ -309,96 +403,118 @@ export const offlineSyncService = {
   },
 };
 
+/** How often a signed-in tab reconciles with the server. */
+export const SYNC_INTERVAL = 5 * 60 * 1000;
+
 /**
- * Auto-sync when back online + periodic sync every 5 minutes
+ * Push the queue, then pull anything new.
+ *
+ * Returns null when a sync is already in flight, so overlapping timers and an
+ * impatient button press cannot double-send the same queue.
+ *
+ * `applyToServerData` is a callback rather than a direct store import because
+ * the database store imports this module; calling into it from here would
+ * close the cycle.
+ */
+export const runSync = async (
+  token: string,
+  applyToServerData?: (data: ITimetableDatabase) => void
+): Promise<SyncOutcome | null> => {
+  const network = useNetworkStore.getState();
+  if (network.isSyncing) return null;
+
+  network.setSyncing(true);
+
+  try {
+    const queueResult = await offlineSyncService.processSyncQueue(token);
+
+    let pulled = false;
+    let reachedServer = false;
+
+    try {
+      const api = createApiClient(token);
+      const response = await api.get("/data");
+
+      if (response.data?.success && response.data?.data) {
+        reachedServer = true;
+        const database = asDatabase(response.data.data);
+        const fingerprint = fingerprintDatabase(database);
+
+        // Identical to the last payload means there is nothing to apply and
+        // nothing to announce.
+        if (fingerprint !== (await readServerFingerprint())) {
+          await offlineSyncService.saveTimetableData(database);
+          applyToServerData?.(database);
+          await writeServerFingerprint(fingerprint);
+          pulled = true;
+        }
+      }
+    } catch {
+      // The queue still got processed; carry on with the cached copy.
+    }
+
+    // "Last synced" means the last time we successfully reached the server,
+    // not the last time something happened to change.
+    if (reachedServer || queueResult.success > 0) {
+      useNetworkStore.getState().setLastSyncTime(Date.now());
+    }
+
+    return {
+      pushed: queueResult.success,
+      failed: queueResult.failed,
+      pulled,
+      reachedServer,
+      errors: queueResult.errors,
+    };
+  } finally {
+    useNetworkStore.getState().setSyncing(false);
+  }
+};
+
+/**
+ * Auto-sync when back online + periodic sync.
+ *
+ * `onSyncComplete` only fires for runs that moved data, so callers can treat
+ * it as "something changed" rather than "the timer ticked".
  */
 export const setupAutoSync = (
   getAuthToken: () => string | null,
-  onSyncComplete?: () => void,
+  onSyncComplete?: (outcome: SyncOutcome) => void,
   onSyncError?: (error: Error) => void
 ) => {
-  const SYNC_INTERVAL = 0.5 * 60 * 1000; // 5 minutes in milliseconds
   let syncIntervalId: ReturnType<typeof setInterval> | null = null;
 
-  // Function to perform sync
   const performSync = async () => {
     const token = getAuthToken();
     if (!token) return;
 
-    const { isSyncing, pendingChanges } = useNetworkStore.getState();
-    
-    if (isSyncing) return;
-
-    console.log("[AutoSync] Starting periodic sync...");
-    useNetworkStore.getState().setSyncing(true);
-
     try {
-      // First, process any pending changes in the queue
-      const queueResult = await offlineSyncService.processSyncQueue(token);
-      console.log("[AutoSync] Queue processing result:", queueResult);
-      
-      // Then, fetch latest data from server to keep local cache updated
-      const api = createApiClient(token);
-      try {
-        const response = await api.get("/data");
-        if (response.data.success && response.data.data) {
-          const serverData = response.data.data;
-          await offlineSyncService.saveTimetableData({
-            tutors: (serverData.tutors || []) as ITutor[],
-            courses: (serverData.courses || []) as ICourse[],
-            sessions: (serverData.sessions || []) as ISession[],
-            blockedSlots: [],
-            blockedTexts: [],
-            templates: (serverData.templates || []) as ITimetableTemplate[],
-          });
-          console.log("[AutoSync] Local cache updated from server");
-        }
-      } catch {
-        // Continue even if fetch fails - we still processed the queue
-        console.log("[AutoSync] Could not fetch latest data, using cached data");
+      const outcome = await runSync(token);
+      if (outcome && !isNoOpSync(outcome)) {
+        onSyncComplete?.(outcome);
       }
-
-      if (queueResult.success > 0 || pendingChanges > 0) {
-        useNetworkStore.getState().setLastSyncTime(Date.now());
-      }
-
-      onSyncComplete?.();
     } catch (error) {
       console.error("[AutoSync] Sync failed:", error);
-      const errorObj = error instanceof Error ? error : new Error("Sync failed");
-      onSyncError?.(errorObj);
-    } finally {
-      useNetworkStore.getState().setSyncing(false);
+      onSyncError?.(
+        error instanceof Error ? error : new Error("Sync failed")
+      );
     }
   };
 
-  // Handle network coming back online
+  // Coming back online only matters when there is something waiting to go out.
   const handleOnline = async () => {
-    const token = getAuthToken();
-    if (!token) return;
-
-    const { isSyncing, pendingChanges } = useNetworkStore.getState();
-    
-    if (isSyncing || pendingChanges === 0) return;
-
-    console.log("[AutoSync] Network restored, processing sync queue...");
+    if (useNetworkStore.getState().pendingChanges === 0) return;
     await performSync();
   };
 
-  // Setup online listener
   window.addEventListener("online", handleOnline);
-
-  // Start periodic sync interval (every 5 minutes)
   syncIntervalId = setInterval(performSync, SYNC_INTERVAL);
-  console.log(`[AutoSync] Periodic sync started - checking every ${SYNC_INTERVAL / 1000} seconds`);
 
-  // Return cleanup function
   return () => {
     window.removeEventListener("online", handleOnline);
     if (syncIntervalId) {
       clearInterval(syncIntervalId);
       syncIntervalId = null;
-      console.log("[AutoSync] Periodic sync stopped");
     }
   };
 };

@@ -56,6 +56,7 @@ const WorkspaceView = () => {
     isLoading,
     error,
     clearError,
+    loadWorkspaces,
     createWorkspace,
     joinWorkspace,
     setActiveWorkspace,
@@ -63,6 +64,13 @@ const WorkspaceView = () => {
     revokeInvite,
     removeMember,
   } = useWorkspaceStore();
+
+  // Memberships live on the server, so what this device persisted is a cache
+  // that may be stale — a colleague's invite, or a second device, would not
+  // be in it.
+  React.useEffect(() => {
+    void loadWorkspaces();
+  }, [loadWorkspaces]);
 
   const [inviteEmail, setInviteEmail] = React.useState("");
   const [inviteRole, setInviteRole] = React.useState<WorkspaceRole>("member");

@@ -2,6 +2,7 @@ import Dashboard from "@/views";
 import Blocks from "@/views/blocks";
 import Tutors from "@/views/members-view";
 import Billing from "@/views/billing";
+import BillingCallback from "@/views/billing-callback";
 import Courses from "@/views/items-view";
 import Account from "@/views/account";
 import Settings from "@/views/settings";
@@ -60,6 +61,12 @@ export const appRoutes = [
   {
     path: "billing",
     element: <Billing />,
+  },
+  {
+    // Where Paystack returns the buyer. Inside /app so the page has a token
+    // to confirm the payment with.
+    path: "billing/callback",
+    element: <BillingCallback />,
   },
   {
     path: "account",

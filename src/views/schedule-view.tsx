@@ -38,6 +38,7 @@ import {
 import { generateAITimetable } from "@/lib/ai-timetable";
 import { exportTimetableToPDF } from "@/lib/pdf-export";
 import { createExportApiClient } from "@/config/axios";
+import { useMeteredAction } from "@/hooks/use-credits";
 import { getSampleDatabaseForMode } from "@/mock/load-data";
 import { useDatabaseStore } from "@/store/databaseStore";
 import { IconCheck, IconAlertCircle, IconLoader2 } from "@tabler/icons-react";
@@ -66,6 +67,9 @@ const Timetables: React.FC<TimetablesProps> = () => {
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = React.useState(false);
   const [apiKey, setApiKey] = React.useState("");
   const [isGenerating, setIsGenerating] = React.useState(false);
+  // AI generation and PDF export are metered; this charges for them and
+  // reverses the charge if the work fails.
+  const runMetered = useMeteredAction();
 
   const {
     selectedCells,
@@ -177,17 +181,38 @@ const Timetables: React.FC<TimetablesProps> = () => {
     setApiKeyDialogOpen(false);
 
     try {
-      const newCellContents = await generateAITimetable({
-        apiKey,
-        database,
-        columnCount,
-        columnDurations,
-        defaultSlotDuration,
-        existingCellContents: cellContents,
-        hiddenCells,
-      });
+      const outcome = await runMetered(
+        "ai_schedule",
+        () =>
+          generateAITimetable({
+            apiKey,
+            database,
+            columnCount,
+            columnDurations,
+            defaultSlotDuration,
+            existingCellContents: cellContents,
+            hiddenCells,
+          }),
+        { label: "AI generation" }
+      );
 
-      gridState.setAllCellContents(newCellContents);
+      // The toast has already explained an unaffordable balance and offered
+      // the way to fix it; a second dialog on top would only be in the way.
+      if (!outcome.ok) {
+        if (outcome.reason === "unaffordable") return;
+
+        console.error("AI Generation Error:", outcome.error);
+        showDialog(
+          t('timetables.aiGenerationFailed'),
+          outcome.error instanceof Error
+            ? outcome.error.message
+            : t('timetables.aiFailedDesc'),
+          "error"
+        );
+        return;
+      }
+
+      gridState.setAllCellContents(outcome.result);
 
       const periodsCount = database.courses.reduce(
         (sum, s) => sum + s.periodsPerWeek,
@@ -198,15 +223,6 @@ const Timetables: React.FC<TimetablesProps> = () => {
         t('timetables.aiGenerated'),
         `Successfully generated timetable with ${periodsCount} periods across ${database.courses.length} subjects using AI.`,
         "success"
-      );
-    } catch (error) {
-      console.error("AI Generation Error:", error);
-      showDialog(
-        t('timetables.aiGenerationFailed'),
-        error instanceof Error
-          ? error.message
-          : t('timetables.aiFailedDesc'),
-        "error"
       );
     } finally {
       setIsGenerating(false);
@@ -253,32 +269,35 @@ const Timetables: React.FC<TimetablesProps> = () => {
       });
   };
 
-  const handleExportPDF = () => {
-    try {
-      exportTimetableToPDF({
-        cellContents,
-        columnCount,
-        columnDurations,
-        defaultSlotDuration,
-        hiddenCells,
-        title: "Weekly Timetable",
-        subtitle: "Master Schedule",
-      });
-      showDialog(
-        t('common.success'),
-        t('timetables.exportedPdf'),
-        "success"
-      );
-    } catch (error) {
-      console.error("PDF Export Error:", error);
+  const handleExportPDF = async () => {
+    const outcome = await runMetered(
+      "pdf_export",
+      () =>
+        exportTimetableToPDF({
+          cellContents,
+          columnCount,
+          columnDurations,
+          defaultSlotDuration,
+          hiddenCells,
+          title: "Weekly Timetable",
+          subtitle: "Master Schedule",
+        }),
+      { label: "PDF export" }
+    );
+
+    if (!outcome.ok) {
+      if (outcome.reason === "unaffordable") return;
+      console.error("PDF Export Error:", outcome.error);
       showDialog(t('common.error'), t('timetables.exportFailed'), "error");
+      return;
     }
+
+    showDialog(t('common.success'), t('timetables.exportedPdf'), "success");
   };
 
   const handleExportProPDF = async () => {
-    try {
-      // Create HTML content for the timetable
-      const htmlContent = `
+    // Create HTML content for the timetable
+    const htmlContent = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -317,33 +336,38 @@ const Timetables: React.FC<TimetablesProps> = () => {
         </html>
       `;
 
-      // Call the Pro API to export PDF
-      const exportApi = createExportApiClient();
-      const response = await exportApi.post("/export-pdf", {
-        html: htmlContent,
-        filename: "timetable-pro",
-      });
+    const outcome = await runMetered(
+      "pdf_export",
+      async () => {
+        // Call the Pro API to export PDF
+        const exportApi = createExportApiClient();
+        const response = await exportApi.post("/export-pdf", {
+          html: htmlContent,
+          filename: "timetable-pro",
+        });
 
-      // Handle the blob response
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "timetable-pro.pdf";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+        // Handle the blob response
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "timetable-pro.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      { label: "PDF export" }
+    );
 
-      showDialog(
-        t('common.success'),
-        t('timetables.exportedProPdf'),
-        "success"
-      );
-    } catch (error) {
-      console.error("Pro PDF Export Error:", error);
+    if (!outcome.ok) {
+      if (outcome.reason === "unaffordable") return;
+      console.error("Pro PDF Export Error:", outcome.error);
       showDialog(t('common.error'), t('timetables.exportProFailed'), "error");
+      return;
     }
+
+    showDialog(t('common.success'), t('timetables.exportedProPdf'), "success");
   };
 
   const handleGenerateAutomatedTimetable = (classId?: string) => {

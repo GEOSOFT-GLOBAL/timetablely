@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Minus } from "lucide-react";
+import { Check, Coins, Minus } from "lucide-react";
 
 import {
   Container,
@@ -23,6 +23,7 @@ import {
   pricingPlans,
   yearlySavingPercent,
 } from "@/config/pricing";
+import { useCreditsStore } from "@/store/creditsStore";
 import { cn } from "@/lib/utils";
 
 /** Rows for the at-a-glance comparison under the plan cards. */
@@ -64,6 +65,18 @@ const billingFaqs = [
 
 const Pricing = () => {
   const [isAnnually, setIsAnnually] = useState(false);
+
+  // The credit allowances come from the server catalog rather than this
+  // file, so what the page promises and what a purchase delivers cannot
+  // drift apart. The endpoint is public; no sign-in needed to read it.
+  const catalog = useCreditsStore((state) => state.catalog);
+  const loadCatalog = useCreditsStore((state) => state.loadCatalog);
+
+  useEffect(() => {
+    void loadCatalog();
+  }, [loadCatalog]);
+
+  const planCredits = catalog?.planCredits ?? {};
 
   return (
     <>
@@ -149,6 +162,13 @@ const Pricing = () => {
                       ? "per year"
                       : "per month"}
                 </p>
+
+                {planCredits[plan.id] !== undefined ? (
+                  <p className="mt-3 flex items-center gap-1.5 text-sm font-medium">
+                    <Coins className="text-primary size-4 shrink-0" />
+                    {planCredits[plan.id].toLocaleString()} credits included
+                  </p>
+                ) : null}
 
                 <p className="text-muted-foreground mt-4 text-sm">
                   {plan.description}

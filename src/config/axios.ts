@@ -9,6 +9,8 @@ export enum ApiPath {
   AUTH = "/auth",
   TIMETABLELY = "/timetablely/sync",
   TIMETABLELY_EXPORT = "/timetablely/export",
+  CREDITS = "/credits",
+  WORKSPACES = "/workspaces",
 }
 
 /**
@@ -70,5 +72,16 @@ export const authApi = createAuthApiClient();
 export const getAuthenticatedClient = (token: string): AxiosInstance => {
   return createApiClient(token);
 };
+
+/**
+ * Credits and workspaces sit at the service root rather than under the
+ * timetablely namespace, so they need their own base path — the default
+ * client would prefix them with /timetablely/sync.
+ */
+export const createCreditsClient = (token?: string): AxiosInstance =>
+  createApiClient(token, ApiPath.CREDITS);
+
+export const createWorkspacesClient = (token: string): AxiosInstance =>
+  createApiClient(token, ApiPath.WORKSPACES);
 
 export default apiClient;

@@ -4,6 +4,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { IconBell, IconMenu2 } from "@tabler/icons-react";
 import { NavLink } from "react-router-dom";
 import { SyncStatus } from "./sync-status";
+import { CreditBalance } from "./credit-balance";
 
 interface SiteHeaderProps {
   title?: string;
@@ -28,7 +29,9 @@ export function SiteHeader({ title = "Overview" }: SiteHeaderProps) {
         
         <div className="ml-auto flex items-center gap-2">
           <SyncStatus />
-          
+
+          <CreditBalance />
+
           <Button
             variant="ghost"
             size="icon"

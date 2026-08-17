@@ -27,6 +27,8 @@ interface WorkspaceState {
   isLoading: boolean;
   error: string | null;
 
+  /** Replaces local state with the server's list of memberships. */
+  loadWorkspaces: () => Promise<void>;
   createWorkspace: (name: string) => Promise<Workspace | null>;
   joinWorkspace: (code: string) => Promise<Workspace | null>;
   setActiveWorkspace: (workspaceId: string) => void;
@@ -81,6 +83,33 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         activeWorkspaceId: null,
         isLoading: false,
         error: null,
+
+        loadWorkspaces: async () => {
+          const token = useAuthStore.getState().token;
+          if (!token) return;
+
+          set({ isLoading: true, error: null });
+          try {
+            const workspaces = await workspaceApi.list(token);
+            set((state) => ({
+              workspaces,
+              // A persisted active id that is no longer a membership — left
+              // over from another account, or a workspace since left — would
+              // otherwise point the whole app at nothing.
+              activeWorkspaceId: workspaces.some(
+                (workspace) => workspace.id === state.activeWorkspaceId
+              )
+                ? state.activeWorkspaceId
+                : (workspaces[0]?.id ?? null),
+              isLoading: false,
+            }));
+          } catch (error) {
+            set({
+              isLoading: false,
+              error: messageFor(error, "Could not load your workspaces."),
+            });
+          }
+        },
 
         createWorkspace: async (name) => {
           if (!name.trim()) {

@@ -1,36 +1,40 @@
-import { getAuthenticatedClient } from "@/config/axios";
+import { createWorkspacesClient } from "@/config/axios";
 
 /**
  * Workspace transport.
  *
- * ../service has no workspace model yet, so every call here resolves against
- * local persistence instead. The endpoint paths and payload shapes below are
- * the contract the server should implement — when it does, set
- * `SERVER_BACKED` to true and nothing above this file has to change.
+ * ../service now implements the contract below, so a signed-in user's
+ * workspaces live on the server: invite codes resolve between people rather
+ * than only within one browser, and a workspace can own a shared credit
+ * balance, which requires membership the server can verify.
  *
- * What local mode can and cannot do is worth being precise about: a workspace
- * created in this browser can be joined from this browser, because the code
- * is in the device registry. An invite code from a colleague cannot resolve
- * until the server exists, and `joinWorkspace` says so rather than pretending.
+ * The local path is kept for the signed-out case. It resolves against a
+ * device registry, so a workspace created in this browser can be joined from
+ * this browser but a colleague's code cannot — `localJoin` says so rather
+ * than pretending.
  */
 
-const SERVER_BACKED = false;
+const SERVER_BACKED = true;
 
+/**
+ * Paths relative to the `/workspaces` base the client is built with, so the
+ * namespace appears once rather than in every call.
+ */
 export const workspaceEndpoints = {
   /** POST { name } -> Workspace */
-  create: "/workspaces",
+  create: "/",
   /** POST { code } -> Workspace */
-  join: "/workspaces/join",
+  join: "/join",
   /** GET -> Workspace[] */
-  list: "/workspaces",
+  list: "/",
   /** POST { email, role } -> WorkspaceInvite */
-  invites: (workspaceId: string) => `/workspaces/${workspaceId}/invites`,
-  /** DELETE -> void */
+  invites: (workspaceId: string) => `/${workspaceId}/invites`,
+  /** DELETE -> Workspace */
   invite: (workspaceId: string, code: string) =>
-    `/workspaces/${workspaceId}/invites/${code}`,
-  /** DELETE -> void */
+    `/${workspaceId}/invites/${code}`,
+  /** DELETE -> Workspace */
   member: (workspaceId: string, memberId: string) =>
-    `/workspaces/${workspaceId}/members/${memberId}`,
+    `/${workspaceId}/members/${memberId}`,
 } as const;
 
 export type WorkspaceRole = "admin" | "member" | "viewer";
@@ -211,7 +215,7 @@ export const workspaceApi = {
     token?: string | null
   ): Promise<Workspace> => {
     if (SERVER_BACKED && token) {
-      const { data } = await getAuthenticatedClient(token).post(
+      const { data } = await createWorkspacesClient(token).post(
         workspaceEndpoints.create,
         { name }
       );
@@ -226,7 +230,7 @@ export const workspaceApi = {
     token?: string | null
   ): Promise<Workspace> => {
     if (SERVER_BACKED && token) {
-      const { data } = await getAuthenticatedClient(token).post(
+      const { data } = await createWorkspacesClient(token).post(
         workspaceEndpoints.join,
         { code: normaliseCode(code) }
       );
@@ -242,7 +246,7 @@ export const workspaceApi = {
     token?: string | null
   ): Promise<WorkspaceInvite> => {
     if (SERVER_BACKED && token) {
-      const { data } = await getAuthenticatedClient(token).post(
+      const { data } = await createWorkspacesClient(token).post(
         workspaceEndpoints.invites(workspace.id),
         { email, role }
       );
@@ -269,7 +273,7 @@ export const workspaceApi = {
     token?: string | null
   ): Promise<void> => {
     if (SERVER_BACKED && token) {
-      await getAuthenticatedClient(token).delete(
+      await createWorkspacesClient(token).delete(
         workspaceEndpoints.invite(workspace.id, code)
       );
       return;
@@ -287,7 +291,7 @@ export const workspaceApi = {
     token?: string | null
   ): Promise<void> => {
     if (SERVER_BACKED && token) {
-      await getAuthenticatedClient(token).delete(
+      await createWorkspacesClient(token).delete(
         workspaceEndpoints.member(workspace.id, memberId)
       );
       return;
@@ -297,6 +301,22 @@ export const workspaceApi = {
       ...workspace,
       members: workspace.members.filter((member) => member.id !== memberId),
     });
+  },
+
+  /**
+   * Every workspace this user belongs to.
+   *
+   * Signing in on a second device has nothing in local state to show, so the
+   * store calls this rather than trusting what it persisted.
+   */
+  list: async (token?: string | null): Promise<Workspace[]> => {
+    if (SERVER_BACKED && token) {
+      const { data } = await createWorkspacesClient(token).get(
+        workspaceEndpoints.list
+      );
+      return (data.data ?? []) as Workspace[];
+    }
+    return readRegistry();
   },
 
   /** Kept so the store can refresh from whichever source is authoritative. */

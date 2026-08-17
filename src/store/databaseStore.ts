@@ -58,11 +58,13 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
     // Save to offline storage but don't queue for sync
     try {
       await offlineSyncService.saveTimetableData(database);
-      // Clear the sync queue since this is server data
-      await offlineSyncService.clearSyncQueue();
-      useNetworkStore.getState().setPendingChanges(0);
-      
-      console.log("[DatabaseStore] Data loaded from server, queue cleared");
+
+      // The queue is not cleared here. Anything still in it is a local edit
+      // the server has not accepted yet — dropping it because a *read*
+      // succeeded would silently discard the user's offline work. Items that
+      // did reach the server were already removed as they were sent.
+      const queue = await offlineSyncService.getSyncQueue();
+      useNetworkStore.getState().setPendingChanges(queue.length);
     } catch (error) {
       console.error("[DatabaseStore] Failed to save server data:", error);
     }
