@@ -3,7 +3,7 @@
 ## Planned Features
 
 - Be able to merge already merged (rectangular) cells
-- Be able to sync timetable to the server
+✅ Be able to sync timetable to the server
 ✅ Add AI generation using Gemini
 - Export to PDF using Rust
 ✅ Add background colors to cells
@@ -55,7 +55,7 @@
 
 ### Mobile & Offline
 - Progressive Web App (PWA) support
-- Offline mode with local storage sync
+✅ Offline mode with local storage sync
 - Native mobile apps (iOS/Android)
 - Widget support for mobile home screens
 
@@ -63,7 +63,7 @@
 - Calendar app integrations (Google, Apple, Outlook)
 - Slack/Discord notifications
 - Zapier/Make.com automation support
-- API for third-party integrations
+✅ API for third-party integrations (API keys + the Timetablely SDK)
 - Webhook support for custom workflows
 
 ### Accessibility & UX

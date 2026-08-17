@@ -17,7 +17,9 @@ Welcome to Timetablely! This guide will help you create and manage school timeta
 11. [Templates](#templates)
 12. [Special Blocks](#special-blocks)
 13. [Exporting Timetables](#exporting-timetables)
-14. [Tips & Best Practices](#tips--best-practices)
+14. [Where Your Data Lives](#where-your-data-lives)
+15. [API Keys & the SDK](#api-keys--the-sdk)
+16. [Tips & Best Practices](#tips--best-practices)
 
 ---
 
@@ -629,6 +631,76 @@ Export timetable data for:
 - Time slot information
 - Merged cell data
 - Formatting details
+
+---
+
+## Where Your Data Lives
+
+### Signed in
+
+Your tutors, courses, sessions, templates, and special blocks are kept on the
+Timetablely service and cached in your browser. Signing in on a second device
+brings your data with you.
+
+Editing does not wait for the network. Changes are written locally and queued,
+then pushed the next time a sync runs — on a timer, when the browser comes
+back online, or when you sync by hand. The **sync status** indicator shows
+what is pending.
+
+Because the local copy is authoritative until the server accepts it, closing
+the tab with changes still queued does not lose them; they go out on your next
+visit.
+
+### Quick Start (not signed in)
+
+Nothing is saved. Quick Start is for trying the app out — export before you
+close the tab.
+
+---
+
+## API Keys & the SDK
+
+Timetablely can be embedded in another site with the Timetablely SDK
+(`@geo-soft/timetablely-sdk`), which reads the same records you maintain here
+rather than a copy of them.
+
+### Creating a key
+
+There is no screen for this yet — keys are created against the service
+directly, with the access token from your signed-in session:
+
+```bash
+curl -X POST https://geosoft-service.onrender.com/api/v1/api-keys \
+  -H "Authorization: Bearer <your-access-token>" \
+  -H "X-App-Source: timetablely" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Marketing site", "scopes": ["read"]}'
+```
+
+The response carries `apiSecret`. Copy it — it is shown once and never again,
+because only its hash is stored.
+
+`GET /api-keys` lists your keys; `DELETE /api-keys/:id` revokes one. Both need
+the same bearer token: an API key cannot manage API keys, or revoking a leaked
+one would not contain it.
+
+### Scopes
+
+- **read** — load your timetable data. This is the scope for a public page
+  that displays a schedule.
+- **write** — also push changes back.
+
+### Keeping a key safe
+
+A key acts as you. Anything it can reach, whoever holds it can reach.
+
+- A key placed in front-end code is readable by anyone who views the page.
+  Use a **read** key there, so the worst case is someone reading a timetable
+  you were already publishing.
+- Use **write** keys only where the credentials stay on a server.
+- Revoke a key the moment you suspect it leaked. Revoking takes effect
+  immediately, and the record stays so you can still see when it was last
+  used.
 
 ---
 

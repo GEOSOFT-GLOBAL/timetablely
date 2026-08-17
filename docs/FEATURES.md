@@ -31,6 +31,12 @@ Complete feature list and capabilities of Timetablely timetable management syste
 - **Courses Database** - Define subjects and assignments
 - **Sessions Database** - Organize by class groups
 - **Special Blocks** - Define breaks, lunch, assemblies
+- **Server Sync** - Signed-in data lives on the service, not just the browser
+- **Offline Editing** - Changes queue locally and push when the network returns
+
+### Integration
+- **API Keys** - Read/write scoped credentials, issued per user
+- **Timetablely SDK** - Embed the grid elsewhere against the same records
 
 ### Automation
 - **Standard Generation** - Rule-based timetable creation
@@ -659,8 +665,14 @@ Save and reuse timetable layouts for efficiency.
 **State Management:**
 - React hooks (useState, useEffect)
 - Custom hooks (useGridState, useStorage)
-- Zustand (database store)
+- Zustand (database, auth, network, workspace, credits stores)
+- IndexedDB (offline cache and sync queue)
 - Session/Local storage
+
+**Backend:**
+- Shared geosoft service (`/api/v1`)
+- JWT bearer auth for the app, API key pairs for the SDK
+- Timetable records under `/timetablely/sync`
 
 **UI Components:**
 - Shadcn/ui
